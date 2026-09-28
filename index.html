@@ -23,7 +23,7 @@ small{display:block;margin-top:14px;color:#7b8390}.status{margin-top:14px;min-he
 <script>
 const button=document.querySelector('#ar'),status=document.querySelector('#status');
 button.addEventListener('click',()=>{
- const file=new URL('./Desk.glb',location.href).href;
+ const file=new URL('./desk-200-drawers-left.glb',location.href).href;
  if(!/Android/i.test(navigator.userAgent)){
    status.textContent='Bu pilot şu anda Android / ARCore cihazlarda test ediliyor.';
    return;
