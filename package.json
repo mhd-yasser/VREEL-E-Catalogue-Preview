@@ -1,0 +1,13 @@
+{
+  "name": "vreel-e-catalogue",
+  "private": true,
+  "scripts": {
+    "test:storage": "node tests/storage.cjs",
+    "test:browser": "node tests/authoring.cjs"
+  },
+  "devDependencies": {
+    "fake-indexeddb": "6.2.5",
+    "playwright": "1.62.1"
+  },
+  "type": "module"
+}

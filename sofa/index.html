@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="VREEL interaktif Lounge Duo yapılandırıcısı.">
+  <title>VREEL | Lounge Duo</title>
+  <link rel="stylesheet" href="../styles.css">
+  <link rel="stylesheet" href="../font.css">
+  <script type="importmap">{"imports":{"three":"../vendor/three.module.js","three/addons/":"../vendor/addons/"}}</script>
+  <script src="../vendor/jspdf.umd.min.js"></script>
+</head>
+<body data-product="sofa">
+  <svg class="icon-defs" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+    <symbol id="ico-camera" viewBox="0 0 24 24"><path d="M4 7h4l2-2h4l2 2h4v12H4z"/><circle cx="12" cy="13" r="3.5"/></symbol>
+    <symbol id="ico-measure" viewBox="0 0 24 24"><path d="m3 16 13-13 5 5L8 21zM11 8l2 2m-5 1 2 2m-5 1 2 2"/></symbol>
+    <symbol id="ico-expand" viewBox="0 0 24 24"><path d="M9 3H3v6m12-6h6v6M3 15v6h6m12-6v6h-6"/></symbol>
+    <symbol id="ico-collapse" viewBox="0 0 24 24"><path d="M3 9h6V3m12 6h-6V3M3 15h6v6m12-6h-6v6"/></symbol>
+    <symbol id="ico-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5M17.5 17.5 19 19M19 5l-1.5 1.5M6.5 17.5 5 19"/></symbol>
+    <symbol id="ico-rotate" viewBox="0 0 24 24"><path d="M20 11a8 8 0 1 0-2 6M20 5v6h-6"/></symbol>
+    <symbol id="ico-plus" viewBox="0 0 24 24"><circle cx="10" cy="10" r="6"/><path d="M10 7v6m-3-3h6m1.5 4.5L21 21"/></symbol>
+    <symbol id="ico-minus" viewBox="0 0 24 24"><circle cx="10" cy="10" r="6"/><path d="M7 10h6m1.5 4.5L21 21"/></symbol>
+    <symbol id="ico-left" viewBox="0 0 24 24"><path d="M20 12H4m7-7-7 7 7 7"/></symbol>
+    <symbol id="ico-right" viewBox="0 0 24 24"><path d="M4 12h16m-7-7 7 7-7 7"/></symbol>
+    <symbol id="ico-reset" viewBox="0 0 24 24"><path d="M4 9V4h5M4 9a8 8 0 1 1 0 6"/></symbol>
+    <symbol id="ico-front" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="14" rx="2"/><path d="M4 10h16"/></symbol>
+    <symbol id="ico-side" viewBox="0 0 24 24"><path d="M5 5h14v14H5zM12 5v14"/></symbol>
+    <symbol id="ico-top" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 10h16m-10 0v10"/></symbol>
+    <symbol id="ico-ar" viewBox="0 0 24 24"><path d="m12 2 9 5v10l-9 5-9-5V7zM3 7l9 5 9-5M12 12v10"/></symbol>
+  </svg>
+  <main class="configurator">
+    <section class="viewer-panel" aria-label="Etkileşimli 3B ürün görünümü">
+      <header class="topbar">
+        <div class="brand">VREEL <span>ETKİLEŞİMLİ TASARIM</span></div>
+        <a class="gallery-back" href="../products/" aria-label="Ürün galerisine dön">← <span>Galeriye Dön</span></a>
+        <div class="product-mark"><strong>Lounge Duo</strong><span>Hayal et. Yapılandır. Gerçekleştir.</span></div>
+      </header>
+
+      <div id="product-viewer" role="img" aria-label="Yapılandırılabilir Lounge Duo ve koltuğu">
+        <div slot="progress-bar" class="progress"><span></span></div>
+      </div>
+      <div id="model-loading" class="model-loading" role="status">3D model hazırlanıyor…</div>
+
+      <div id="material-wheel" class="material-wheel" hidden role="group" aria-label="Malzeme seçenekleri">
+        <button id="wheel-drag" class="wheel-drag" type="button" aria-label="Malzeme çarkını taşı" title="Sürükleyerek taşı">⠿ Taşı</button>
+        <div id="wheel-options" class="wheel-options"></div>
+        <div class="wheel-core"><span>MALZEME</span><strong id="wheel-title"></strong><small id="wheel-current"></small><div class="wheel-pages" hidden><button id="wheel-prev" aria-label="Önceki seçenekler">‹</button><span id="wheel-page"></span><button id="wheel-next" aria-label="Sonraki seçenekler">›</button></div></div>
+        <button id="wheel-close" class="wheel-close" aria-label="Malzeme çarkını kapat">×</button>
+      </div>
+      <p class="viewer-hint">Malzeme seçmek için parçaya dokunun. Döndürmek için sürükleyin.</p>
+      <div class="viewer-utilities" role="group" aria-label="Görünüm araçları">
+        <button type="button" data-action="snapshot" title="Görüntü kaydet" aria-label="Görüntü kaydet"><svg><use href="#ico-camera"/></svg></button>
+        <button type="button" data-action="snapshot-4k" title="4K görüntü kaydet" aria-label="4K görüntü kaydet">4K</button>
+        <button type="button" data-action="dimensions" aria-pressed="false" title="Ölçüleri göster" aria-label="Ölçüleri göster"><svg><use href="#ico-measure"/></svg></button>
+        <button type="button" data-action="ar" disabled title="AR yakında" aria-label="Artırılmış gerçeklik, yakında"><svg><use href="#ico-ar"/></svg></button>
+        <button type="button" data-action="fullscreen" title="Tam ekran" aria-label="Tam ekran"><svg><use href="#ico-expand"/></svg></button>
+      </div>
+      <div id="dimensions-overlay" class="dimensions-overlay" hidden aria-live="polite"></div>
+      <div class="lighting-presets" role="group" aria-label="Aydınlatma modu" hidden>
+        <button type="button" data-lighting="default" aria-pressed="false">Default</button>
+        <button type="button" data-lighting="studio" aria-pressed="false">Studio</button>
+        <button type="button" data-lighting="cinematic" aria-pressed="true">Cinematic</button>
+      </div>
+
+      <nav class="viewer-tools" aria-label="Kamera kontrolleri">
+        <button data-action="lighting-menu" title="Aydınlatma" aria-label="Aydınlatma"><svg><use href="#ico-sun"/></svg></button>
+        <button data-action="rotate" aria-pressed="false" title="Otomatik döndür" aria-label="Otomatik döndür"><svg><use href="#ico-rotate"/></svg></button>
+        <button data-action="zoom-in" title="Yakınlaştır" aria-label="Yakınlaştır"><svg><use href="#ico-plus"/></svg></button>
+        <button data-action="zoom-out" title="Uzaklaştır" aria-label="Uzaklaştır"><svg><use href="#ico-minus"/></svg></button>
+        <button data-action="pan-left" title="Sola kaydır" aria-label="Sola kaydır"><svg><use href="#ico-left"/></svg></button>
+        <button data-action="pan-right" title="Sağa kaydır" aria-label="Sağa kaydır"><svg><use href="#ico-right"/></svg></button>
+        <button data-action="reset" title="Kamera açısını sıfırla" aria-label="Kamera açısını sıfırla"><svg><use href="#ico-reset"/></svg></button>
+        <i></i>
+        <button data-view="front" title="Ön görünüş" aria-label="Ön görünüş">Ön</button>
+        <button data-view="side" title="Yan görünüş" aria-label="Yan görünüş">Yan</button>
+        <button data-view="top" title="Üst görünüş" aria-label="Üst görünüş">Üst</button>
+      </nav>
+      <label class="rotation-speed">Dönüş hızı <input id="rotation-speed" type="range" min="15" max="80" value="40"><output>40°/sn</output></label>
+    </section>
+
+    <aside class="product-panel">
+      <div class="panel-heading">
+        <p class="eyebrow">ETKİLEŞİMLİ ÜRÜN DENEYİMİ</p>
+        <h1>Lounge Duo</h1>
+        <p class="lead">Deri yüzeyini ve modül sayısını seçin veya modeldeki bir parçaya dokunun.</p>
+      </div>
+
+      <div class="tabs" role="tablist">
+        <button class="tab active" data-tab="configure" role="tab">YAPILANDIR</button>
+        <button class="tab" data-tab="details" role="tab">ÜRÜN DETAYLARI</button>
+      </div>
+
+      <section id="configure" class="tab-panel active">
+        <div id="material-groups"></div>
+
+
+        <div class="summary" hidden><span>Seçilen yüzeyler</span><strong id="selection"></strong></div>
+        <div class="downloads">
+          <button id="datasheet">PDF Oluştur</button>
+          <button id="reset-materials" type="button">Malzemeleri Sıfırla</button>
+          <button id="source-download" type="button">3D İndir</button>
+        </div>
+        <button id="add" class="primary">Sipariş Ver <span>→</span></button>
+        <p id="notice" class="notice" role="status"></p>
+      </section>
+
+      <section id="details" class="tab-panel">
+        <h2>Modüler oturum, çağdaş karakter</h2>
+        <p>Geniş oturum yüzeyi, yumuşak hatları ve rahat minder yapısıyla modern bekleme ve dinlenme alanları için tasarlanmış modüler oturma çözümü. Sosyal alanlara güçlü, sade ve çağdaş bir karakter kazandırır.</p>
+        <dl class="detail-list">
+          <div><dt>Yapılandırma</dt><dd>İkili</dd></div>
+        </dl>
+        <dl id="material-details" class="detail-list"></dl>
+        <h3>Malzeme Teknik Föyleri</h3>
+        <div class="material-files"><button disabled>Tabla Malzemesi</button><button disabled>Metal Yüzey</button><button disabled>Koltuk Döşemesi</button></div>
+        <p class="coming">Malzeme dosyaları, onaylı dokümanlar eklendiğinde seçime göre etkinleşecektir.</p>
+      </section>
+      <p class="powered">VREEL tarafından geliştirilen etkileşimli ürün deneyimi</p>
+    </aside>
+  </main>
+
+  <div id="pdf-modal" class="modal" hidden>
+    <div class="modal-card"><button class="modal-close" aria-label="Kapat">×</button><h2>Ürün Teknik Föyü</h2><p>Mevcut görünüm ve seçimlerle A4 teknik föy hazırlandı.</p><div id="pdf-preview"></div><button id="download-pdf" class="primary">PDF İndir</button></div>
+  </div>
+  <div id="order-modal" class="modal" hidden>
+    <div class="modal-card order-card" role="dialog" aria-modal="true" aria-labelledby="order-title">
+      <button class="modal-close" data-close-order aria-label="Kapat">×</button>
+      <h2 id="order-title">Sipariş Talebi</h2>
+      <p>Seçtiğiniz ürün için iletişim bilgilerinizi girin.</p>
+      <div class="order-tabs"><button type="button" data-order-tab="login">Giriş Yap</button><button type="button" data-order-tab="register" class="active">Kayıt Ol</button></div>
+      <p id="order-account-note" class="order-note">Üyelik ve sipariş gönderimi henüz bağlı değil. Bilgileriniz kaydedilmez.</p>
+      <form id="order-form">
+        <label>Ad Soyad <input name="name" autocomplete="name" required maxlength="100"></label>
+        <label>Şirket / Kurum <input name="company" autocomplete="organization" maxlength="120"></label>
+        <label>E-posta <input name="email" type="email" autocomplete="email" required maxlength="160"></label>
+        <label>Telefon <input name="phone" type="tel" autocomplete="tel" required maxlength="40"></label>
+        <label>Şehir / Ülke <input name="location" autocomplete="address-level2" maxlength="120"></label>
+        <label>Adet ve Notlar <textarea name="note" rows="3" maxlength="1000"></textarea></label>
+        <div class="order-summary" id="order-summary"></div>
+        <button class="primary" type="submit">Siparişi Gönder</button>
+        <p id="order-status" class="notice" role="status"></p>
+      </form>
+    </div>
+  </div>
+  <div id="source-modal" class="modal" hidden>
+    <div class="modal-card source-card" role="dialog" aria-modal="true" aria-labelledby="source-title">
+      <button type="button" class="modal-close" data-close-source aria-label="Kapat">×</button>
+      <h2 id="source-title">3D İndir</h2>
+      <p>Şirket bilgilerinizi doğrulayın ve indirmek istediğiniz dosya türünü seçin. Bu form şu anda bilgilerinizi göndermez veya kaydetmez.</p>
+      <form id="source-form">
+        <label>Şirket adı <input name="company" autocomplete="organization" placeholder="Şirket adınız" required maxlength="120"></label>
+        <label>Şirket türü <select name="type" required><option value="Mimarlık ofisi" selected>Mimarlık ofisi</option><option value="İç mimarlık firması">İç mimarlık firması</option><option value="Gayrimenkul geliştiricisi">Gayrimenkul geliştiricisi</option><option value="Mobilya üreticisi">Mobilya üreticisi</option><option value="Diğer">Diğer</option></select></label>
+        <label>E-posta <input name="email" type="email" autocomplete="email" placeholder="ad@firma.com" required maxlength="160"></label>
+        <label>Telefon / WhatsApp <input name="phone" type="tel" autocomplete="tel" placeholder="+90 …" required maxlength="40"></label>
+        <button class="primary" type="submit">Bilgileri Onayla</button>
+      </form>
+      <div id="source-downloads" hidden>
+        <p class="source-note">Dosyalar henüz yüklenmedi. Hazır olan türler burada indirilebilir.</p>
+        <div class="source-actions"><button type="button" data-source-format="dwg">DWG İndir</button><button type="button" data-source-format="max">3ds Max İndir</button><button type="button" data-source-format="fbx">FBX İndir</button></div>
+        <p id="source-status" class="notice" role="status"></p>
+      </div>
+    </div>
+  </div>
+  <div id="reset-modal" class="modal" hidden>
+    <div class="modal-card confirm-card" role="alertdialog" aria-modal="true" aria-labelledby="reset-title">
+      <h2 id="reset-title">Malzemeler sıfırlansın mı?</h2><p>Tüm yüzeyler başlangıç seçeneklerine dönecek.</p>
+      <div class="confirm-actions"><button type="button" id="cancel-reset">Vazgeç</button><button type="button" id="confirm-reset" class="primary">Evet, sıfırla</button></div>
+    </div>
+  </div>
+  <script type="module" src="../viewer-app.js"></script>
+</body>
+</html>

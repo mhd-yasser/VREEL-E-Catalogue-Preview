@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Ürün Hazırlama | VREEL</title>
+    <link rel="stylesheet" href="../font.css" />
+    <link rel="stylesheet" href="author.css" />
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "../vendor/three.module.js",
+          "three/addons/": "../vendor/addons/"
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <header>
+      <a href="../products/"
+        ><img
+          src="../products/assets/vreel-studio-header.svg"
+          alt="VREEL Studio"
+          width="170" /></a
+      ><span class="workspace">KATALOG ÇALIŞMA ALANI</span
+      ><button id="save">Taslağı kaydet</button>
+    </header>
+    <div class="layout">
+      <aside>
+        <p class="eyebrow">ÜRÜN HAZIRLAMA</p>
+        <h1>Modelden<br />kataloğa.</h1>
+        <nav id="steps">
+          <button data-step="1" class="active">
+            <b>01</b> Ürün ve dosyalar</button
+          ><button data-step="2"><b>02</b> Malzeme eşleştirme</button
+          ><button data-step="3"><b>03</b> Önizleme ve kontrol</button>
+        </nav>
+        <div class="scope">
+          <strong>Yerel pilot</strong>
+          <p>
+            Dosyalar ve kayıtlar yalnızca bu tarayıcıda saklanır. Genel kataloğa
+            yüklenmez.
+          </p>
+        </div>
+        <label
+          >Kayıtlı ürünler<select id="drafts">
+            <option value="">Ürün seçin</option>
+          </select></label
+        ><button id="new">+ Yeni ürün</button>
+      </aside>
+      <main>
+        <div class="page-heading">
+          <div>
+            <p class="eyebrow" id="step-label">ADIM 01 / 03</p>
+            <h2 id="page-title">Yeni ürün ekleyin</h2>
+            <p id="page-subtitle">
+              Ürününüzün bilgilerini, modelini ve sunum özelliklerini
+              hazırlayın.
+            </p>
+          </div>
+          <span class="badge" id="state">Kaydedilmedi</span>
+        </div>
+        <p id="notice" role="status" aria-live="polite"></p>
+        <section id="setup">
+          <div class="setup-grid">
+            <div>
+              <article>
+                <h3>01 · Temel bilgiler</h3>
+                <div class="fields">
+                  <label
+                    >Ürün adı *<input
+                      id="name"
+                      maxlength="120"
+                      placeholder="Örn. BARI Banyo Dolabı" /></label
+                  ><label
+                    >Ürün kodu<input
+                      id="code"
+                      maxlength="80"
+                      placeholder="BARI-100" /></label
+                  ><label
+                    >Kategori<input
+                      id="category"
+                      maxlength="80"
+                      list="categories"
+                      placeholder="Kategori seçin"
+                    /><datalist id="categories">
+                      <option>Banyo mobilyası</option>
+                      <option>Ofis mobilyası</option>
+                      <option>Oturma grubu</option>
+                    </datalist></label
+                  ><label
+                    >Birim<select id="unit">
+                      <option>mm</option>
+                      <option>cm</option>
+                      <option>m</option>
+                    </select></label
+                  ><label class="wide"
+                    >Açıklama<textarea
+                      id="description"
+                      rows="3"
+                      maxlength="3000"
+                      placeholder="Ürününüzü müşterilere tanıtın."
+                    ></textarea>
+                  </label>
+                </div>
+                <div class="dimensions">
+                  <label
+                    >Genişlik<input
+                      id="width"
+                      type="number"
+                      min="0"
+                      step="any" /></label
+                  ><label
+                    >Derinlik<input
+                      id="depth"
+                      type="number"
+                      min="0"
+                      step="any" /></label
+                  ><label
+                    >Yükseklik<input
+                      id="height"
+                      type="number"
+                      min="0"
+                      step="any"
+                  /></label>
+                </div>
+                <small
+                  >Girilen ölçüler bilgi amaçlıdır; modelin fiziksel ölçeğini
+                  değiştirmez.</small
+                >
+              </article>
+              <article>
+                <h3>02 · 3D model</h3>
+                <label class="drop" id="drop"
+                  ><span class="upload-icon">↥</span
+                  ><strong>GLB dosyanızı buraya bırakın</strong
+                  ><span>veya dosya seçin · gömülü dokular içeren GLB</span
+                  ><input id="model-file" type="file" accept=".glb"
+                /></label>
+                <p id="model-status">Henüz model seçilmedi.</p>
+                <button id="example">Örnek masa ile deneyin</button
+                ><small
+                  >Yeni bir model yüklemek mevcut eşleştirmeleri
+                  sıfırlar.</small
+                >
+              </article>
+              <article>
+                <h3>03 · Malzemeler ve ek dosyalar</h3>
+                <div class="asset-upload">
+                  <label
+                    >Malzeme görselleri
+                    <input
+                      id="textures"
+                      type="file"
+                      accept="image/png,image/jpeg,image/webp"
+                      multiple /></label
+                  ><label
+                    >Ürün görselleri
+                    <input
+                      id="photos"
+                      type="file"
+                      accept="image/png,image/jpeg,image/webp"
+                      multiple /></label
+                  ><label
+                    >İndirilebilir dosyalar
+                    <input id="attachments" type="file" multiple
+                  /></label>
+                </div>
+                <p class="helper">
+                  Malzeme görselleri iç kullanım içindir. Ek dosyalar, siz
+                  açıkça “Ziyaretçiye açık” seçeneğini işaretlemedikçe
+                  gösterilmez.
+                </p>
+                <div id="assets"></div>
+              </article>
+            </div>
+            <div>
+              <article>
+                <h3>Sunum özellikleri</h3>
+                <label class="feature"
+                  ><input id="configurable" type="checkbox" /><span
+                    ><strong>Malzeme ve renk seçenekleri</strong
+                    ><small
+                      >En az bir eşleştirilmiş grup ve alternatif
+                      gerekir.</small
+                    ></span
+                  ></label
+                ><label class="feature"
+                  ><input id="dimensions" type="checkbox" /><span
+                    ><strong>Ürün ölçüleri</strong
+                    ><small>Genişlik, derinlik ve yükseklik girin.</small></span
+                  ></label
+                ><label class="feature"
+                  ><input type="checkbox" disabled /><span
+                    ><strong>Artırılmış gerçeklik</strong
+                    ><small
+                      >Bu yükleme akışına henüz bağlanmadı. Mevcut AR denemeleri
+                      ayrı tutulur.</small
+                    ></span
+                  ></label
+                ><label class="feature"
+                  ><input id="downloads" type="checkbox" /><span
+                    ><strong>Dosya indirme</strong
+                    ><small>En az bir ek dosyayı ziyaretçiye açın.</small></span
+                  ></label
+                ><label class="feature"
+                  ><input id="contact" type="checkbox" /><span
+                    ><strong>Teklif iste / iletişim</strong
+                    ><small
+                      >Geçerli bir iletişim e-postası gerekir.</small
+                    ></span
+                  ></label
+                ><label
+                  >İletişim e-postası<input
+                    id="email"
+                    type="email"
+                    placeholder="sales@company.com"
+                /></label>
+              </article>
+              <article class="quiet">
+                <h3>Dosyadan ürüne</h3>
+                <p>
+                  Önce model ve görselleri ekleyin. Sonraki adımda hangi
+                  parçaların birlikte değişeceğini belirleyin.
+                </p>
+                <p>
+                  Modelin içindeki malzemeler başlangıç noktası olarak korunur.
+                </p>
+              </article>
+            </div>
+          </div>
+        </section>
+        <section id="mapping" hidden>
+          <div class="mapping-grid">
+            <div id="viewer-column">
+              <div class="viewer-head">
+                <span id="view-name">3D ürün önizlemesi</span>
+                <div>
+                  <button id="reset-view">Görünümü sıfırla</button
+                  ><button id="clear-highlight">Seçimi temizle</button>
+                </div>
+              </div>
+              <div id="viewer" aria-label="3D ürün önizlemesi"></div>
+              <p class="viewer-hint">
+                Döndürmek için sürükleyin · Yakınlaştırmak için kaydırın ·
+                Malzeme seçmek için tıklayın
+              </p>
+              <div id="public-info" hidden></div>
+            </div>
+            <div id="editor">
+              <article>
+                <div class="section-heading">
+                  <h3>Özelleştirme grupları</h3>
+                  <button id="add-group">+ Grup</button>
+                </div>
+                <p class="helper">
+                  Bir grup, birlikte değişen birden fazla parçayı veya malzemeyi
+                  içerebilir.
+                </p>
+                <div id="groups"></div>
+              </article>
+              <article id="group-editor" hidden>
+                <label
+                  >Grup adı<input
+                    id="group-name"
+                    placeholder="Örn. Dolap rengi"
+                /></label>
+                <h4>Bağlı parçalar ve malzemeler</h4>
+                <p class="helper">
+                  Modelden seçim yapın veya aşağıdan işaretleyin. Bir hedef
+                  yalnızca bir gruba bağlanabilir.
+                </p>
+                <div id="targets"></div>
+                <div class="section-heading">
+                  <h4>Seçenekler</h4>
+                  <button id="add-option">+ Renk</button>
+                </div>
+                <div id="options"></div>
+                <small
+                  >Renk görseli değişir; normal, roughness ve diğer gömülü
+                  haritalar korunur. Doku seçenekleri için UV gerekir.</small
+                >
+              </article>
+              <article>
+                <h3>Malzeme kütüphanesi</h3>
+                <p class="helper">
+                  Bir grubu seçin, ardından görsele tıklayarak alternatif
+                  ekleyin.
+                </p>
+                <div id="library" class="library"></div>
+              </article>
+            </div>
+            <div id="review" hidden>
+              <article>
+                <h3>Yayın öncesi kontrol</h3>
+                <ul id="checks"></ul>
+                <label class="feature"
+                  ><input id="reviewed" type="checkbox" /><span
+                    >Tüm grupları ve seçenekleri önizlemede kontrol ettim.</span
+                  ></label
+                ><button id="publish" class="primary">
+                  Yerel sürümü yayınla
+                </button>
+                <p class="helper">
+                  Yalnızca bu tarayıcıdaki yayın kopyasını günceller.
+                  Paylaşılan kataloğa yayınlamaz.
+                </p>
+                <a id="public-link" hidden target="_blank" rel="noopener"
+                  >Yerel ziyaretçi görünümünü aç ↗</a
+                >
+              </article>
+              <article>
+                <h3>Ziyaretçi seçenekleri</h3>
+                <div id="preview-options"></div>
+              </article>
+            </div>
+          </div>
+        </section>
+        <footer>
+          <button id="back" hidden>← Önceki adım</button
+          ><span id="footer-hint"
+            >Değişikliklerinizi taslak olarak saklayabilirsiniz.</span
+          ><button id="next" class="primary">Malzeme eşleştirme →</button>
+        </footer>
+      </main>
+    </div>
+    <script type="module" src="author.js"></script>
+  </body>
+</html>

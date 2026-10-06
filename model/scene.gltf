@@ -1,0 +1,367 @@
+{
+  "accessors": [
+    {
+      "bufferView": 2,
+      "componentType": 5126,
+      "count": 5851,
+      "max": [
+        16.664804458618164,
+        20.041404724121094,
+        20.77863121032715
+      ],
+      "min": [
+        -16.664804458618164,
+        -20.041410446166992,
+        -20.77863311767578
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 70212,
+      "componentType": 5126,
+      "count": 5851,
+      "max": [
+        1.0,
+        0.9999377727508545,
+        0.9998456835746765
+      ],
+      "min": [
+        -1.0,
+        -0.9987621903419495,
+        -0.9999687075614929
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 3,
+      "componentType": 5126,
+      "count": 5851,
+      "max": [
+        1.0,
+        0.9995008707046509,
+        0.9997199773788452,
+        1.0
+      ],
+      "min": [
+        -1.0,
+        -0.9998590350151062,
+        -0.9999690055847168,
+        1.0
+      ],
+      "type": "VEC4"
+    },
+    {
+      "bufferView": 1,
+      "componentType": 5126,
+      "count": 5851,
+      "max": [
+        0.99169921875,
+        0.980804443359375
+      ],
+      "min": [
+        0.00656890869140625,
+        0.006096439901739359
+      ],
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 46808,
+      "componentType": 5126,
+      "count": 5851,
+      "max": [
+        0.98974609375,
+        0.9919357299804688
+      ],
+      "min": [
+        0.00806427001953125,
+        0.01171875
+      ],
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 93616,
+      "componentType": 5126,
+      "count": 5851,
+      "max": [
+        0.99169921875,
+        0.980804443359375
+      ],
+      "min": [
+        0.00656890869140625,
+        0.006096439901739359
+      ],
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 140424,
+      "componentType": 5126,
+      "count": 5851,
+      "max": [
+        0.99169921875,
+        0.980804443359375
+      ],
+      "min": [
+        0.00656890869140625,
+        0.006096439901739359
+      ],
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 187232,
+      "componentType": 5126,
+      "count": 5851,
+      "max": [
+        0.99169921875,
+        0.980804443359375
+      ],
+      "min": [
+        0.00656890869140625,
+        0.006096439901739359
+      ],
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 234040,
+      "componentType": 5126,
+      "count": 5851,
+      "max": [
+        0.99169921875,
+        0.980804443359375
+      ],
+      "min": [
+        0.00656890869140625,
+        0.006096439901739359
+      ],
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 0,
+      "componentType": 5125,
+      "count": 26748,
+      "type": "SCALAR"
+    }
+  ],
+  "asset": {
+    "extras": {
+      "author": "MaX3Dd (https://sketchfab.com/MaX3Dd)",
+      "license": "SKETCHFAB Standard (https://sketchfab.com/licenses)",
+      "source": "https://sketchfab.com/3d-models/armchair-4f7d3af4c3fe40569983a894b7140904",
+      "title": "Armchair"
+    },
+    "generator": "Sketchfab-15.50.0",
+    "version": "2.0"
+  },
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteLength": 106992,
+      "name": "floatBufferViews",
+      "target": 34963
+    },
+    {
+      "buffer": 0,
+      "byteLength": 280848,
+      "byteOffset": 106992,
+      "byteStride": 8,
+      "name": "floatBufferViews",
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteLength": 140424,
+      "byteOffset": 387840,
+      "byteStride": 12,
+      "name": "floatBufferViews",
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteLength": 93616,
+      "byteOffset": 528264,
+      "byteStride": 16,
+      "name": "floatBufferViews",
+      "target": 34962
+    }
+  ],
+  "buffers": [
+    {
+      "byteLength": 621880,
+      "uri": "https://raw.githubusercontent.com/mhd-yasser/ArmchairViewer/main/model/scene.bin"
+    }
+  ],
+  "images": [
+    {
+      "uri": "https://raw.githubusercontent.com/mhd-yasser/ArmchairViewer/main/model/textures/armchair_baseColor.png"
+    },
+    {
+      "uri": "https://raw.githubusercontent.com/mhd-yasser/ArmchairViewer/main/model/textures/armchair_metallicRoughness.png"
+    },
+    {
+      "uri": "https://raw.githubusercontent.com/mhd-yasser/ArmchairViewer/main/model/textures/armchair_normal.png"
+    }
+  ],
+  "materials": [
+    {
+      "doubleSided": true,
+      "name": "armchair",
+      "normalTexture": {
+        "index": 2
+      },
+      "occlusionTexture": {
+        "index": 1
+      },
+      "pbrMetallicRoughness": {
+        "baseColorTexture": {
+          "index": 0
+        },
+        "metallicRoughnessTexture": {
+          "index": 1
+        }
+      }
+    }
+  ],
+  "meshes": [
+    {
+      "name": "armchair_armchair_0",
+      "primitives": [
+        {
+          "attributes": {
+            "NORMAL": 1,
+            "POSITION": 0,
+            "TANGENT": 2,
+            "TEXCOORD_0": 3,
+            "TEXCOORD_1": 4,
+            "TEXCOORD_2": 5,
+            "TEXCOORD_3": 6,
+            "TEXCOORD_4": 7,
+            "TEXCOORD_5": 8
+          },
+          "indices": 9,
+          "material": 0,
+          "mode": 4
+        }
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "children": [
+        1
+      ],
+      "matrix": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        2.220446049250313e-16,
+        -1.0,
+        0.0,
+        0.0,
+        1.0,
+        2.220446049250313e-16,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "name": "Sketchfab_model"
+    },
+    {
+      "children": [
+        2
+      ],
+      "matrix": [
+        0.009999999776482582,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.009999999776482582,
+        0.0,
+        0.0,
+        -0.009999999776482582,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "name": "armchair.fbx"
+    },
+    {
+      "children": [
+        3
+      ],
+      "name": "RootNode"
+    },
+    {
+      "children": [
+        4
+      ],
+      "matrix": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        2.220446049250313e-16,
+        -1.0,
+        0.0,
+        0.0,
+        1.0,
+        2.220446049250313e-16,
+        0.0,
+        0.0,
+        20.791223526000977,
+        0.0,
+        1.0
+      ],
+      "name": "armchair"
+    },
+    {
+      "mesh": 0,
+      "name": "armchair_armchair_0"
+    }
+  ],
+  "samplers": [
+    {
+      "magFilter": 9729,
+      "minFilter": 9987,
+      "wrapS": 10497,
+      "wrapT": 10497
+    }
+  ],
+  "scene": 0,
+  "scenes": [
+    {
+      "name": "Sketchfab_Scene",
+      "nodes": [
+        0
+      ]
+    }
+  ],
+  "textures": [
+    {
+      "sampler": 0,
+      "source": 0
+    },
+    {
+      "sampler": 0,
+      "source": 1
+    },
+    {
+      "sampler": 0,
+      "source": 2
+    }
+  ]
+}

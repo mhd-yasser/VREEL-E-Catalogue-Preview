@@ -1,0 +1,9 @@
+/* Product hub visual direction: beige preview, navy information panel. */
+.product-card{background:var(--navy);border-color:#d9d0c4}
+.product-art,.art-desk,.art-chair,.art-sofa{background:radial-gradient(circle at 50% 46%,#f4ecdf 0,#e9dfd1 62%,#dfd1bf 100%)}
+.product-art img{filter:drop-shadow(0 18px 15px rgba(7,16,27,.2))}
+.product-card:hover .product-art img{filter:drop-shadow(0 22px 18px rgba(7,16,27,.25)) contrast(1.03) saturate(1.04)}
+.viewer-controls span{border-color:rgba(15,27,45,.28);background:rgba(15,27,45,.9)}
+.card-body{color:#f7f3ec}.card-heading h3{color:#fff}.product-type{color:#d6b47f}.card-body>p:not(.product-type){color:#aeb9c5}
+.status{color:#d6c6a9;background:rgba(255,255,255,.09)}.status.ready{color:#b9ead5;background:rgba(102,213,160,.13)}
+.card-link{border-top-color:rgba(255,255,255,.18);color:#f6f1e8}.product-card .card-link::before{color:#d6b47f}.product-card .card-link.muted::before{color:#91a0ae}.card-link.muted{color:#91a0ae}
