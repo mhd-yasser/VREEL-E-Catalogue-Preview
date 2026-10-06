@@ -1,0 +1,51 @@
+
+/* Workflow board visual direction — authoring pages only. */
+body:not(.public-mode){background:#f5f7fa;font-family:Alexandria,Arial,sans-serif;color:#12243a}
+body:not(.public-mode) h1,body:not(.public-mode) h2,body:not(.public-mode) h3,body:not(.public-mode) h4{font-family:Alexandria,Arial,sans-serif;font-style:normal}
+body:not(.public-mode) header{height:76px;padding:0 28px;background:#fff;border-bottom:1px solid #dfe5ed}
+body:not(.public-mode) header .workspace{letter-spacing:0;font-size:11px}
+body:not(.public-mode) header .workspace a{color:#52677d;text-decoration:none}
+body:not(.public-mode) .layout{grid-template-columns:225px minmax(0,1fr);min-height:calc(100vh - 76px)}
+body:not(.public-mode) aside{background:linear-gradient(165deg,#142a40,#0b1b2c);padding:30px 20px}
+body:not(.public-mode) aside h1{font-size:23px;line-height:1.6;font-weight:600;margin:12px 0 30px}
+body:not(.public-mode) aside .eyebrow{color:#d3a45f;letter-spacing:.04em}
+body:not(.public-mode) aside nav button{border:1px solid transparent;border-radius:7px;padding:13px 10px;font-size:11px;color:#c7d1de}
+body:not(.public-mode) aside nav b{display:inline-grid;place-items:center;width:25px;height:25px;border-radius:50%;background:#ffffff14;color:#bac8d7;font-size:10px;margin-right:9px}
+body:not(.public-mode) aside nav .active{border-color:#ffffff18;background:#ffffff18;color:white}
+body:not(.public-mode) aside nav .active b{background:#b78336;color:#fff}
+body:not(.public-mode) aside .scope{margin-top:35px}
+body:not(.public-mode) main{padding:30px clamp(20px,3vw,44px)}
+body:not(.public-mode) .page-heading h2{font-size:25px;font-weight:600;line-height:1.5;margin:7px 0}
+body:not(.public-mode) .page-heading p{font-size:11px;max-width:620px}
+body:not(.public-mode) .eyebrow{letter-spacing:.06em}
+body:not(.public-mode) article{border:1px solid #dfe6ee;box-shadow:0 3px 12px #16324c04;border-radius:9px;padding:23px;background:#fff}
+body:not(.public-mode) h3{font-size:13px;font-weight:600}
+body:not(.public-mode) input:not([type=checkbox],[type=radio],[type=color]),body:not(.public-mode) select,body:not(.public-mode) textarea{background:#fff;border-color:#d7e1ec;border-radius:6px}
+body:not(.public-mode) button{border-color:#d7e1ec;border-radius:6px}
+body:not(.public-mode) .primary{background:linear-gradient(100deg,#b77d2e,#c18b3c);border-color:#b77d2e;color:#fff;box-shadow:0 2px 5px #a8742620}
+body:not(.public-mode) .setup-grid{grid-template-columns:minmax(0,1.65fr) minmax(270px,.85fr);gap:23px}
+body:not(.public-mode) .drop{min-height:180px;background:#f7f9fc;border-color:#bdcce0}
+body:not(.public-mode) .upload-icon{color:#173653;font-size:30px}
+body:not(.public-mode) .feature{align-items:center;border-bottom:0;padding:11px 0;margin:0}
+body:not(.public-mode) .feature input[type=checkbox]{appearance:none;width:34px;height:19px;border-radius:20px;background:#c4cfdd;position:relative;margin:0;cursor:pointer}
+body:not(.public-mode) .feature input[type=checkbox]::before{content:"";position:absolute;top:3px;left:3px;width:13px;height:13px;background:#fff;border-radius:50%;transition:transform .15s}
+body:not(.public-mode) .feature input[type=checkbox]:checked{background:#b78132}
+body:not(.public-mode) .feature input[type=checkbox]:checked::before{transform:translateX(15px)}
+body:not(.public-mode) .feature input[type=checkbox]:disabled{opacity:.5;cursor:not-allowed}
+body:not(.public-mode) .quiet{background:#edf2f7;border-color:#e0e7ef}
+body:not(.public-mode) .mapping-grid{grid-template-columns:minmax(0,1.65fr) minmax(340px,1fr);gap:18px}
+body:not(.public-mode) #viewer-column{background:linear-gradient(#eef2f6,#e2e8ef);border-color:#d9e3ed;border-radius:9px}
+body:not(.public-mode) #viewer{height:590px}
+body:not(.public-mode) .viewer-head{background:#f7f9fccc;border-bottom:1px solid #dfe6ed;padding:13px;font-weight:500}
+body:not(.public-mode) #editor article{padding:17px;margin-bottom:13px;background:#fbfcfe}
+body:not(.public-mode) .group > button:first-child{background:#fff}
+body:not(.public-mode) .group.selected > button:first-child{border-color:#b78336;background:#fcf7ef}
+body:not(.public-mode) .option{background:#fff;border-color:#dce5ef}
+body:not(.public-mode) .option-top img,body:not(.public-mode) .swatch{border-radius:50%;width:38px;height:38px;border:2px solid #fff;box-shadow:0 0 0 1px #c6d0da}
+body:not(.public-mode) .library{grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+body:not(.public-mode) .library button{border:0;background:transparent;padding:4px}
+body:not(.public-mode) .library img{border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px #c7d2df}
+body:not(.public-mode) .badge{background:#eaf0f6;color:#52677d}
+body:not(.public-mode) footer{background:#f5f7fa}
+@media(max-width:1100px){body:not(.public-mode) .setup-grid,body:not(.public-mode) .mapping-grid{grid-template-columns:1fr}body:not(.public-mode) #viewer{height:460px}}
+@media(max-width:760px){body:not(.public-mode) .layout{grid-template-columns:1fr}body:not(.public-mode) aside{padding:16px}body:not(.public-mode) aside h1,body:not(.public-mode) aside .eyebrow,body:not(.public-mode) aside .scope{display:none}body:not(.public-mode) aside nav{display:flex;flex-wrap:wrap;gap:6px}body:not(.public-mode) aside nav button{flex:1;min-width:130px}body:not(.public-mode) main{padding:22px 16px}body:not(.public-mode) header{height:auto;min-height:76px;padding:15px;flex-wrap:wrap;gap:12px}body:not(.public-mode) #viewer{height:360px}body:not(.public-mode) .page-heading h2{font-size:21px}}
