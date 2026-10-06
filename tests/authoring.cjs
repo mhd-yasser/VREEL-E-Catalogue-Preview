@@ -290,6 +290,8 @@ const path = require("node:path");
     2,
   );
   await gallery.locator("#add-product").click();
+  assert.match(gallery.url(), /\/manage\/$/);
+  await gallery.locator("#create-product").click();
   assert.match(gallery.url(), /\/admin\/$/);
   await sofa.screenshot({ path: "/tmp/vreel-sofa.png", fullPage: true });
   assert.deepEqual(errors, []);

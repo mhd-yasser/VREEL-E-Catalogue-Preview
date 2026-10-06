@@ -29,5 +29,5 @@ filters.forEach(button => button.addEventListener('click', () => {
 search.addEventListener('input', refresh);
 
 document.querySelector('#add-product')?.addEventListener('click', () => {
-  location.href = '../admin/';
+  location.href = '../manage/';
 });

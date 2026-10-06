@@ -31,8 +31,8 @@ try {
       link.textContent = "Yerel ziyaretçi görünümü ↗";
       const edit = document.createElement("a");
       edit.className = "card-link";
-      edit.href = `../admin/?edit=${encodeURIComponent(record.id)}`;
-      edit.textContent = "Taslağı düzenle →";
+      edit.href = "../manage/";
+      edit.textContent = "Ürün yönetimi →";
       body.append(name, info, link, edit);
       card.append(body);
       grid.append(card);
