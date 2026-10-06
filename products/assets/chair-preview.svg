@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 720">
+  <defs><linearGradient id="bg" x2="1" y2="1"><stop stop-color="#ecebe8"/><stop offset="1" stop-color="#d9d6d0"/></linearGradient><linearGradient id="cloth" x2=".9" y2="1"><stop stop-color="#b8afa2"/><stop offset=".55" stop-color="#918779"/><stop offset="1" stop-color="#c5b9aa"/></linearGradient><filter id="blur"><feGaussianBlur stdDeviation="17"/></filter></defs>
+  <path fill="url(#bg)" d="M0 0h960v720H0z"/><path fill="#e7e5e1" d="M0 545h960v175H0z"/><ellipse cx="485" cy="600" rx="234" ry="37" fill="#383534" opacity=".17" filter="url(#blur)"/>
+  <path d="m310 366-32 222 23 4 66-175m307-49 19 224-23 3-54-169" fill="#6d533d" stroke="#4f4033" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M322 209c0-50 49-83 106-91l171-14c66-4 106 35 104 97l-18 205-361 29-83-134z" fill="url(#cloth)" stroke="#82796e" stroke-width="6"/>
+  <path d="m349 218 59 180 239-16 27-190" fill="none" stroke="#e0d9ca" stroke-width="5" opacity=".54"/>
+  <path d="M270 344q56-24 93 6l47 47 231-15q60-37 91 4l-35 110q-27 33-77 41l-218 12q-83 1-119-67Z" fill="url(#cloth)" stroke="#746f69" stroke-width="6"/>
+  <path d="m284 442 109 46 260-7 46-50-18 65q-25 42-69 42l-213 13q-78 2-115-57Z" fill="#776f65" opacity=".6"/>
+  <path d="m271 343-42-23q-21-11-32 9l-8 26 93 59 22-19m386-48 48-26q23-10 32 12l7 28-89 57-22-21" fill="#805f43" stroke="#5c4737" stroke-width="5"/>
+</svg>

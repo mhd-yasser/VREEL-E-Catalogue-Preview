@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0f1b2d">
+  <meta name="description" content="VREEL Studio ürün çalışma alanı — etkileşimli mobilya modelleri.">
+  <title>Ürünler | VREEL Studio</title>
+  <link rel="stylesheet" href="./products.css">
+  <link rel="stylesheet" href="../font.css">
+  <link rel="stylesheet" href="./overrides.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="./" aria-label="VREEL Studio ürünler ana sayfa">
+        <img src="./assets/vreel-studio-header.svg" alt="VREEL Studio" width="191" height="40">
+      </a>
+      <nav class="site-nav" aria-label="Ana menü">
+        <a href="./" aria-current="page">Ürünler</a>
+        <a href="#collection">Yapılandırıcılar</a>
+        <a href="#dashboard">Kontrol Paneli</a>
+        <a href="#settings">Ayarlar</a>
+      </nav>
+      <div class="account" aria-label="Çalışma alanı: VREEL Studio demo">
+        <span class="account-avatar">V</span>
+        <span class="account-copy"><strong>VREEL Mobilya</strong><small>Şirket hesabı⌄</small></span>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="intro" aria-labelledby="page-title">
+      <div class="container intro-layout">
+        <div class="intro-content">
+          <p class="eyebrow"><span class="eyebrow-line"></span> VREEL STUDIO / ÜRÜN ALANI</p>
+          <h1 id="page-title">Ürünleriniz,<br><em>yeni bir bakışla.</em></h1>
+          <p class="intro-description">Mobilya modellerinizi tek bir yerde görüntüleyin. Hazır ürünün üzerine tıklayarak interaktif 3D yapılandırıcısını açın.</p>
+          <div class="intro-actions">
+            <button class="add-product" type="button" id="add-product"><span aria-hidden="true">＋</span> Yeni ürün ekle</button>
+          </div>
+        </div>
+        <div class="intro-aside" aria-label="Çalışma alanı özeti">
+          <span class="aside-index">KOLEKSİYON / 001</span>
+          <div class="aside-grid"><span>03</span><span>ÜRÜN<br>VİTRİNİ</span></div>
+          <p>Şirketinize özel ürün alanı.<br>Her model, kendine ait 3D deneyime açılır.</p>
+          <span class="aside-rule"></span>
+        </div>
+      </div>
+    </section>
+
+    <section class="collection container" id="collection" aria-labelledby="collection-title">
+      <div class="collection-heading">
+        <div><p class="eyebrow collection-kicker">KOLEKSİYON</p><h2 id="collection-title">Ofis Mobilyası <span>03</span></h2></div>
+        <p>Bir model seçin, 3D deneyimi başlatın.</p>
+      </div>
+      <div class="toolbar">
+        <div class="filter-list" role="group" aria-label="Ürün filtresi">
+          <button type="button" class="filter active" data-filter="all" aria-pressed="true">Tüm ürünler <span>03</span></button>
+          <button type="button" class="filter" data-filter="ready" aria-pressed="false">Yayınlanan <span>03</span></button>
+          <button type="button" class="filter" data-filter="preparing" aria-pressed="false">Hazırlanıyor <span>00</span></button>
+        </div>
+        <label class="search"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 5 5"/></svg><span class="sr-only">Ürün ara</span><input id="search" type="search" placeholder="Ürünlerinizde ara..." autocomplete="off"></label>
+      </div>
+      <div class="product-grid" id="product-grid">
+        <article class="product-card" data-status="ready" data-search="yönetici masası executive desk office">
+          <a class="product-art art-desk" href="../desk/" aria-label="Axis Executive Desk 3D görüntüleyicisini aç">
+            <span class="art-no">01 / 03</span>
+            <span class="viewer-badge"><i></i> 3D GÖRÜNTÜLEYİCİ</span>
+            <img src="./assets/product-desk-transparent.webp" alt="Yönetici masası" loading="lazy" decoding="async" fetchpriority="low">
+            <span class="viewer-controls" aria-hidden="true"><span>↻</span><span>⌗</span><span>⛶</span></span>
+            <span class="art-icon" aria-hidden="true">↗</span>
+          </a>
+          <div class="card-body"><p class="product-type">ÇALIŞMA ALANI <span class="separator">/</span> 3D YAPILANDIRICI</p><div class="card-heading"><h3>Axis Executive Desk</h3><span class="status ready"><i></i> Hazır</span></div><p>Ölçüyü, keson yönünü ve yüzeyleri yapılandırın.</p><a class="card-link" href="../desk/">3D deneyimi aç <span aria-hidden="true">↗</span></a></div>
+        </article>
+        <article class="product-card" data-status="ready" data-search="aura yönetici koltuğu chair office leather wood metal">
+          <a class="product-art art-chair" href="../chair/" aria-label="Aura Yönetici Koltuğu 3D görüntüleyicisini aç"><span class="art-no">02 / 03</span><span class="viewer-badge"><i></i> 3D GÖRÜNTÜLEYİCİ</span><img src="./assets/product-chair-transparent.webp" alt="Aura Yönetici Koltuğu" loading="lazy" decoding="async" fetchpriority="low"><span class="viewer-controls" aria-hidden="true"><span>↻</span><span>⌗</span><span>⛶</span></span><span class="art-icon" aria-hidden="true">↗</span></a>
+          <div class="card-body"><p class="product-type">ÇALIŞMA ALANI <span class="separator">/</span> 3D YAPILANDIRICI</p><div class="card-heading"><h3>Aura Yönetici Koltuğu</h3><span class="status ready"><i></i> Hazır</span></div><p>Deri, ahşap ve metal yüzeylerini yapılandırın.</p><a class="card-link" href="../chair/">3D deneyimi aç <span aria-hidden="true">↗</span></a></div>
+        </article>
+        <article class="product-card" data-status="ready" data-search="lounge sofa kanepe oturma mobilya">
+          <a class="product-art art-sofa" href="../sofa/" aria-label="Lounge Duo 3D görüntüleyicisini aç"><span class="art-no">03 / 03</span><span class="viewer-badge"><i></i> 3D GÖRÜNTÜLEYİCİ</span><img src="./assets/product-sofa-transparent.webp" alt="Lounge Duo" loading="lazy" decoding="async" fetchpriority="low"><span class="viewer-controls" aria-hidden="true"><span>↻</span><span>⌗</span><span>⛶</span></span><span class="art-icon" aria-hidden="true">↗</span></a>
+          <div class="card-body"><p class="product-type">OTURMA GRUBU <span class="separator">/</span> 3D YAPILANDIRICI</p><div class="card-heading"><h3>Lounge Duo</h3><span class="status ready"><i></i> Hazır</span></div><p>Deri yüzeyini ve modül sayısını yapılandırın.</p><a class="card-link" href="../sofa/">3D deneyimi aç <span aria-hidden="true">↗</span></a></div>
+        </article>
+      </div>
+      <p class="empty-state" id="empty-state" hidden>Bu aramaya uygun ürün bulunamadı.</p>
+    </section>
+  </main>
+  <p class="container"><a href="../ar-desk.html">Android masa AR testini aç ↗</a> · Önizleme ortamı</p>
+  <footer class="footer"><div class="container footer-inner"><span>VREEL STUDIO <span class="footer-line"></span> ETKİLEŞİMLİ ÜRÜNLER</span><span>Ürün çalışma alanı · 2026</span></div></footer>
+  <script src="./products.js" defer></script>
+  <script type="module" src="./local-products.js"></script>
+</body>
+</html>
