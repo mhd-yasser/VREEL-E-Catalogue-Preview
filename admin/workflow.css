@@ -73,3 +73,5 @@ body:not(.public-mode) .dimension-parts input{width:15px;height:15px;flex:none;m
 @media(max-width:1100px){body:not(.public-mode) #editor,body:not(.public-mode) #review{max-height:65dvh;overflow:auto}body:not(.public-mode) #viewer{height:clamp(250px,45dvh,460px)}}
 
 @media(min-width:1101px){body[data-author-step] #mapping:not([hidden]) .mapping-grid{height:100%;min-height:0}body[data-author-step] footer{padding:12px 0}}
+
+@media(min-width:1101px){body[data-author-step="2"] .mapping-grid,body[data-author-step="3"] .mapping-grid{grid-template-rows:minmax(0,1fr);align-items:stretch}body[data-author-step="2"] .layout,body[data-author-step="3"] .layout{grid-template-rows:minmax(0,1fr)}}

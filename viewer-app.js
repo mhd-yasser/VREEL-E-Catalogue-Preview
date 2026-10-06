@@ -1,6 +1,6 @@
 import * as THREE from 'three';
-import {createViewer} from './three-viewer.js';
-import {loadAuthoredConfig, paintAuthored, prepareAuthoredPage, updateAuthoredDimensions} from './authored-viewer.js';
+import {createViewer} from './three-viewer.js?v=20261006-2';
+import {loadAuthoredConfig, paintAuthored, prepareAuthoredPage, updateAuthoredDimensions} from './authored-viewer.js?v=20261006-2';
 import {woodPreviews} from './texture-previews.js';
 
 const page=document.body.dataset.product;
