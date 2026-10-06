@@ -66,24 +66,25 @@ const path = require("node:path");
   await page.locator("#public-link").waitFor({ state: "visible" });
   const published = await context.newPage();
   await published.goto(`http://127.0.0.1:8000/admin/?view=${id}`);
+  await published.waitForFunction(()=>document.querySelector("#product-viewer")?.model);
   await published
-    .locator("#public-options .preview-group button")
+    .locator("#material-groups .swatch")
     .nth(1)
     .waitFor();
   assert.equal(
-    await published.locator("#public-options .preview-group button").count(),
+    await published.locator("#material-groups .swatch").count(),
     2,
   );
   await published
-    .locator("#public-options .preview-group button")
+    .locator("#material-groups .swatch")
     .nth(1)
     .click();
   assert.equal(
     await published
-      .locator("#public-options .preview-group button")
+      .locator("#material-groups .swatch")
       .nth(1)
-      .getAttribute("aria-pressed"),
-    "true",
+      .getAttribute("class"),
+    "swatch active",
   );
   await page.locator("#back").click();
   await page.screenshot({ path: "/tmp/vreel-mapping.png", fullPage: true });
@@ -95,7 +96,7 @@ const path = require("node:path");
   );
   await published.reload();
   assert.equal(
-    await published.locator("#page-title").textContent(),
+    await published.locator(".panel-heading h1").textContent(),
     "Authoring integration desk",
   );
   await page.reload();
@@ -152,20 +153,20 @@ const path = require("node:path");
   await page.locator("#public-link").waitFor({ state: "visible" });
   await published.reload();
   await published
-    .locator("#public-options .preview-group button")
+    .locator("#material-groups .swatch")
     .nth(2)
     .waitFor();
-  assert.equal(await published.locator("#public-info a[download]").count(), 1);
+  assert.equal(await published.locator("#details a[download]").count(), 1);
   await published
-    .locator("#public-options .preview-group button")
+    .locator("#material-groups .swatch")
     .nth(2)
     .click();
   assert.equal(
     await published
-      .locator("#public-options .preview-group button")
+      .locator("#material-groups .swatch")
       .nth(2)
-      .getAttribute("aria-pressed"),
-    "true",
+      .getAttribute("class"),
+    "swatch active",
   );
   await page.locator("#back").click();
   await page.locator("#back").click();
@@ -180,7 +181,7 @@ const path = require("node:path");
   );
   await page.locator("#next").click();
   await page.locator("#next").click();
-  assert.equal(await page.locator("#public-info a[download]").count(), 1);
+  assert.equal(await page.locator("#details a[download]").count(), 1);
   await page.screenshot({ path: "/tmp/vreel-review.png", fullPage: true });
   await page.setViewportSize({ width: 390, height: 844 });
   await page.screenshot({ path: "/tmp/vreel-mobile.png", fullPage: true });

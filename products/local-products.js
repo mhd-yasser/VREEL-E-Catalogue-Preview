@@ -27,7 +27,7 @@ try {
         .join(" · ");
       const link = document.createElement("a");
       link.className = "card-link";
-      link.href = `../admin/?view=${encodeURIComponent(record.id)}`;
+      link.href = `../product/?view=${encodeURIComponent(record.id)}`;
       link.textContent = "Yerel ziyaretçi görünümü ↗";
       const edit = document.createElement("a");
       edit.className = "card-link";
@@ -43,3 +43,4 @@ try {
 } catch (error) {
   console.warn("Yerel yayınlar okunamadı:", error.message);
 }
+
