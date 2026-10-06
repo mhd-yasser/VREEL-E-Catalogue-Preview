@@ -611,7 +611,7 @@ function renderInfo() {
     host.append(
       element(
         "p",
-        (viewer?.getMeasurementGuides()||[]).map(g=>`${g.axis} ${Number((g.value*({mm:1000,cm:100,m:1}[draft.unit]||100)).toFixed(2))} ${draft.unit||'cm'}`).join(' · ')+' (modelden)' ,
+        (viewer?.getMeasurementGuides()||[]).map(g=>`${g.axis} ${(Number(draft[{G:'width',D:'depth',Y:'height'}[g.axis]])>0?Number(draft[{G:'width',D:'depth',Y:'height'}[g.axis]]):Number((g.value*({mm:1000,cm:100,m:1}[draft.unit]||100)).toFixed(2)))} ${draft.unit||'cm'}`).join(' · ') ,
       ),
     );
   if (draft.features.downloads)

@@ -17,7 +17,10 @@ const {updateAuthoredDimensions}=await import('../authored-viewer.js');
 globalThis.document={querySelectorAll:()=>[]};
 const guides=[{part:'product',axis:'G',value:.6},{part:'product',axis:'D',value:.5},{part:'product',axis:'Y',value:1}];
 const config={draft:{features:{dimensions:true},unit:'cm',width:999,depth:999,height:999}};
-updateAuthoredDimensions(config,{},guides);assert.deepEqual(guides.map(g=>g.label),['G 60 cm','D 50 cm','Y 100 cm']);
+updateAuthoredDimensions(config,{},guides);assert.deepEqual(guides.map(g=>g.label),['G 999 cm','D 999 cm','Y 999 cm']);
+delete config.draft.width;delete config.draft.depth;delete config.draft.height;
 config.draft.unit='mm';updateAuthoredDimensions(config,{},guides);assert.equal(guides[0].label,'G 600 mm');
 delete config.draft.width;delete config.draft.depth;delete config.draft.height;config.draft.unit='m';updateAuthoredDimensions(config,{},guides);assert.equal(guides[0].label,'G 0.6 m');
-console.log('PASS: geometry dimensions ignore manual values, work without entries, and convert units.');
+console.log('PASS: manual dimensions take precedence; empty dimensions use geometry with unit conversion.');
+
+config.draft.width=75;config.draft.unit='cm';updateAuthoredDimensions(config,{},guides);assert.deepEqual(guides.map(g=>g.label),['G 75 cm','D 50 cm','Y 100 cm']);

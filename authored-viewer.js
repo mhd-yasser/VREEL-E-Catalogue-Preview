@@ -46,8 +46,8 @@ export function prepareAuthoredPage(config,viewer){
 export function updateAuthoredDimensions(config,viewer,guides=viewer.getMeasurementGuides()){
   if(!config.draft.features.dimensions||!guides?.length)return;
   const unit=config.draft.unit||'cm',factor={mm:1000,cm:100,m:1}[unit]||100;
-  for(const guide of guides)guide.label=`${guide.axis} ${Number((guide.value*factor).toFixed(2))} ${unit}`;
+  for(const guide of guides){const key={G:'width',D:'depth',Y:'height'}[guide.axis],manual=Number(config.draft[key]);guide.label=`${guide.axis} ${manual>0?manual:Number((guide.value*factor).toFixed(2))} ${unit}`;}
   const values=guides.filter(g=>g.part==='product').map(g=>g.label).join(' · ');
   const row=[...document.querySelectorAll('#details dt')].find(el=>el.textContent==='Ölçüler');
-  if(row)row.nextElementSibling.textContent=values+' (modelden)';
+  if(row)row.nextElementSibling.textContent=values;
 }
