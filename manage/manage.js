@@ -28,7 +28,7 @@ function render() {
     if (status.value === 'draft' && p.published || status.value === 'published' && !p.published) continue;
     if (term && ![d.name, d.code, d.category].join(' ').toLocaleLowerCase('tr-TR').includes(term)) continue;
     const links = [['Taslağı düzenle →', `../admin/?edit=${encodeURIComponent(p.id)}`]];
-    if (p.published) links.push(['Yerel ürünü görüntüle ↗', `../admin/?view=${encodeURIComponent(p.id)}`]);
+    if (p.published) links.push(['Yerel ürünü görüntüle ↗', `../product/?view=${encodeURIComponent(p.id)}`]);
     records.append(row(d.name || 'İsimsiz ürün', [d.code, d.category, p.published ? 'Yerel yayın · düzenlenebilir taslak' : 'Taslak'].filter(Boolean).join(' · '), links, d.category, Boolean(p.published)));
   }
   notice.textContent = records.childElementCount ? `${records.childElementCount} ürün` : products.length ? 'Aramaya uygun ürün bulunamadı.' : 'Henüz ürün yok. “Yeni ürün ekle” ile başlayın.';
@@ -36,3 +36,4 @@ function render() {
 for (const [name, path, category] of [['Axis Executive Desk','desk','Ofis'],['Aura Yönetici Koltuğu','chair','Oturma'],['Lounge Duo','sofa','Oturma']]) { const item = row(name, 'Mevcut demo', [['3D deneyimi aç ↗', `../${path}/`]], category, true, `../products/assets/product-${path}-transparent.webp`); item.querySelector('.status-pill').textContent = 'Demo'; document.querySelector('#demos').append(item); }
 search.addEventListener('input', render); status.addEventListener('change', render);
 try { products = await listProducts(); render(); } catch (e) { notice.textContent = 'Yerel ürünler okunamadı. Tarayıcı depolama izinlerini kontrol edin.'; notice.classList.add('error'); }
+

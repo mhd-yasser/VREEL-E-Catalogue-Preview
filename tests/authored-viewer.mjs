@@ -1,0 +1,15 @@
+import assert from 'node:assert/strict';
+import * as THREE from '../vendor/three.module.js';
+globalThis.window={addEventListener(){}};
+globalThis.indexedDB={open(){return {};}};
+const {paintAuthored}=await import('../authored-viewer.js');
+const original=new THREE.MeshStandardMaterial({color:'#665544',roughness:.72,metalness:.21});
+original.map=new THREE.Texture();original.map.repeat.set(3,4);original.normalMap=new THREE.Texture();original.roughnessMap=new THREE.Texture();
+const m=original.clone();m.userData.vreelOriginal={map:original.map,color:original.color.clone()};
+const viewer={createTexture:async()=>new THREE.Texture()};
+await paintAuthored(m,{id:'color',color:'#112244'},viewer);
+assert.equal(m.color.getHexString(),'112244');assert.equal(m.map,null);
+assert.equal(m.normalMap,original.normalMap);assert.equal(m.roughnessMap,original.roughnessMap);assert.equal(m.roughness,.72);assert.equal(m.metalness,.21);
+await paintAuthored(m,{id:'texture',image:'blob:test'},viewer);assert.deepEqual(m.map.repeat.toArray(),[3,4]);assert.equal(m.color.getHexString(),'ffffff');
+await paintAuthored(m,{id:'original',original:true},viewer);assert.equal(m.map,original.map);assert.equal(m.color.getHexString(),'665544');
+console.log('PASS: authored color, texture UV transforms, fixed PBR maps and original restoration.');

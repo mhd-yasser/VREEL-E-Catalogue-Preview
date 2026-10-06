@@ -222,6 +222,10 @@ export function createViewer(element){
         if(isCabinet)boxes.cabinet.expandByObject(node);
         if(isCabinet||names.some(name=>/^(Top|Leg|FrontPanel)/.test(name)))boxes.desk.expandByObject(node);
       });
+    }else if(element.measurementTargets?.length){
+      boxes.product=new THREE.Box3();let index=0;
+      object.updateWorldMatrix(true,true);
+      object.traverse(node=>{if(!node.isMesh)return;const id=`mesh-${index++}`;if(element.measurementTargets.includes(id)&&node.visible){node.geometry.computeBoundingBox();boxes.product.union(node.geometry.boundingBox.clone().applyMatrix4(node.matrixWorld));}});
     }else boxes.product=visibleBox();
     const project=(x,y,z)=>{const p=new THREE.Vector3(x,y,z).project(camera);return {x:(p.x+1)*element.clientWidth/2,y:(1-p.y)*element.clientHeight/2};};
     const guides=[];

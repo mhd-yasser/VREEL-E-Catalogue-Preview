@@ -175,6 +175,7 @@ async function loadModel(model, applyConfig = true) {
       node.material = Array.isArray(node.material) ? clones : clones[0];
     });
     loaded = true;
+    renderDimensionTargets();
     if (applyConfig) await applyAll();
     return true;
   } finally {
@@ -182,6 +183,17 @@ async function loadModel(model, applyConfig = true) {
     $("next").disabled = false;
     $("model-file").disabled = false;
     $("example").disabled = false;
+  }
+}
+function renderDimensionTargets() {
+  let host = $("dimension-targets");
+  if (!host) {host=element("div");host.id="dimension-targets";$("mapping").firstElementChild.append(host);}
+  host.replaceChildren(element("h3","Ölçülere dahil edilecek parçalar"),element("p","Seçim boşsa modelin tamamı kullanılır. Birden fazla ürün içeren modellerde yalnızca ilgili ürünü seçin."));
+  const seen=new Set();
+  for(const t of targets){const id=t.id.split("-slot-")[0];if(seen.has(id))continue;seen.add(id);
+    const label=element("label"),check=element("input");check.type="checkbox";check.checked=(draft.dimensionTargets||[]).includes(id);
+    check.onchange=()=>{draft.dimensionTargets=check.checked?[...(draft.dimensionTargets||[]),id]:(draft.dimensionTargets||[]).filter(x=>x!==id);changed();};
+    label.append(check,element("span",t.node.userData.sourceName||t.node.name||id));host.append(label);
   }
 }
 function clearHighlight() {
@@ -839,7 +851,7 @@ $("publish").onclick = async () => {
       throw e;
     }
     $("state").textContent = "Yerel yayın hazır";
-    $("public-link").href = `?view=${encodeURIComponent(record.id)}`;
+    $("public-link").href = `../product/?view=${encodeURIComponent(record.id)}`;
     $("public-link").hidden = false;
     notice("Yerel yayın kopyası oluşturuldu. Genel katalog değiştirilmedi.");
   } catch (e) {
@@ -882,6 +894,7 @@ window.addEventListener("beforeunload", (e) => {
   }
 });
 async function start() {
+  if(viewId){location.replace(`../product/?view=${encodeURIComponent(viewId)}`);return;}
   try {
     if (viewId) {
       document.body.classList.add("public-mode");
@@ -924,3 +937,4 @@ async function start() {
   }
 }
 start();
+
