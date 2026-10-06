@@ -238,7 +238,7 @@ export function createViewer(element){
         const dx=mid.x-screenCenter.x,dy=mid.y-screenCenter.y,length=Math.hypot(dx,dy);
         const distance=part==='desk'?25:18;
         const offset=length>6?{x:dx/length*distance,y:dy/length*distance}:fallback;
-        guides.push({part,label:`${axis} ${Math.round((axis==='G'?d.x:axis==='D'?d.z:d.y)*100)} cm`,start:a,end:b,offset});
+        guides.push({part,axis,value:axis==='G'?d.x:axis==='D'?d.z:d.y,label:`${axis} ${Math.round((axis==='G'?d.x:axis==='D'?d.z:d.y)*100)} cm`,start:a,end:b,offset});
       };
       add('G',[box.min.x,box.min.y,nearZ],[box.max.x,box.min.y,nearZ],{x:0,y:25});
       add('D',[nearX,box.min.y,box.min.z],[nearX,box.min.y,box.max.z],{x:nearX===box.max.x?25:-25,y:0});
