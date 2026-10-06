@@ -1,0 +1,26 @@
+
+.management-shell{display:grid;grid-template-columns:215px minmax(0,1fr);min-height:calc(100vh - 76px)}
+.management-nav{padding:30px 18px;background:linear-gradient(165deg,#142a40,#0b1b2c);color:white}
+.management-nav .nav-brand{font-size:27px;font-weight:700;color:#d4a052;letter-spacing:.04em;margin-bottom:35px}
+.management-nav a{display:block;padding:13px 14px;margin:7px 0;border-radius:6px;color:#c7d1de;text-decoration:none;font-size:12px}
+.management-nav a.active{background:#ffffff20;color:#fff;border-left:3px solid #b78336}
+.management-nav small{display:block;margin:35px 10px 0;color:#b9c6d5;font-size:10px;line-height:1.8}
+.management-shell main{margin:0;max-width:none;width:100%}
+.management-shell .page-heading{align-items:center}
+.management-shell .toolbar{background:white;padding:15px;border:1px solid #e0e7ee;border-radius:8px}
+.management-table{border:1px solid #dfe6ee;border-radius:9px;overflow:hidden;background:white}
+.table-head,.product-row{display:grid;grid-template-columns:minmax(190px,1.5fr) minmax(95px,.7fr) minmax(130px,.8fr) minmax(135px,.8fr);align-items:center;gap:20px}
+.table-head{padding:15px 20px;background:#edf2f7;color:#506279;font-size:11px;font-weight:600}
+.management-table .product-row{padding:18px 20px;border:0;border-bottom:1px solid #e6ebf2;border-radius:0;box-shadow:none;margin:0}
+.management-table .product-row:last-child{border-bottom:0}
+.product-cell{display:flex;align-items:center;gap:13px;min-width:0}
+.product-cell img{width:66px;height:52px;object-fit:contain;border-radius:6px;background:#f4f6f9}
+.product-symbol{display:grid;place-items:center;flex:none;width:52px;height:48px;border-radius:6px;background:#edf2f7;color:#7790a9;font-size:22px}
+.product-row h3{font-size:11px;margin:0 0 5px}
+.category-cell{font-size:10px;color:#62748a;overflow-wrap:anywhere}
+.status-pill{display:inline-block;padding:6px 10px;border-radius:6px;font-size:9px;background:#e8edf4;color:#506279}
+.status-pill.published{background:#d8f3e2;color:#26714b}
+.product-row .links{font-size:10px;gap:9px;flex-direction:column}
+.product-row .links a{text-decoration:none;color:#213f5c}
+@media(max-width:900px){.management-shell{grid-template-columns:1fr}.management-nav{padding:15px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}.management-nav .nav-brand{font-size:20px;margin:0 15px 0 0}.management-nav a{margin:0}.management-nav small{display:none}.table-head{display:none}.management-table .product-row{grid-template-columns:minmax(0,1fr) minmax(100px,.6fr);gap:14px}.management-shell .page-heading{flex-wrap:wrap}}
+@media(max-width:480px){.management-table .product-row{grid-template-columns:1fr}.product-row .links{flex-direction:row;flex-wrap:wrap}}
