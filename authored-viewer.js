@@ -29,7 +29,7 @@ export function prepareAuthoredPage(config,viewer){
   $('.lead').textContent=d.features.configurable?'Yüzeyleri seçin veya modeldeki bir parçaya dokunun.':'Ürünü farklı açılardan inceleyin.';
   $('#details h2').textContent=d.name;$('#details p').textContent=d.description;
   $('#details .detail-list').replaceChildren();
-  for(const [label,value] of [['Ürün kodu',d.code],['Kategori',d.category],...(d.features.dimensions?[['Ölçüler',`${d.width} × ${d.depth} × ${d.height} ${d.unit}`]]:[])]){
+  for(const [label,value] of [['Ürün kodu',d.code],['Kategori',d.category],...(d.features.dimensions?[['Ölçüler','Modelden hesaplanıyor…']]:[])]){
     const row=document.createElement('div'),dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=label;dd.textContent=value;row.append(dt,dd);$('#details .detail-list').append(row);
   }
   $('#details h3').textContent='Ürün Dosyaları';$('.coming').hidden=true;$('.material-files').replaceChildren();
@@ -40,4 +40,14 @@ export function prepareAuthoredPage(config,viewer){
   $('#source-download').hidden=true;$('#reset-materials').hidden=!d.features.configurable;
   $('#add').hidden=!d.features.contact;$('#add').textContent='Teklif İste →';
   $('#add').addEventListener('click',event=>{event.stopImmediatePropagation();location.href=`mailto:${encodeURIComponent(d.email)}?subject=${encodeURIComponent(d.name+' — Teklif talebi')}`;});
+}
+
+
+export function updateAuthoredDimensions(config,viewer,guides=viewer.getMeasurementGuides()){
+  if(!config.draft.features.dimensions||!guides?.length)return;
+  const unit=config.draft.unit||'cm',factor={mm:1000,cm:100,m:1}[unit]||100;
+  for(const guide of guides)guide.label=`${guide.axis} ${Number((guide.value*factor).toFixed(2))} ${unit}`;
+  const values=guides.filter(g=>g.part==='product').map(g=>g.label).join(' · ');
+  const row=[...document.querySelectorAll('#details dt')].find(el=>el.textContent==='Ölçüler');
+  if(row)row.nextElementSibling.textContent=values+' (modelden)';
 }

@@ -187,14 +187,17 @@ async function loadModel(model, applyConfig = true) {
 }
 function renderDimensionTargets() {
   let host = $("dimension-targets");
-  if (!host) {host=element("div");host.id="dimension-targets";$("mapping").firstElementChild.append(host);}
-  host.replaceChildren(element("h3","Ölçülere dahil edilecek parçalar"),element("p","Seçim boşsa modelin tamamı kullanılır. Birden fazla ürün içeren modellerde yalnızca ilgili ürünü seçin."));
+  if (!host) {host=element("div");host.id="dimension-targets";$("viewer-column").append(host);}
+  host.replaceChildren();
+  const details=element("details"),summary=element("summary","Ölçülere dahil edilecek parçalar"),list=element("div");list.className="dimension-parts";
+  details.append(summary,element("p","Seçim boşsa modelin tamamı kullanılır. Birden fazla ürün içeren modellerde yalnızca ilgili ürünü seçin."),list);host.append(details);
   const seen=new Set();
   for(const t of targets){const id=t.id.split("-slot-")[0];if(seen.has(id))continue;seen.add(id);
     const label=element("label"),check=element("input");check.type="checkbox";check.checked=(draft.dimensionTargets||[]).includes(id);
-    check.onchange=()=>{draft.dimensionTargets=check.checked?[...(draft.dimensionTargets||[]),id]:(draft.dimensionTargets||[]).filter(x=>x!==id);changed();};
-    label.append(check,element("span",t.node.userData.sourceName||t.node.name||id));host.append(label);
+    check.onchange=()=>{draft.dimensionTargets=check.checked?[...(draft.dimensionTargets||[]),id]:(draft.dimensionTargets||[]).filter(x=>x!==id);viewer.measurementTargets=draft.dimensionTargets;renderInfo();changed();};
+    label.append(check,element("span",t.node.userData.sourceName||t.node.name||id));list.append(label);
   }
+  viewer.measurementTargets=draft.dimensionTargets||[];
 }
 function clearHighlight() {
   for (const h of highlighted) {
@@ -608,7 +611,7 @@ function renderInfo() {
     host.append(
       element(
         "p",
-        `${draft.width} × ${draft.depth} × ${draft.height} ${draft.unit} · G × D × Y (girilen ölçüler)`,
+        (viewer?.getMeasurementGuides()||[]).map(g=>`${g.axis} ${Number((g.value*({mm:1000,cm:100,m:1}[draft.unit]||100)).toFixed(2))} ${draft.unit||'cm'}`).join(' · ')+' (modelden)' ,
       ),
     );
   if (draft.features.downloads)
@@ -638,6 +641,7 @@ async function go(next) {
     return;
   }
   step = next;
+  document.body.dataset.authorStep=String(step);
   clearHighlight();
   $("setup").hidden = step !== 1;
   $("mapping").hidden = step === 1;
@@ -916,7 +920,7 @@ async function start() {
       renderInfo();
       const host = element("article");
       host.id = "public-options";
-      $("mapping").firstElementChild.append(host);
+      $("viewer-column").append(host);
       renderPreviewOptions(host);
       $("clear-highlight").hidden = true;
     } else {
@@ -937,4 +941,5 @@ async function start() {
   }
 }
 start();
+
 

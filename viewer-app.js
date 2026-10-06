@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import {createViewer} from './three-viewer.js';
-import {loadAuthoredConfig, paintAuthored, prepareAuthoredPage} from './authored-viewer.js';
+import {loadAuthoredConfig, paintAuthored, prepareAuthoredPage, updateAuthoredDimensions} from './authored-viewer.js';
 import {woodPreviews} from './texture-previews.js';
 
 const page=document.body.dataset.product;
@@ -181,7 +181,7 @@ wheelHandle.addEventListener('pointerup',()=>{dragWheel=null;});wheelHandle.addE
 ui.wheel.querySelector('#wheel-close').addEventListener('click',closeWheel);document.querySelector('#wheel-prev').addEventListener('click',()=>{wheelPage--;renderWheel();});document.querySelector('#wheel-next').addEventListener('click',()=>{wheelPage++;renderWheel();});
 viewer.addEventListener('pointerdown',event=>pointerStart={x:event.clientX,y:event.clientY});viewer.addEventListener('pointerup',event=>{if(!pointerStart||Math.hypot(event.clientX-pointerStart.x,event.clientY-pointerStart.y)>7)return;const hit=viewer.materialFromPoint(event.clientX,event.clientY);const key=hit&&inferGroup(hit.object,hit);if(key)openWheel(key,hit.object,event.clientX,event.clientY);else closeWheel();});
 
-viewer.addEventListener('load',async()=>{try{isolateMaterials();if(page==='sofa')setupSofa();if(page==='desk')setupDesk();await previewLoads;await Promise.all(Object.keys(config.groups).map(key=>applyGroup(key,choice(key),null,true)));updateText();ui.notice.textContent='';viewerCanvas.style.visibility='visible';document.querySelector('#model-loading').hidden=true;
+viewer.addEventListener('load',async()=>{try{isolateMaterials();if(authored)updateAuthoredDimensions(authored,viewer);if(page==='sofa')setupSofa();if(page==='desk')setupDesk();await previewLoads;await Promise.all(Object.keys(config.groups).map(key=>applyGroup(key,choice(key),null,true)));updateText();ui.notice.textContent='';viewerCanvas.style.visibility='visible';document.querySelector('#model-loading').hidden=true;
   // Let the browser paint the lightweight result before requesting PBR maps.
   setTimeout(()=>{Promise.all(Object.keys(config.groups).map(key=>applyGroup(key))).catch(console.error);},200);
 }catch(error){console.error(error);ui.notice.textContent='Malzemeler yüklenemedi. Lütfen sayfayı yenileyin.';}});
@@ -260,7 +260,7 @@ buildMaterials();
 function updateDimensions(){
   const overlay=document.querySelector('#dimensions-overlay'),visible=!overlay.hidden;
   const guides=visible?viewer.getMeasurementGuides():null;
-  if(authored&&guides)for(const guide of guides){const axis=guide.label[0];guide.label=`${axis} ${authored.draft[{G:'width',D:'depth',Y:'height'}[axis]]} ${authored.draft.unit}`;}
+  if(authored&&guides)updateAuthoredDimensions(authored,viewer,guides);
   viewer.setDimensionsVisible(visible&&!guides?.length);
   if(!guides?.length){overlay.replaceChildren();return;}
   if(matchMedia('(max-width:600px)').matches){
@@ -290,3 +290,4 @@ function updateDimensions(){
   for(const guide of guides){const label=document.createElement('span');label.textContent=guide.label;label.style.left=`${(guide.start.x+guide.end.x)/2+guide.offset.x}px`;label.style.top=`${(guide.start.y+guide.end.y)/2+guide.offset.y}px`;overlay.append(label);}
 }
 setInterval(updateDimensions,250);
+

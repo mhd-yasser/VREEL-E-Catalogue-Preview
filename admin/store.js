@@ -59,11 +59,6 @@ export function validation(draft, targetIds = []) {
   if (!draft.model)
     errors.push("Yüklenmiş ve kontrol edilmiş bir GLB gerekli.");
   if (
-    draft.features.dimensions &&
-    !["width", "depth", "height"].every((k) => Number(draft[k]) > 0)
-  )
-    errors.push("Ölçüler için üç pozitif değer gerekli.");
-  if (
     draft.features.downloads &&
     !draft.assets.some((a) => a.kind === "attachments" && a.public)
   )
@@ -125,3 +120,4 @@ export function inspectGLB(buffer) {
     );
   return json;
 }
+

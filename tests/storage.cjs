@@ -32,6 +32,7 @@ global.indexedDB = indexedDB;
   const draft = newDraft();
   draft.name = "Desk";
   draft.model = { blob: new Blob([bytes]), name: "desk.glb" };
+  draft.features.dimensions = true;
   assert.deepEqual(validation(draft), []);
   draft.features.downloads = true;
   draft.assets = [

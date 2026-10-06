@@ -13,3 +13,11 @@ assert.equal(m.normalMap,original.normalMap);assert.equal(m.roughnessMap,origina
 await paintAuthored(m,{id:'texture',image:'blob:test'},viewer);assert.deepEqual(m.map.repeat.toArray(),[3,4]);assert.equal(m.color.getHexString(),'ffffff');
 await paintAuthored(m,{id:'original',original:true},viewer);assert.equal(m.map,original.map);assert.equal(m.color.getHexString(),'665544');
 console.log('PASS: authored color, texture UV transforms, fixed PBR maps and original restoration.');
+const {updateAuthoredDimensions}=await import('../authored-viewer.js');
+globalThis.document={querySelectorAll:()=>[]};
+const guides=[{part:'product',axis:'G',value:.6},{part:'product',axis:'D',value:.5},{part:'product',axis:'Y',value:1}];
+const config={draft:{features:{dimensions:true},unit:'cm',width:999,depth:999,height:999}};
+updateAuthoredDimensions(config,{},guides);assert.deepEqual(guides.map(g=>g.label),['G 60 cm','D 50 cm','Y 100 cm']);
+config.draft.unit='mm';updateAuthoredDimensions(config,{},guides);assert.equal(guides[0].label,'G 600 mm');
+delete config.draft.width;delete config.draft.depth;delete config.draft.height;config.draft.unit='m';updateAuthoredDimensions(config,{},guides);assert.equal(guides[0].label,'G 0.6 m');
+console.log('PASS: geometry dimensions ignore manual values, work without entries, and convert units.');
