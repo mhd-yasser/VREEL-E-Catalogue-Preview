@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { createViewer } from "../three-viewer.js";
+import { createViewer } from "../three-viewer.js?v=20261006-2";
 import {
   saveProduct,
   listProducts,
