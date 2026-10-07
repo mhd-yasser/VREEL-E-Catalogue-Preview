@@ -34,6 +34,7 @@ const path = require("node:path");
   );
   await page.locator("#name").fill("Authoring integration desk");
   await page.locator("#next").click();
+  await page.locator("#next").click();
   await page.locator("#add-group").click();
   await page.locator("#group-name").fill("Cabinet finish");
   const targetInputs = page.locator("#targets input");

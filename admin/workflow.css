@@ -57,7 +57,7 @@ body:not(.public-mode) .dimension-parts{max-height:150px;overflow:auto;overscrol
 body:not(.public-mode) .dimension-parts label{display:flex;align-items:center;gap:9px;margin:0;padding:7px 0}
 body:not(.public-mode) .dimension-parts input{width:15px;height:15px;flex:none;margin:0}
 @media(min-width:1101px){
-  body[data-author-step="2"],body[data-author-step="3"]{height:100dvh;overflow:hidden}
+  body[data-author-step="2"],body[data-author-step="3"],body[data-author-step="4"]{height:100dvh;overflow:hidden}
   body[data-author-step] .layout:has(#mapping:not([hidden])){height:calc(100dvh - 76px);min-height:0}
   body[data-author-step] .layout:has(#mapping:not([hidden])) aside{overflow:auto}
   body[data-author-step] main:has(#mapping:not([hidden])){display:flex;flex-direction:column;min-height:0;padding-top:18px;padding-bottom:14px}
@@ -74,4 +74,12 @@ body:not(.public-mode) .dimension-parts input{width:15px;height:15px;flex:none;m
 
 @media(min-width:1101px){body[data-author-step] #mapping:not([hidden]) .mapping-grid{height:100%;min-height:0}body[data-author-step] footer{padding:12px 0}}
 
-@media(min-width:1101px){body[data-author-step="2"] .mapping-grid,body[data-author-step="3"] .mapping-grid{grid-template-rows:minmax(0,1fr);align-items:stretch}body[data-author-step="2"] .layout,body[data-author-step="3"] .layout{grid-template-rows:minmax(0,1fr)}}
+@media(min-width:1101px){body[data-author-step="2"] .mapping-grid,body[data-author-step="3"] .mapping-grid,body[data-author-step="4"] .mapping-grid{grid-template-rows:minmax(0,1fr);align-items:stretch}body[data-author-step="2"] .layout,body[data-author-step="3"] .layout,body[data-author-step="4"] .layout{grid-template-rows:minmax(0,1fr)}}
+
+#component-editor{min-height:0;overflow:auto;overscroll-behavior:contain;height:100%;padding-right:5px}
+#component-editor article{padding:17px;margin-bottom:13px}
+#component-nodes{max-height:230px;overflow:auto}
+#component-nodes .target span{overflow-wrap:anywhere}
+.component-option{border:1px solid #dce5ef;border-radius:7px;padding:12px;margin:10px 0;background:#fff}
+.component-option .option-bottom{margin-top:8px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+@media(max-width:1100px){#component-editor{max-height:65dvh}}

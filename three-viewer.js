@@ -198,6 +198,12 @@ export function createViewer(element){
   element.materialFromPoint=fromPoint;
   element.createTexture=(url)=>new Promise((resolve,reject)=>textureLoader.load(url,texture=>{texture.colorSpace=THREE.SRGBColorSpace;texture.flipY=false;resolve(texture);},undefined,reject));
   element.requestUpdate=()=>renderer.render(scene,camera);
+  element.loadAdditionalModel=async url=>{
+    const bytes=await fetch(url).then(r=>{if(!r.ok)throw new Error('Alternatif model yüklenemedi.');return r.arrayBuffer();});
+    const gltf=await new Promise((resolve,reject)=>loader.parse(bytes,'',resolve,reject));
+    gltf.scene.traverse(node=>{if(node.isMesh){node.castShadow=true;node.receiveShadow=true;}});
+    return gltf.scene;
+  };
   element.reframe=reframe;
   element.bounds=root=>visibleBox(root);
   element.findObjects=name=>{const matches=[];object?.traverse(node=>{if(node.name===name)matches.push(node);});return matches;};

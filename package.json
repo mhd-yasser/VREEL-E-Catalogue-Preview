@@ -3,6 +3,8 @@
   "private": true,
   "scripts": {
     "test:storage": "node tests/storage.cjs",
+    "test:components": "node tests/components.mjs",
+    "test:component-browser": "node tests/component-authoring.cjs",
     "test:browser": "node tests/authoring.cjs"
   },
   "devDependencies": {

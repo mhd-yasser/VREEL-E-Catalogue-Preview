@@ -14,7 +14,7 @@
         }
       }
     </script>
-  <link rel="stylesheet" href="./workflow.css?v=20261006-2"></head>
+  <link rel="stylesheet" href="./workflow.css?v=20261007-1"></head>
   <body>
     <header>
       <a href="../manage/"
@@ -32,8 +32,9 @@
         <nav id="steps">
           <button data-step="1" class="active">
             <b>01</b> Ürün ve dosyalar</button
-          ><button data-step="2"><b>02</b> Malzeme eşleştirme</button
-          ><button data-step="3"><b>03</b> Önizleme ve kontrol</button>
+          ><button data-step="2"><b>02</b> Parça alternatifleri</button
+          ><button data-step="3"><b>03</b> Malzeme eşleştirme</button
+          ><button data-step="4"><b>04</b> Önizleme ve kontrol</button>
         </nav>
         <div class="scope">
           <strong>Yerel pilot</strong>
@@ -51,7 +52,7 @@
       <main>
         <div class="page-heading">
           <div>
-            <p class="eyebrow" id="step-label">ADIM 01 / 03</p>
+            <p class="eyebrow" id="step-label">ADIM 01 / 04</p>
             <h2 id="page-title">Yeni ürün ekleyin</h2>
             <p id="page-subtitle">
               Ürününüzün bilgilerini, modelini ve sunum özelliklerini
@@ -246,6 +247,22 @@
               </p>
               <div id="public-info" hidden></div>
             </div>
+            <div id="component-editor" hidden>
+              <article>
+                <div class="section-heading"><h3>Alternatif grupları</h3><button id="add-component-group">+ Grup</button></div>
+                <p class="helper">P_ ile başlayan grupları alternatif olarak düzenleyin. Her grup için yalnızca bir seçenek görünür. Atanmayan parçalar görünür kalır.</p>
+                <div id="component-groups"></div>
+              </article>
+              <article id="component-group-editor" hidden>
+                <label>Grup adı<input id="component-group-name" maxlength="80" placeholder="Örn. Dolap ölçüsü" /></label>
+                <h4>Modeldeki P_ parçaları</h4><div id="component-nodes"></div>
+                <h4>Alternatif adları ve varsayılan seçim</h4><div id="component-options"></div>
+                <h4>Ayrı GLB dosyası ekleyin</h4>
+                <label>Yerini alacağı referans parça<select id="component-reference"></select></label>
+                <label>Alternatif GLB<input id="component-file" type="file" accept=".glb" /></label>
+                <p class="helper">Dosyanın merkezi referans parçanın merkezine hizalanır. Boyut ve yön korunur; dosyaları aynı birim ve yönde hazırlayın. İç içe seçenek ilişkileri daha sonra eklenecek.</p>
+              </article>
+            </div>
             <div id="editor">
               <article>
                 <div class="section-heading">
@@ -319,11 +336,11 @@
           <button id="back" hidden>← Önceki adım</button
           ><span id="footer-hint"
             >Değişikliklerinizi taslak olarak saklayabilirsiniz.</span
-          ><button id="next" class="primary">Malzeme eşleştirme →</button>
+          ><button id="next" class="primary">Parça alternatifleri →</button>
         </footer>
       </main>
     </div>
-    <script type="module" src="author.js?v=20261006-2"></script>
+    <script type="module" src="author.js?v=20261007-1"></script>
   </body>
 </html>
 
