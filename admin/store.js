@@ -51,6 +51,8 @@ export function newDraft() {
     model: null,
     assets: [],
     groups: [],
+    componentGroups: [],
+    componentAssets: [],
   };
 }
 export function validation(draft, targetIds = []) {

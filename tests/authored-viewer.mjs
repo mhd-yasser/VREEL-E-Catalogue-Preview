@@ -24,3 +24,17 @@ delete config.draft.width;delete config.draft.depth;delete config.draft.height;c
 console.log('PASS: manual dimensions take precedence; empty dimensions use geometry with unit conversion.');
 
 config.draft.width=75;config.draft.unit='cm';updateAuthoredDimensions(config,{},guides);assert.deepEqual(guides.map(g=>g.label),['G 75 cm','D 50 cm','Y 100 cm']);
+const {prepareAuthoredComponents}=await import('../authored-viewer.js');
+const dom={createElement(){return {dataset:{},append(){}};},querySelector(){return {append(){}};}};
+globalThis.document=dom;
+const root=new THREE.Group();
+for(let i=0;i<2;i++){const node=new THREE.Group();node.userData={sourceName:`P_${i}`,sourceNodeIndex:i};root.add(node);}
+const componentConfig={draft:{componentGroups:[{id:'size',name:'Size',defaultId:'small',options:[{id:'large',label:'100 cm',nodeId:'node-0'},{id:'small',label:'65 cm',nodeId:'node-1'}]}]}};
+let change,changeCount=0;
+const buttons=[{dataset:{variant:'large'},classList:{toggle(){}}},{dataset:{variant:'small'},classList:{toggle(){}}}],summary={};
+const componentViewer={model:{root},reframe(){},requestUpdate(){}};
+const reset=await prepareAuthoredComponents(componentConfig,componentViewer,(_name,_options,_initial,handler)=>{change=handler;return {querySelectorAll:()=>buttons,querySelector:()=>summary};},()=>changeCount++);
+assert(!root.children[0].visible);assert(root.children[1].visible);assert.equal(componentConfig.componentChoices.size.value,'65 cm');
+change('large');assert(root.children[0].visible);assert(!root.children[1].visible);assert.equal(componentConfig.componentChoices.size.value,'100 cm');
+reset();assert(!root.children[0].visible);assert(root.children[1].visible);assert.equal(componentConfig.componentChoices.size.value,'65 cm');assert.equal(changeCount,2);
+console.log('PASS: public component defaults, independent selection labels, reset to default.');

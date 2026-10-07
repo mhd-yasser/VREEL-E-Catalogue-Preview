@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { createViewer } from "../three-viewer.js?v=20261006-2";
+import { createViewer } from "../three-viewer.js?v=20261007-1";
 import {
   saveProduct,
   listProducts,
@@ -8,6 +8,9 @@ import {
   validation,
   inspectGLB,
 } from "./store.js";
+import {collectComponents, mountAlternatives, applyComponentSelection, componentErrors, materialTargetId} from '../component-options.js?v=20261007-1';
+let components = [], componentNodes = new Map(), activeComponentGroup = null;
+const componentSelection = new Map();
 const $ = (id) => document.getElementById(id),
   uid = () => crypto.randomUUID();
 const fieldIds = [
@@ -65,6 +68,7 @@ function cleanup() {
   for (const texture of textures.values()) texture.dispose();
   textures.clear();
   previewSelection.clear();
+  componentSelection.clear();
 }
 function readFields() {
   for (const id of fieldIds) draft[id] = $(id).value;
@@ -106,7 +110,7 @@ function initViewer() {
     if (
       !down ||
       Math.hypot(e.clientX - down[0], e.clientY - down[1]) > 5 ||
-      step !== 2
+      step !== 3
     )
       return;
     const pick = viewer.materialFromPoint(e.clientX, e.clientY);
@@ -126,6 +130,8 @@ async function loadModel(model, applyConfig = true) {
   loading = true;
   loaded = false;
   $("next").disabled = true;
+  $("save").disabled = true;
+  $("component-editor").inert = true;
   $("model-file").disabled = true;
   $("example").disabled = true;
   try {
@@ -152,15 +158,19 @@ async function loadModel(model, applyConfig = true) {
       viewer.src = assetUrl(model);
     });
     clearHighlight();
+    components = collectComponents(viewer.model.root);
+    componentNodes = applyConfig
+      ? await mountAlternatives(viewer, draft, assetUrl)
+      : new Map(components.map(c => [c.id,c.node]));
     targets = [];
     let meshIndex = 0;
     viewer.model.root.traverse((node) => {
       if (!node.isMesh) return;
-      const index = meshIndex++;
+      const index = node.userData.componentMaterialPrefix ? -1 : meshIndex++;
       const original = [node.material].flat();
       const clones = original.map((m, slot) => {
         const material = m.clone();
-        const id = `mesh-${index}-slot-${slot}`;
+        const id = materialTargetId(node, index, slot);
         targets.push({
           id,
           node,
@@ -175,29 +185,17 @@ async function loadModel(model, applyConfig = true) {
       node.material = Array.isArray(node.material) ? clones : clones[0];
     });
     loaded = true;
-    renderDimensionTargets();
+    viewer.measurementTargets = (draft.componentGroups||[]).length?[]:draft.dimensionTargets||[];
     if (applyConfig) await applyAll();
     return true;
   } finally {
     loading = false;
     $("next").disabled = false;
+    $("save").disabled = false;
+    $("component-editor").inert = false;
     $("model-file").disabled = false;
     $("example").disabled = false;
   }
-}
-function renderDimensionTargets() {
-  let host = $("dimension-targets");
-  if (!host) {host=element("div");host.id="dimension-targets";$("viewer-column").append(host);}
-  host.replaceChildren();
-  const details=element("details"),summary=element("summary","Ölçülere dahil edilecek parçalar"),list=element("div");list.className="dimension-parts";
-  details.append(summary,element("p","Seçim boşsa modelin tamamı kullanılır. Birden fazla ürün içeren modellerde yalnızca ilgili ürünü seçin."),list);host.append(details);
-  const seen=new Set();
-  for(const t of targets){const id=t.id.split("-slot-")[0];if(seen.has(id))continue;seen.add(id);
-    const label=element("label"),check=element("input");check.type="checkbox";check.checked=(draft.dimensionTargets||[]).includes(id);
-    check.onchange=()=>{draft.dimensionTargets=check.checked?[...(draft.dimensionTargets||[]),id]:(draft.dimensionTargets||[]).filter(x=>x!==id);viewer.measurementTargets=draft.dimensionTargets;renderInfo();changed();};
-    label.append(check,element("span",t.node.userData.sourceName||t.node.name||id));list.append(label);
-  }
-  viewer.measurementTargets=draft.dimensionTargets||[];
 }
 function clearHighlight() {
   for (const h of highlighted) {
@@ -271,6 +269,9 @@ async function applyOption(g, o) {
 async function applyAll() {
   if (!loaded) return;
   clearHighlight();
+  viewer.measurementTargets = (draft.componentGroups||[]).length?[]:draft.dimensionTargets||[];
+  applyComponentSelection(componentNodes, draft.componentGroups, componentSelection);
+  viewer.requestUpdate();
   releaseDerivedMaps();
   for (const t of targets) t.material.copy(t.original);
   if (draft.features.configurable)
@@ -528,6 +529,21 @@ function renderOptions() {
 }
 function renderPreviewOptions(host) {
   host.replaceChildren();
+  for (const g of draft.componentGroups || []) {
+    const block = element('div', undefined, 'preview-group');
+    block.append(element('strong', g.name));
+    for (const o of g.options) {
+      const b = button(o.label, () => {
+        componentSelection.set(g.id,o.id);
+        applyComponentSelection(componentNodes,draft.componentGroups,componentSelection);
+        viewer.reframe(); renderInfo(); renderPreviewOptions(host);
+      });
+      b.classList.toggle('active',o.id === (componentSelection.get(g.id)||g.defaultId));
+      b.setAttribute('aria-pressed',String(b.classList.contains('active')));
+      block.append(b);
+    }
+    host.append(block);
+  }
   if (!draft.features.configurable) return;
   for (const g of draft.groups) {
     const block = element("div", undefined, "preview-group");
@@ -568,6 +584,7 @@ function errors() {
     draft,
     targets.map((t) => t.id),
   );
+  all.push(...componentErrors(draft, components));
   if (!loaded) all.push("Model yükleme kontrolü tamamlanmalı.");
   if (draft.features.configurable)
     for (const g of draft.groups)
@@ -645,35 +662,39 @@ async function go(next) {
   clearHighlight();
   $("setup").hidden = step !== 1;
   $("mapping").hidden = step === 1;
-  $("editor").hidden = step !== 2;
-  $("review").hidden = step !== 3;
-  $("public-info").hidden = step !== 3;
+  $("component-editor").hidden = step !== 2;
+  $("editor").hidden = step !== 3;
+  $("review").hidden = step !== 4;
+  $("public-info").hidden = step !== 4;
   $("back").hidden = step === 1;
-  $("next").hidden = step === 3;
+  $("next").hidden = step === 4;
   $("next").textContent =
-    step === 1 ? "Malzeme eşleştirme →" : "Önizleme ve kontrol →";
-  $("step-label").textContent = `ADIM 0${step} / 03`;
+    step === 1 ? "Parça alternatifleri →" : step === 2 ? "Malzeme eşleştirme →" : "Önizleme ve kontrol →";
+  $("step-label").textContent = `ADIM 0${step} / 04`;
   $("page-title").textContent = [
     "",
     "Yeni ürün ekleyin",
+    "Ürün parçalarının alternatiflerini düzenleyin",
     "Parçaları seçeneklere bağlayın",
     "Ürününüzü kontrol edin",
   ][step];
   $("page-subtitle").textContent = [
     "",
     "Ürününüzün bilgilerini, modelini ve sunum özelliklerini hazırlayın.",
+    "P_ parçalarını gruplayın, seçenekleri adlandırın ve varsayılanları belirleyin.",
     "Birlikte değişen parçaları gruplandırın ve müşteriye sunulacak alternatifleri tanımlayın.",
     "Seçenekleri deneyin ve yerel yayın kopyasını hazırlayın.",
   ][step];
   for (const b of $("steps").children)
     b.classList.toggle("active", Number(b.dataset.step) === step);
   notice("");
-  if (step === 2) {
+  if (step === 2) {applyComponentSelection(componentNodes,draft.componentGroups,componentSelection);renderComponentEditor();}
+  if (step === 3) {
     renderGroups();
     renderGroupEditor();
     renderLibrary();
   }
-  if (step === 3) {
+  if (step === 4) {
     try {
       await applyAll();
       renderReview();
@@ -714,6 +735,11 @@ async function acceptModel(file) {
     await loadModel(model, false);
     draft.model = model;
     draft.groups = [];
+    draft.componentGroups = [];
+    draft.componentAssets = [];
+    draft.dimensionTargets = [];
+    componentSelection.clear();
+    activeComponentGroup = null;
     activeGroup = null;
     changed();
     fillFields();
@@ -874,6 +900,7 @@ $("drafts").onchange = async (e) => {
     cleanup();
     record = next;
     draft = record.draft;
+    draft.componentGroups ||= []; draft.componentAssets ||= []; componentSelection.clear(); activeComponentGroup = null;
     activeGroup = draft.groups[0]?.id || null;
     dirty = false;
     loaded = false;
@@ -915,7 +942,7 @@ async function start() {
         "Bu ürün yalnızca bu tarayıcıdaki yayın kopyasından gösteriliyor.";
       $("state").textContent = "Yerel yayın";
       $("public-info").hidden = false;
-      step = 3;
+      step = 4;
       await loadModel(draft.model);
       renderInfo();
       const host = element("article");
@@ -929,6 +956,7 @@ async function start() {
         if (!saved) throw new Error("Kayıt bulunamadı.");
         record = saved;
         draft = record.draft;
+    draft.componentGroups ||= []; draft.componentAssets ||= []; componentSelection.clear(); activeComponentGroup = null;
         activeGroup = draft.groups[0]?.id || null;
       }
       fillFields();
@@ -943,3 +971,83 @@ async function start() {
 start();
 
 
+
+function componentGroup() { return (draft.componentGroups || []).find(g => g.id === activeComponentGroup); }
+function refreshComponentPreview() {
+  for (const node of componentNodes.values()) node.visible = true;
+  applyComponentSelection(componentNodes,draft.componentGroups,componentSelection);
+  viewer?.requestUpdate();
+}
+function renderComponentEditor() {
+  draft.componentGroups ||= []; draft.componentAssets ||= [];
+  if (!componentGroup()) activeComponentGroup = draft.componentGroups[0]?.id || null;
+  const host = $('component-groups'); host.replaceChildren();
+  if (!draft.componentGroups.length) {
+    host.append(element('p',`${components.length} P_ parçası bulundu. Bir grup ekleyin veya alternatif yoksa bu adımı geçin.`,'helper'));
+    for(const c of components)host.append(element('small',c.path));
+  }
+  for (const g of draft.componentGroups) {
+    const row=element('div',undefined,'group'+(g.id===activeComponentGroup?' selected':''));
+    row.append(button(`${g.name} · ${g.options.length} seçenek`,()=>{activeComponentGroup=g.id;renderComponentEditor();}),button('Sil',async()=>{
+      draft.componentGroups=draft.componentGroups.filter(x=>x.id!==g.id);
+      const removed=new Set(g.options.filter(o=>o.assetId).map(o=>o.assetId));
+      draft.componentAssets=draft.componentAssets.filter(a=>!removed.has(a.id));
+      removeExternalMaterialTargets(removed);
+      componentSelection.delete(g.id); changed(); await loadModel(draft.model); renderComponentEditor();
+    })); host.append(row);
+  }
+  const g=componentGroup(); $('component-group-editor').hidden=!g; if(!g)return;
+  $('component-group-name').value=g.name;
+  const list=$('component-nodes'); list.replaceChildren();
+  if(!components.length)list.append(element('p','P_ ile başlayan grup bulunamadı. Kaynak dosyada grup adlarını düzenleyip GLB olarak yeniden yükleyin.','helper'));
+  const assigned=(draft.componentGroups||[]).flatMap(x=>x.options).filter(o=>o.nodeId).map(o=>o.nodeId);
+  for(const c of components){
+    const row=element('label',undefined,'target'),check=element('input');check.type='checkbox';check.checked=g.options.some(o=>o.nodeId===c.id);
+    const owner=draft.componentGroups.find(x=>x.id!==g.id&&x.options.some(o=>o.nodeId===c.id));
+    const nested=components.some(other=>assigned.includes(other.id)&&other.id!==c.id&&(isAncestor(c.node,other.node)||isAncestor(other.node,c.node)));
+    check.disabled=!!owner||(nested&&!check.checked);
+    check.onchange=()=>{
+      if(check.checked){const option={id:uid(),nodeId:c.id,label:c.name.slice(2)||c.name};g.options.push(option);g.defaultId ||= option.id;}
+      else {
+        if(g.options.some(o=>o.referenceId===c.id)){notice('Önce bu parçaya bağlı dosya alternatiflerini kaldırın.',true);check.checked=true;return;}
+        g.options=g.options.filter(o=>o.nodeId!==c.id);if(!g.options.some(o=>o.id===g.defaultId))g.defaultId=g.options[0]?.id||null;
+      }
+      componentSelection.delete(g.id);changed();refreshComponentPreview();renderComponentEditor();
+    };
+    row.append(check,element('span',c.path+(owner?` (${owner.name})`:nested?' (İç içe seçim daha sonra)':'')),button('Göster',()=>{
+      componentSelection.set(g.id,g.options.find(o=>o.nodeId===c.id)?.id||g.defaultId);refreshComponentPreview();
+      highlight(targets.filter(t=>isAncestor(c.node,t.node)||c.node===t.node).map(t=>t.id));
+    }));list.append(row);
+  }
+  const options=$('component-options');options.replaceChildren();
+  for(const o of g.options){
+    const row=element('div',undefined,'component-option'),name=element('input');name.value=o.label;name.maxLength=80;name.setAttribute('aria-label','Alternatif adı');name.oninput=()=>{o.label=name.value;changed();};
+    const bottom=element('div',undefined,'option-bottom'),label=element('label'),radio=element('input');radio.type='radio';radio.name='component-default';radio.checked=g.defaultId===o.id;
+    radio.onchange=()=>{g.defaultId=o.id;componentSelection.delete(g.id);changed();refreshComponentPreview();};label.append(radio,element('span','Varsayılan'));
+    bottom.append(label,button('Önizle',()=>{componentSelection.set(g.id,o.id);refreshComponentPreview();viewer.reframe();}));
+    if(o.assetId)bottom.append(button('Sil',async()=>{g.options=g.options.filter(x=>x.id!==o.id);draft.componentAssets=draft.componentAssets.filter(a=>a.id!==o.assetId);removeExternalMaterialTargets(new Set([o.assetId]));if(g.defaultId===o.id)g.defaultId=g.options[0]?.id||null;componentSelection.delete(g.id);changed();await loadModel(draft.model);renderComponentEditor();}));
+    row.append(name,element('small',o.assetId?'Ayrı GLB dosyası':components.find(c=>c.id===o.nodeId)?.path||'Eksik parça'),bottom);options.append(row);
+  }
+  const reference=$('component-reference');reference.replaceChildren(new Option('Referans parça seçin',''));
+  for(const o of g.options.filter(o=>o.nodeId))reference.append(new Option(o.label,o.nodeId));
+  $('component-file').disabled=!g.options.some(o=>o.nodeId)||loading;
+}
+function isAncestor(parent,node){for(let p=node.parent;p;p=p.parent)if(p===parent)return true;return false;}
+function removeExternalMaterialTargets(ids){for(const g of draft.groups)g.targets=g.targets.filter(t=>![...ids].some(id=>t.startsWith(`asset-${id}-mesh-`)));}
+$('add-component-group').onclick=()=>{
+  const g={id:uid(),name:`Alternatif grubu ${(draft.componentGroups||[]).length+1}`,options:[],defaultId:null};
+  (draft.componentGroups ||= []).push(g);activeComponentGroup=g.id;changed();renderComponentEditor();
+};
+$('component-group-name').oninput=e=>{componentGroup().name=e.target.value;changed();const g=componentGroup();const b=$('component-groups').querySelector('.selected button');if(b)b.textContent=`${g.name} · ${g.options.length} seçenek`;};
+$('component-file').onchange=async e=>{
+  const file=e.target.files[0],g=componentGroup(),referenceId=$('component-reference').value;
+  if(!file||!g||loading)return;
+  if(!referenceId){notice('Önce yerini alacağı referans parçayı seçin.',true);e.target.value='';return;}
+  const asset={id:uid(),name:file.name,blob:file};
+  const option={id:uid(),label:file.name.replace(/\.glb$/i,''),assetId:asset.id,referenceId};
+  try{
+    inspectGLB(await file.arrayBuffer()); draft.componentAssets.push(asset);g.options.push(option);
+    await loadModel(draft.model);changed();renderComponentEditor();notice('Alternatif eklendi. Önizlemede konumunu kontrol edin.');
+  }catch(err){draft.componentAssets=draft.componentAssets.filter(a=>a.id!==asset.id);g.options=g.options.filter(o=>o.id!==option.id);try{await loadModel(draft.model);}catch{}notice(err.message,true);}
+  finally{e.target.value='';}
+};

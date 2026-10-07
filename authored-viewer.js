@@ -1,3 +1,4 @@
+import {mountAlternatives, applyComponentSelection} from './component-options.js?v=20261007-1';
 import {getProduct} from './admin/store.js';
 const urls=[];
 const url=asset=>{const value=URL.createObjectURL(asset.blob);urls.push(value);return value;};
@@ -36,8 +37,8 @@ export function prepareAuthoredPage(config,viewer){
   if(d.features.downloads)for(const a of d.assets.filter(a=>a.kind==='attachments'&&a.public)){const link=document.createElement('a');link.textContent=a.name;link.href=url(a);link.download=a.name;$('.material-files').append(link);}
   for(const a of d.assets.filter(a=>a.kind==='photos')){const img=document.createElement('img');img.src=url(a);img.alt=d.name;img.style.cssText='width:100%;height:auto;border-radius:12px;margin-top:16px';$('#details').append(img);}
   $('[data-action="dimensions"]').hidden=!d.features.dimensions;
-  viewer.measurementTargets=d.dimensionTargets||[];
-  $('#source-download').hidden=true;$('#reset-materials').hidden=!d.features.configurable;
+  viewer.measurementTargets=(d.componentGroups||[]).length?[]:d.dimensionTargets||[];
+  $('#source-download').hidden=true;$('#reset-materials').hidden=!d.features.configurable&&!(d.componentGroups||[]).length;
   $('#add').hidden=!d.features.contact;$('#add').textContent='Teklif İste →';
   $('#add').addEventListener('click',event=>{event.stopImmediatePropagation();location.href=`mailto:${encodeURIComponent(d.email)}?subject=${encodeURIComponent(d.name+' — Teklif talebi')}`;});
 }
@@ -50,4 +51,30 @@ export function updateAuthoredDimensions(config,viewer,guides=viewer.getMeasurem
   const values=guides.filter(g=>g.part==='product').map(g=>g.label).join(' · ');
   const row=[...document.querySelectorAll('#details dt')].find(el=>el.textContent==='Ölçüler');
   if(row)row.nextElementSibling.textContent=values;
+}
+
+export async function prepareAuthoredComponents(config,viewer,addCard,onChange){
+  const groups=config.draft.componentGroups||[];
+  const nodes=await mountAlternatives(viewer,config.draft,url), selection=new Map();
+  applyComponentSelection(nodes,groups,selection);
+  config.componentChoices=Object.fromEntries(groups.map(g=>[g.id,{label:g.name,value:g.options.find(o=>o.id===g.defaultId).label}]));
+  const cards=[];
+  for(const group of groups){
+    const row=document.createElement('div'),dt=document.createElement('dt'),dd=document.createElement('dd');
+    dt.textContent=group.name;dd.dataset.componentDetail=group.id;dd.textContent=config.componentChoices[group.id].value;
+    row.append(dt,dd);document.querySelector('#material-details').append(row);
+  }
+  for(const group of [...groups].reverse()){
+    cards.push({group,card:addCard(group.name,group.options,group.defaultId,id=>{
+      config.componentChoices[group.id].value=group.options.find(o=>o.id===id).label;
+      selection.set(group.id,id);applyComponentSelection(nodes,groups,selection);
+      viewer.reframe();viewer.requestUpdate();onChange();
+    })});
+  }
+  if(groups.length)viewer.reframe();
+  return ()=>{selection.clear();applyComponentSelection(nodes,groups);for(const {group,card} of cards){
+    card.querySelectorAll('[data-variant]').forEach(b=>b.classList.toggle('active',b.dataset.variant===group.defaultId));
+    config.componentChoices[group.id].value=group.options.find(o=>o.id===group.defaultId).label;
+    card.querySelector('summary b').textContent=config.componentChoices[group.id].value;
+  }viewer.reframe();onChange();};
 }

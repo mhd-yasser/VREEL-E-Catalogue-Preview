@@ -66,6 +66,8 @@ global.indexedDB = indexedDB;
   });
   assert(validation(draft, ["a", "b"]).some((e) => e.includes("birden fazla")));
   draft.groups.pop();
+  draft.componentAssets=[{id:'alternative',name:'alternative.glb',blob:new Blob([bytes])}];
+  draft.componentGroups=[{id:'size',name:'Size',defaultId:'base',options:[{id:'base',nodeId:'node-0',label:'100 cm'},{id:'other',assetId:'alternative',referenceId:'node-0',label:'85 cm'}]}];
   const record = { id: "test", draft, published: structuredClone(draft) };
   await saveProduct(record);
   record.draft.name = "Revised";
@@ -73,6 +75,8 @@ global.indexedDB = indexedDB;
   const loaded = await getProduct("test");
   assert.equal(loaded.draft.name, "Revised");
   assert.equal(loaded.published.name, "Desk");
+  assert.equal(loaded.published.componentGroups[0].options[1].label,'85 cm');
+  assert.deepEqual(Buffer.from(await loaded.published.componentAssets[0].blob.arrayBuffer()),bytes);
   assert.deepEqual(
     Buffer.from(await loaded.draft.model.blob.arrayBuffer()),
     bytes,
