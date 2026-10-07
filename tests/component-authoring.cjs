@@ -21,9 +21,17 @@ function fixture(external=false){
   const check=page.locator('#component-nodes input');assert.equal(await check.count(),3);await check.nth(0).check();await check.nth(1).check();
   await page.locator('#component-options input[aria-label="Alternatif adı"]').nth(0).fill('100 cm');
   await page.locator('#component-options input[aria-label="Alternatif adı"]').nth(1).fill('65 cm');await page.locator('#component-options input[type=radio]').nth(1).check();
+  // Missing reference must give a visible inline error and permit retrying the same file.
+  await page.locator('#component-reference').selectOption('');
+  await page.locator('#component-file').setInputFiles({name:'85.glb',mimeType:'model/gltf-binary',buffer:fixture(true)});
+  assert((await page.locator('#component-upload-status').textContent()).includes('referans'));
+  assert.equal(await page.locator('#component-file').inputValue(),'');
   await page.locator('#component-reference').selectOption('node-0');
   await page.locator('#component-file').setInputFiles({name:'85.glb',mimeType:'model/gltf-binary',buffer:fixture(true)});
-  await page.waitForFunction(()=>document.querySelector('#notice').textContent.includes('Alternatif eklendi'));
+  await page.waitForFunction(()=>document.querySelector('#component-upload-status').textContent.includes('alternatiflere eklendi'));
+  assert.equal(await page.locator('#component-options input[aria-label="Alternatif adı"]').count(),3);
+  assert.equal(await page.locator('#component-reference').inputValue(),'node-0');
+  assert(await page.evaluate(()=>{let found=false;document.querySelector('#viewer').model.root.traverseVisible(n=>{if(n.name==='External')found=true;});return found;}));
   await page.locator('#component-options input[aria-label="Alternatif adı"]').nth(2).fill('85 cm');
   await page.locator('#next').click();assert.equal(await page.locator('#step-label').textContent(),'ADIM 03 / 04');
   await page.locator('#add-group').click();await page.locator('#group-name').fill('Finish');

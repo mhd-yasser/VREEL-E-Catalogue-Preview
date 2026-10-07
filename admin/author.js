@@ -647,7 +647,7 @@ function renderInfo() {
   }
 }
 async function go(next) {
-  if (loading) return;
+  if (loading || componentUploadBusy) return;
   readFields();
   if (next > 1 && !draft.model) {
     notice("Önce bir GLB model ekleyin.", true);
@@ -1028,8 +1028,11 @@ function renderComponentEditor() {
     if(o.assetId)bottom.append(button('Sil',async()=>{g.options=g.options.filter(x=>x.id!==o.id);draft.componentAssets=draft.componentAssets.filter(a=>a.id!==o.assetId);removeExternalMaterialTargets(new Set([o.assetId]));if(g.defaultId===o.id)g.defaultId=g.options[0]?.id||null;componentSelection.delete(g.id);changed();await loadModel(draft.model);renderComponentEditor();}));
     row.append(name,element('small',o.assetId?'Ayrı GLB dosyası':components.find(c=>c.id===o.nodeId)?.path||'Eksik parça'),bottom);options.append(row);
   }
-  const reference=$('component-reference');reference.replaceChildren(new Option('Referans parça seçin',''));
-  for(const o of g.options.filter(o=>o.nodeId))reference.append(new Option(o.label,o.nodeId));
+  const reference=$('component-reference'),previousReference=reference.value;
+  reference.replaceChildren(new Option('Referans parça seçin',''));
+  const references=g.options.filter(o=>o.nodeId);
+  for(const o of references)reference.append(new Option(o.label,o.nodeId));
+  reference.value=references.some(o=>o.nodeId===previousReference)?previousReference:references.length===1?references[0].nodeId:'';
   $('component-file').disabled=!g.options.some(o=>o.nodeId)||loading;
 }
 function isAncestor(parent,node){for(let p=node.parent;p;p=p.parent)if(p===parent)return true;return false;}
@@ -1039,15 +1042,37 @@ $('add-component-group').onclick=()=>{
   (draft.componentGroups ||= []).push(g);activeComponentGroup=g.id;changed();renderComponentEditor();
 };
 $('component-group-name').oninput=e=>{componentGroup().name=e.target.value;changed();const g=componentGroup();const b=$('component-groups').querySelector('.selected button');if(b)b.textContent=`${g.name} · ${g.options.length} seçenek`;};
+let componentUploadBusy=false;
+function componentUploadNotice(message,error=false){
+  const host=$('component-upload-status');host.textContent=message;host.classList.toggle('error',error);
+  notice(message,error);
+}
 $('component-file').onchange=async e=>{
-  const file=e.target.files[0],g=componentGroup(),referenceId=$('component-reference').value;
-  if(!file||!g||loading)return;
-  if(!referenceId){notice('Önce yerini alacağı referans parçayı seçin.',true);e.target.value='';return;}
+  const input=e.target,file=input.files[0],g=componentGroup(),referenceId=$('component-reference').value;
+  if(!file)return;
+  if(componentUploadBusy||loading){componentUploadNotice('Model yükleniyor. Tamamlandıktan sonra dosyayı tekrar seçin.',true);input.value='';return;}
+  if(!g){componentUploadNotice('Önce bir alternatif grubu seçin.',true);input.value='';return;}
+  if(!g.options.some(o=>o.nodeId===referenceId)){
+    componentUploadNotice('Önce yerini alacağı referans parçayı seçin.',true);input.value='';return;
+  }
   const asset={id:uid(),name:file.name,blob:file};
   const option={id:uid(),label:file.name.replace(/\.glb$/i,''),assetId:asset.id,referenceId};
+  componentUploadBusy=true;input.disabled=true;$('component-editor').inert=true;$('save').disabled=true;$('next').disabled=true;
+  componentUploadNotice(`${file.name} kontrol ediliyor ve yükleniyor…`);
   try{
-    inspectGLB(await file.arrayBuffer()); draft.componentAssets.push(asset);g.options.push(option);
-    await loadModel(draft.model);changed();renderComponentEditor();notice('Alternatif eklendi. Önizlemede konumunu kontrol edin.');
-  }catch(err){draft.componentAssets=draft.componentAssets.filter(a=>a.id!==asset.id);g.options=g.options.filter(o=>o.id!==option.id);try{await loadModel(draft.model);}catch{}notice(err.message,true);}
-  finally{e.target.value='';}
+    inspectGLB(await file.arrayBuffer());
+    (draft.componentAssets ||= []).push(asset);g.options.push(option);
+    await loadModel(draft.model);
+    componentSelection.set(g.id,option.id);refreshComponentPreview();viewer.reframe();
+    changed();renderComponentEditor();componentUploadNotice(`${file.name} alternatiflere eklendi ve önizlemede gösteriliyor.`);
+  }catch(err){
+    draft.componentAssets=(draft.componentAssets||[]).filter(a=>a.id!==asset.id);g.options=g.options.filter(o=>o.id!==option.id);
+    componentSelection.delete(g.id);
+    let restoreError='';
+    try{await loadModel(draft.model);}catch(restore){restoreError=` Önceki model de yüklenemedi: ${restore.message}`;}
+    renderComponentEditor();componentUploadNotice(`${file.name} eklenemedi: ${err.message}${restoreError}`,true);
+  }finally{
+    componentUploadBusy=false;input.value='';$('component-editor').inert=false;$('save').disabled=false;$('next').disabled=false;
+    input.disabled=!componentGroup()?.options.some(o=>o.nodeId);
+  }
 };
