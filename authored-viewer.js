@@ -1,4 +1,4 @@
-import {normalizeDraft,applyMaterialVariant,configureMotions,toggleMotion} from './product-runtime.js?v=20261010-3';
+import {normalizeDraft,applyMaterialVariant,configureMotions,toggleMotion} from './product-runtime.js?v=20261010-4';
 import {addARControls} from './product-ar.js?v=20261010-1';
 import {mountAlternatives, applyComponentSelection} from './component-options.js?v=20261010-1';
 import {getProduct} from './admin/store.js?v=20261010-1';
@@ -77,7 +77,7 @@ export async function prepareAuthoredComponents(config,viewer,addCard,onChange){
     cards.push({group,card:addCard(group.name,group.options,group.defaultId,id=>{
       config.componentChoices[group.id].value=group.options.find(o=>o.id===id).label;
       selection.set(group.id,id);applyComponentSelection(nodes,groups,selection);
-      viewer.reframe();viewer.requestUpdate();onChange();
+      viewer.requestUpdate();onChange();
     })});
   }
   if(groups.length)viewer.reframe();
