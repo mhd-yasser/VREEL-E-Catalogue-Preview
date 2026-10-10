@@ -308,7 +308,7 @@
             </div>
             <div id="review" hidden>
               <article>
-                <h3>Yayın öncesi kontrol</h3><label><input id="ar-preview" type="checkbox" /> AR bileşimini önizle (noAR hariç)</label><div id="review-ar"></div>
+                <h3>Yayın öncesi kontrol</h3><label><input id="ar-preview" type="checkbox" /> AR bileşimini önizle (noAR hariç)</label><div style="display:grid;gap:10px;margin:12px 0"><label>AR yerleşimi <select id="ar-placement"><option value="floor">Zemin</option><option value="wall">Duvar</option></select></label><label>Duvara temas eden arka yüz <select id="ar-back"><option value="-z">−Z</option><option value="+z">+Z</option><option value="-x">−X</option><option value="+x">+X</option></select></label><label>Modelin yüksekliğine ek fark (metre) <input id="ar-height" type="number" step="0.01" value="0" /></label><small>Duvar yerleşiminde dosyanın Y=0 seviyesi taranan zemine hizalanır. Modeldeki asılı parçaların yükseklikleri korunur.</small></div><div id="review-ar"></div>
                 <ul id="checks"></ul>
                 <label class="feature"
                   ><input id="reviewed" type="checkbox" /><span
@@ -340,7 +340,7 @@
         </footer>
       </main>
     </div>
-    <script type="module" src="author.js?v=20261010-4"></script>
+    <script type="module" src="author.js?v=20261010-5"></script>
   </body>
 </html>
 

@@ -1,0 +1,12 @@
+import assert from 'node:assert/strict';
+import * as THREE from '../vendor/three.module.js';
+import {surfacePose,preparePlacement,placeOnSurface} from '../ar-placement.js';
+const eye=new THREE.Vector3(0,1,3),floor=new THREE.Matrix4().makeTranslation(0,0,1),vertical=new THREE.Matrix4().makeRotationX(Math.PI/2);vertical.setPosition(1,1.5,0);
+assert.equal(surfacePose(floor,eye).kind,'floor');const wall=surfacePose(vertical,eye);assert.equal(wall.kind,'wall');assert(wall.normal.z>0);
+const root=new THREE.Group();root.scale.setScalar(.01);const mesh=new THREE.Mesh(new THREE.BoxGeometry(100,70,40));mesh.position.set(10,65,20);root.add(mesh);
+const state=preparePlacement(root,{placement:'wall',back:'-z'}),holder=new THREE.Group();holder.add(root);
+assert(!placeOnSurface(holder,wall,state,null));assert(!placeOnSurface(holder,surfacePose(floor,eye),state,0));assert(placeOnSurface(holder,wall,state,.2));
+const box=new THREE.Box3().setFromObject(root),size=box.getSize(new THREE.Vector3());assert(Math.abs(size.x-1)<1e-6);assert(Math.abs(box.min.z)<1e-6);assert(Math.abs(box.min.y-.5)<1e-6);
+state.settings.heightOffset=.1;placeOnSurface(holder,wall,state,.2);assert(Math.abs(new THREE.Box3().setFromObject(root).min.y-.6)<1e-6);assert.deepEqual(root.scale.toArray(),[.01,.01,.01]);
+const sideWall=surfacePose(new THREE.Matrix4().makeRotationZ(-Math.PI/2),new THREE.Vector3(2,1,0));placeOnSurface(holder,sideWall,state,0);const normal=new THREE.Vector3(0,0,1).applyQuaternion(holder.quaternion);assert(normal.distanceTo(sideWall.normal)<1e-6);assert.equal(holder.scale.x,1);
+console.log('PASS: floor/wall filtering, floor calibration required, wall contact, exported suspended height, height adjustment, wall yaw, fixed metre scale.');

@@ -82,6 +82,8 @@ export function composeProduct(runtime,draft,selection=new Map(),ar=false){
   if(!runtime)return;
   const visible=node=>{for(let p=node;p;p=p.parent)if(!p.visible)return false;return true;};
   const previous=new Map((runtime.motions||[]).map(m=>[m,visible(m.target)]));
+  runtime.ar=draft.ar||{enabled:true};
+  runtime.scaleConfirmed=!!draft.scaleConfirmed;
   runtime.root.scale.setScalar(Number(draft.modelScale)||1);
   const chosen=new Set();
   for(const group of draft.componentGroups||[]){const option=group.options.find(o=>o.id===(selection.get(group.id)||group.defaultId));if(option)chosen.add(option.assetId?`asset-${option.assetId}`:option.nodeId);}
