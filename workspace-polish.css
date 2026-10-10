@@ -1,0 +1,39 @@
+/* Shared finishing layer; keeps the established navy / warm gold identity. */
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid #b68a4c;outline-offset:3px}
+body:not(.public-mode) #notice:not(:empty){padding:12px 15px;border:1px solid #dbe5ef;border-radius:8px;background:#edf3f8;line-height:1.7;overflow-wrap:anywhere}
+body:not(.public-mode) #notice.error{background:#fff1ee;border-color:#edc2ba}
+body:not(.public-mode) .page-heading .badge{padding:8px 12px;border-radius:999px;white-space:nowrap}
+body:not(.public-mode) label{line-height:1.7}
+body:not(.public-mode) textarea{resize:vertical;min-height:115px;line-height:1.8}
+body:not(.public-mode) input[type=checkbox],body:not(.public-mode) input[type=radio]{accent-color:#b68a4c}
+#scene-classification .option strong{font-size:12px}
+#native-variants .option>small{font-size:10px;color:#738297;overflow-wrap:anywhere}
+#motion-settings .option>label{padding:6px 0;border-bottom:1px solid #edf1f5;line-height:1.6}
+#scene-classification select,#native-variants input,#motion-settings input{max-width:100%}
+.management-list .product-row{transition:background .15s;border-bottom:1px solid #e4eaf0}
+.management-list .product-row:hover{background:#faf8f4}
+.management-list .links a{display:inline-flex;align-items:center;min-height:40px;font-size:11px;text-decoration:none}
+.management-list .links a:hover{color:#91672f}
+.site-header{border-bottom:1px solid #e4e4e0}
+.product-card{border-radius:12px;overflow:hidden;box-shadow:0 5px 20px #0f1b2d07}
+.product-card:focus-within{outline:2px solid #b68a4c;outline-offset:4px}
+.card-heading h3{line-height:1.5}
+body[data-product=authored] .product-panel{background:#faf9f6}
+body[data-product=authored] .panel-heading{padding-bottom:20px}
+body[data-product=authored] .panel-heading h1{font-size:clamp(24px,2.5vw,34px);line-height:1.4;margin:9px 0 12px}
+body[data-product=authored] .panel-heading .lead{font-size:12px;line-height:1.9;color:#657282;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+body[data-product=authored] .tabs{border-color:#e1ded6}
+body[data-product=authored] .option-card{border-color:#dedfdc;border-radius:10px;box-shadow:0 2px 8px #0f1b2d03;margin-bottom:12px}
+body[data-product=authored] .option-card summary{font-family:Alexandria,Arial,sans-serif;font-size:12px;padding:15px;flex-wrap:wrap}
+body[data-product=authored] .option-card summary b{font-family:inherit;font-size:10px;color:#647387;max-width:65%;text-align:right;overflow-wrap:anywhere}
+body[data-product=authored] .variant-options{display:flex;flex-wrap:wrap;gap:8px;padding-top:14px}
+body[data-product=authored] .variant-options button{font:inherit;font-size:11px;min-height:42px;line-height:1.6;padding:9px 12px;border:1px solid #dce1e5;border-radius:7px;background:#fff;color:#203349;cursor:pointer}
+body[data-product=authored] .variant-options button.active{background:#102237;color:#fff;border-color:#102237}
+body[data-product=authored] #details p{font-size:12px;line-height:1.9;color:#657282;white-space:pre-line}
+body[data-product=authored] #details h2{font-family:Alexandria,Arial,sans-serif;font-size:19px;line-height:1.6}
+body[data-product=authored] .detail-list{font-size:11px}
+body[data-product=authored] .detail-list div{gap:18px;align-items:flex-start;line-height:1.8}
+body[data-product=authored] .detail-list dd{max-width:68%;text-align:right;overflow-wrap:anywhere}
+.product-source{display:inline-flex;align-items:center;margin-top:18px;min-height:44px;color:#936b33;font-size:11px;text-decoration:underline;text-underline-offset:4px}
+body[data-product=authored] .product-ar-controls{border-color:#dcd5c8;background:#f5f0e7}
+@media(max-width:600px){body[data-product=authored] .detail-list div{flex-direction:column;gap:3px}body[data-product=authored] .detail-list dd{max-width:100%;text-align:left}.page-heading{gap:14px;flex-wrap:wrap}}

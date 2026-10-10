@@ -15,3 +15,10 @@ await assert.rejects(()=>importProductPackage(damaged),/eksik veya değiştirilm
 const missing=structuredClone(pkg);missing.files=[];
 await assert.rejects(()=>importProductPackage(missing),/dosya eksik/);
 console.log('Portable product snapshot, ordering, defaults, deduplication and integrity passed.');
+
+const {addBariProfile}=await import("../admin/bari-profile.js");
+const product=structuredClone(draft),before=JSON.stringify(product.componentGroups);
+product.model.name="BARI_KHRONOS4.glb";product.description="My custom description";
+assert(addBariProfile(product));assert.equal(product.brand,"ORKA");assert.equal(product.description,"My custom description");
+assert.equal(JSON.stringify(product.componentGroups),before);assert.equal(addBariProfile(product),false);
+console.log("BARI metadata enrichment preserves existing copy and all configuration groups.");

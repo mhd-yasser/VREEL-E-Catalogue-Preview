@@ -1,8 +1,9 @@
-import {normalizeDraft,sceneSettings,collectScenes,importVariantSettings,applyMaterialVariant,motionSettings,configureMotions,toggleMotion,productErrors,composeProduct} from '../product-runtime.js?v=20261010-5';
-import {addARControls} from '../product-ar.js?v=20261010-5';
+import {normalizeDraft,sceneSettings,collectScenes,importVariantSettings,applyMaterialVariant,motionSettings,configureMotions,toggleMotion,productErrors,composeProduct} from '../product-runtime.js?v=20261010-6';
+import {addARControls} from '../product-ar.js?v=20261010-6';
 import {exportProductPackage, importProductPackage} from './product-package.js?v=20261010-1';
+import {addBariProfile} from './bari-profile.js?v=20261010-1';
 import * as THREE from "three";
-import { createViewer } from "../three-viewer.js?v=20261010-4";
+import { createViewer } from "../three-viewer.js?v=20261010-5";
 import {
   saveProduct,
   listProducts,
@@ -18,6 +19,7 @@ const $ = (id) => document.getElementById(id),
   uid = () => crypto.randomUUID();
 const fieldIds = [
   "name",
+  "brand",
   "code",
   "category",
   "description",
@@ -79,9 +81,10 @@ function readFields() {
   for (const id of featureIds) draft.features[id] = $(id).checked;
 }
 function fillFields() {
+  addBariProfile(draft);
   $("ar-enabled").checked=draft.ar?.enabled!==false;
   $("ar-placement").value=draft.ar?.placement||"floor";$("ar-back").value=draft.ar?.back||"-z";$("ar-height").value=draft.ar?.heightOffset||0;
-  for (const id of fieldIds) $(id).value = draft[id];
+  for (const id of fieldIds) $(id).value = draft[id] || '';
   for (const id of featureIds) $(id).checked = draft.features[id];
   $("model-status").textContent = draft.model
     ? `${draft.model.name} · ${(draft.model.blob.size / 1048576).toFixed(2)} MB`

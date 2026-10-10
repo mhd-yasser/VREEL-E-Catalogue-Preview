@@ -1,5 +1,5 @@
 import * as THREE from './vendor/three.module.js';
-import {snapshotProduct} from './product-runtime.js?v=20261010-5';
+import {snapshotProduct} from './product-runtime.js?v=20261010-6';
 import {placementSettings,surfacePose,preparePlacement,placeOnSurface} from './ar-placement.js';
 const urls=[];
 window.addEventListener('pagehide',()=>urls.forEach(u=>URL.revokeObjectURL(u)));

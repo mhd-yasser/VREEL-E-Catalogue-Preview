@@ -1,5 +1,5 @@
-import {normalizeDraft,applyMaterialVariant,configureMotions,toggleMotion} from './product-runtime.js?v=20261010-5';
-import {addARControls} from './product-ar.js?v=20261010-5';
+import {normalizeDraft,applyMaterialVariant,configureMotions,toggleMotion} from './product-runtime.js?v=20261010-6';
+import {addARControls} from './product-ar.js?v=20261010-6';
 import {mountAlternatives, applyComponentSelection} from './component-options.js?v=20261010-1';
 import {getProduct} from './admin/store.js?v=20261010-1';
 const urls=[];
@@ -30,12 +30,15 @@ export function prepareAuthoredPage(config,viewer){
   const d=config.draft,$=selector=>document.querySelector(selector);
   document.title=`VREEL | ${d.name}`;
   $('.panel-heading h1').textContent=d.name;$('.product-mark strong').textContent=d.name;
-  $('.lead').textContent=d.features.configurable?'Yüzeyleri seçin veya modeldeki bir parçaya dokunun.':'Ürünü farklı açılardan inceleyin.';
+  $('.lead').textContent=d.description||'Ürünü farklı açılardan inceleyin.';
+  if(d.brand)$('.panel-heading .eyebrow').textContent=`${d.brand} / ÜRÜN KOLEKSİYONU`;
   $('#details h2').textContent=d.name;$('#details p').textContent=d.description;
   $('#details .detail-list').replaceChildren();
-  for(const [label,value] of [['Ürün kodu',d.code],['Kategori',d.category],...(d.features.dimensions?[['Ölçüler','Modelden hesaplanıyor…']]:[])]){
+  for(const [label,value] of [['Marka',d.brand],['Ürün kodu',d.code],['Kategori',d.category],...(d.features.dimensions?[['Ölçüler','Modelden hesaplanıyor…']]:[])].filter(([,value])=>value)){
     const row=document.createElement('div'),dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=label;dd.textContent=value;row.append(dt,dd);$('#details .detail-list').append(row);
   }
+  if(d.productSource){try{const source=new URL(d.productSource);if(source.protocol==='https:'){const a=document.createElement('a');a.className='product-source';a.href=source.href;a.target='_blank';a.rel='noopener';a.textContent='Üretici ürün bilgisi ↗';$('#details').append(a);}}catch{}}
+  const hint=$('.viewer-hint');hint.textContent=d.animations?.length?'Döndürmek için sürükleyin. Açmak için kapak veya çekmeceye dokunun.':'Döndürmek için sürükleyin. Seçenekleri sağ panelden değiştirin.';
   $('#details h3').textContent='Ürün Dosyaları';$('.coming').hidden=true;$('.material-files').replaceChildren();
   if(d.features.downloads)for(const a of d.assets.filter(a=>a.kind==='attachments'&&a.public)){const link=document.createElement('a');link.textContent=a.name;link.href=url(a);link.download=a.name;$('.material-files').append(link);}
   for(const a of d.assets.filter(a=>a.kind==='photos')){const img=document.createElement('img');img.src=url(a);img.alt=d.name;img.style.cssText='width:100%;height:auto;border-radius:12px;margin-top:16px';$('#details').append(img);}

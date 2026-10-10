@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import * as THREE from '../vendor/three.module.js';
-import {composeProduct,applyMaterialVariant,configureMotions,toggleMotion,updateMotions,measuredBox,snapshotProduct,normalizeDraft} from '../product-runtime.js';
+import {composeProduct,applyMaterialVariant,configureMotions,toggleMotion,updateMotions,measuredBox,snapshotProduct,normalizeDraft,importVariantSettings} from '../product-runtime.js';
 const root=new THREE.Group(),shared=new THREE.Group(),wide=new THREE.Group(),narrow=new THREE.Group(),wall=new THREE.Group();root.add(shared,wide,narrow,wall);
 for(const [node,id] of [[shared,'scene-0'],[wall,'scene-1'],[wide,'scene-2'],[narrow,'scene-3']])node.userData.productScene=id;
 const original=new THREE.MeshStandardMaterial({color:'white'}),red=new THREE.MeshStandardMaterial({color:'red'}),blue=new THREE.MeshStandardMaterial({color:'blue'});
@@ -31,3 +31,11 @@ rt.sources[0].tracks.push({key:'0:2',track:sharedTrack,node:sharedDoor});configu
 const sharedMotion=rt.motions.find(m=>m.target===sharedDoor);toggleMotion(rt,sharedMotion.setting.id);updateMotions(rt,.4);
 composeProduct(rt,d,new Map([['width','narrow']]));assert.equal(sharedMotion.progress,.4);assert.equal(sharedMotion.direction,1);
 console.log('PASS: changing an alternative preserves shared-element motion state.');
+
+const variants={variants:[{id:"variant-0",name:"Green"},{id:"variant-1",name:"White"},{id:"variant-2",name:"Blue"}]};
+const saved=[{id:"variant-1",key:"White",label:"Beyaz"},{id:"variant-0",key:"Green",label:"Yeşil"}];
+const imported=importVariantSettings(variants,saved);
+assert.deepEqual(imported.map(v=>v.id),["variant-1","variant-0","variant-2"]);
+assert.deepEqual(imported.map(v=>v.label),["Beyaz","Yeşil","Blue"]);
+assert.deepEqual(saved.map(v=>v.id),["variant-1","variant-0"]);
+console.log("PASS: saved native variant order and labels survive reopening; new variants append.");
