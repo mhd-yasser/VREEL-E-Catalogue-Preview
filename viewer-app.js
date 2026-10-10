@@ -1,6 +1,6 @@
 import {materialTargetId} from './component-options.js?v=20261010-1';
 import * as THREE from 'three';
-import {createViewer} from './three-viewer.js?v=20261010-1';
+import {createViewer} from './three-viewer.js?v=20261010-2';
 import {loadAuthoredConfig, paintAuthored, prepareAuthoredPage, updateAuthoredDimensions, prepareAuthoredComponents} from './authored-viewer.js?v=20261010-1';
 import {woodPreviews} from './texture-previews.js';
 

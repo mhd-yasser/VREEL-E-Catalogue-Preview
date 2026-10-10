@@ -77,6 +77,9 @@ export function createViewer(element){
   }
   function visibleBox(root=object){const box=new THREE.Box3();if(!root)return box;root.updateWorldMatrix(true,true);root.traverseVisible(node=>{if(node.isMesh){node.geometry.computeBoundingBox();box.union(node.geometry.boundingBox.clone().applyMatrix4(node.matrixWorld));}});return box;}
   function focusBox(){const box=element.productMode==='scenes'?measuredBox(object):visibleBox();return box.isEmpty()?visibleBox():box;}
+  // Scene products retain the exported ground datum, including wall-mounted parts.
+  // Measurement bounds exclude decoration and must never raise the studio floor.
+  function floorY(box){return element.productMode==='scenes'?0:box.min.y-.012;}
   const dimensionGroup=new THREE.Group();scene.add(dimensionGroup);dimensionGroup.visible=false;
   let dimensionSignature='';
   function dimensionLabel(value){
@@ -128,7 +131,7 @@ export function createViewer(element){
     const box=focusBox();if(box.isEmpty())return;
     const dim=box.getSize(new THREE.Vector3()),center=box.getCenter(new THREE.Vector3());controls.target.copy(center);
     radius=Math.max(dim.length()*1.78,1.25);baseRadius=radius;camera.near=Math.max(.01,radius/1000);camera.far=radius*30;camera.updateProjectionMatrix();face();
-    if(ground){ground.position.y=box.min.y-.012;ground.scale.setScalar(Math.max(dim.x,dim.z)*1.65);}
+    if(ground){ground.position.y=floorY(box);ground.scale.setScalar(Math.max(dim.x,dim.z)*1.65);}
   }
   async function setModel(url){
     element.dispatchEvent(new CustomEvent('progress',{detail:{totalProgress:0}}));
@@ -155,7 +158,7 @@ export function createViewer(element){
       // One opaque floor receives the shadow directly; layered transparent planes
       // can produce overlapping patches and depth artifacts around the furniture.
       ground=new THREE.Mesh(new THREE.PlaneGeometry(floorSize,floorSize),new THREE.MeshStandardMaterial({color:darkScene?0x343d49:0xe9edf0,roughness:1,metalness:0}));
-      ground.rotation.x=-Math.PI/2;ground.position.y=box.min.y-.012;ground.receiveShadow=true;scene.add(ground);
+      ground.rotation.x=-Math.PI/2;ground.position.y=floorY(box);ground.receiveShadow=true;scene.add(ground);
       element.dispatchEvent(new CustomEvent('progress',{detail:{totalProgress:1}}));
       element.dispatchEvent(new Event('load'));
     }catch(err){console.error(err);element.dispatchEvent(new CustomEvent('error',{detail:{message:err.message}}));}
