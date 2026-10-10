@@ -1,4 +1,4 @@
-import {normalizeDraft} from '../product-runtime.js?v=20261010-5';
+import {normalizeDraft} from '../product-runtime.js?v=20261010-6';
 const database = new Promise((resolve, reject) => {
   const request = indexedDB.open("vreel-authoring", 1);
   request.onupgradeneeded = () =>
@@ -36,6 +36,7 @@ export function newDraft() {
   return {
     schemaVersion:2,scenes:[],materialVariants:[],defaultVariant:null,animations:[],modelScale:1,scaleConfirmed:false,ar:{enabled:true},
     name: "",
+    brand: "",
     code: "",
     category: "",
     description: "",

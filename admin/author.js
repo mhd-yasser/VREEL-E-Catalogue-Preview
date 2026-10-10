@@ -1,7 +1,9 @@
-import {normalizeDraft,sceneSettings,collectScenes,importVariantSettings,applyMaterialVariant,motionSettings,configureMotions,toggleMotion,productErrors,composeProduct} from '../product-runtime.js?v=20261010-5';
-import {addARControls} from '../product-ar.js?v=20261010-5';
+import {normalizeDraft,sceneSettings,collectScenes,importVariantSettings,applyMaterialVariant,motionSettings,configureMotions,toggleMotion,productErrors,composeProduct} from '../product-runtime.js?v=20261010-6';
+import {addARControls} from '../product-ar.js?v=20261010-6';
+import {exportProductPackage, importProductPackage} from './product-package.js?v=20261010-1';
+import {addBariProfile} from './bari-profile.js?v=20261010-1';
 import * as THREE from "three";
-import { createViewer } from "../three-viewer.js?v=20261010-4";
+import { createViewer } from "../three-viewer.js?v=20261010-5";
 import {
   saveProduct,
   listProducts,
@@ -17,6 +19,7 @@ const $ = (id) => document.getElementById(id),
   uid = () => crypto.randomUUID();
 const fieldIds = [
   "name",
+  "brand",
   "code",
   "category",
   "description",
@@ -78,9 +81,10 @@ function readFields() {
   for (const id of featureIds) draft.features[id] = $(id).checked;
 }
 function fillFields() {
+  addBariProfile(draft);
   $("ar-enabled").checked=draft.ar?.enabled!==false;
   $("ar-placement").value=draft.ar?.placement||"floor";$("ar-back").value=draft.ar?.back||"-z";$("ar-height").value=draft.ar?.heightOffset||0;
-  for (const id of fieldIds) $(id).value = draft[id];
+  for (const id of fieldIds) $(id).value = draft[id] || '';
   for (const id of featureIds) $(id).checked = draft.features[id];
   $("model-status").textContent = draft.model
     ? `${draft.model.name} · ${(draft.model.blob.size / 1048576).toFixed(2)} MB`
@@ -942,6 +946,35 @@ $("new").onclick = () => {
   if (dirty && !confirm("Kaydedilmemiş değişikliklerden çıkılsın mı?")) return;
   dirty = false;
   location.href = location.pathname;
+};
+$('export-package').onclick = async () => {
+  const control = $('export-package');
+  if (loading) return notice('Modelin yüklenmesini bekleyin.', true);
+  control.disabled = true;
+  try {
+    await save();
+    const data = await exportProductPackage(record);
+    const blob = new Blob([JSON.stringify(data)], {type:'application/json'});
+    const href = URL.createObjectURL(blob), link = document.createElement('a');
+    link.href = href; link.download = `${(draft.code || draft.name || 'urun').replace(/[^\p{L}\p{N}_-]+/gu, '-')}.vreel.json`;
+    document.body.append(link); link.click(); link.remove();
+    setTimeout(() => URL.revokeObjectURL(href), 30000);
+    notice('Ürün paketi indirildi. Taslak, grup sırası, adlar, varsayılanlar ve dosyalar birlikte korunur.');
+  } catch (error) { notice(error.message, true); }
+  finally { control.disabled = false; }
+};
+$('import-package').onchange = async event => {
+  const file = event.target.files[0]; if (!file) return;
+  try {
+    if (dirty && !confirm('Kaydedilmemiş değişikliklerden çıkılsın mı?')) return;
+    const next = await importProductPackage(JSON.parse(await file.text()));
+    inspectGLB(await next.draft.model.blob.arrayBuffer());
+    // Import as a new editable copy; never overwrite an existing local draft.
+    next.id = uid(); next.updatedAt = new Date().toISOString();
+    await saveProduct(next); dirty = false;
+    location.href = `${location.pathname}?edit=${encodeURIComponent(next.id)}`;
+  } catch (error) { notice(error.message, true); }
+  finally { event.target.value = ''; }
 };
 window.addEventListener("beforeunload", (e) => {
   if (dirty) {

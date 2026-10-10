@@ -31,3 +31,7 @@ AR is unavailable in this new authoring flow; existing independently tested AR p
 ## Validation
 
 `tests/authoring.cjs` is a Playwright integration test covering real GLB loading, multi-target configuration, color/image options, IndexedDB reload, isolated publication, private/public attachments, validation, responsive overflow and loading the existing chair viewer. Run `npm ci` and `npx playwright install chromium`, then start the HTTP server and run `npm run test:browser`. `npm run test:storage` checks GLB validation, group conflicts, binary persistence and publication isolation independently. `CHROMIUM_EXECUTABLE` can select an existing Chromium binary. Browser tests disable shadows and throttle frames for software WebGL; they verify real loading/material changes and layout, but not shadow appearance or AR.
+
+## Portable product packages
+
+Use **Ürün paketini indir** in the authoring sidebar to save the current draft and its distinct local publication as a `.vreel.json` package. Files are embedded once per SHA-256 hash; group names, ordering, defaults, material mappings, motions, AR settings and scale are preserved. **Ürün paketi aç** restores a new editable copy without replacing existing local drafts. This is a transfer/backup, not shared catalogue publication. BARI official product copy fills only empty product metadata; no options are generated from that copy.

@@ -102,7 +102,9 @@ export function composeProduct(runtime,draft,selection=new Map(),ar=false){
 }
 export function importVariantSettings(runtime,existing=[]){
   // A glTF variant is a complete mapping, not an independent fabric/leg group.
-  return runtime.variants.map(v=>({id:v.id,key:v.name,label:existing.find(e=>e.id===v.id)?.label||v.name}));
+  const available=new Map(runtime.variants.map(v=>[v.id,v]));
+  const ordered=[...existing.filter(v=>available.has(v.id)),...runtime.variants.filter(v=>!existing.some(e=>e.id===v.id))];
+  return ordered.map(v=>({...v,id:v.id,key:available.get(v.id).name,label:existing.find(e=>e.id===v.id)?.label||available.get(v.id).name}));
 }
 export function applyMaterialVariant(runtime,draft,requested){
   const settings=draft.materialVariants||[],fallback=draft.defaultVariant||null;

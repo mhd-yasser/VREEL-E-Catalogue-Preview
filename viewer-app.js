@@ -1,7 +1,7 @@
 import {materialTargetId} from './component-options.js?v=20261010-1';
 import * as THREE from 'three';
-import {createViewer} from './three-viewer.js?v=20261010-4';
-import {loadAuthoredConfig, paintAuthored, prepareAuthoredPage, updateAuthoredDimensions, prepareAuthoredComponents} from './authored-viewer.js?v=20261010-5';
+import {createViewer} from './three-viewer.js?v=20261010-5';
+import {loadAuthoredConfig, paintAuthored, prepareAuthoredPage, updateAuthoredDimensions, prepareAuthoredComponents} from './authored-viewer.js?v=20261010-6';
 import {woodPreviews} from './texture-previews.js';
 
 const page=document.body.dataset.product;
