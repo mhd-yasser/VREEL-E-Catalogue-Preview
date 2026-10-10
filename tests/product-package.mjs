@@ -1,0 +1,17 @@
+import assert from 'node:assert/strict';
+import {exportProductPackage,importProductPackage} from '../admin/product-package.js';
+const draft={name:'BARI',model:{name:'BARI.glb',blob:new Blob(['model'],{type:'model/gltf-binary'})},componentGroups:[{id:'mirror',name:'Ayna',options:[{id:'led',label:'LED ayna'},{id:'cab',label:'Ayna dolabı'}],defaultId:'cab'},{id:'size',name:'Ölçü',options:[{id:'85',label:'85 cm'},{id:'65',label:'65 cm'}],defaultId:'85'}],materialVariants:[{id:'variant-4',label:'Beyaz'},{id:'variant-0',label:'Yeşil'}],defaultVariant:'variant-4',ar:{enabled:true,placement:'wall',back:'-z',heightOffset:.3},modelScale:.01};
+const record={id:'original',draft,published:structuredClone(draft)};
+record.published.description='Public snapshot';
+const pkg=await exportProductPackage(record);
+assert.equal(pkg.files.length,1,'identical draft/public binary is embedded once');
+const restored=await importProductPackage(JSON.parse(JSON.stringify(pkg)));
+for(const key of ['componentGroups','materialVariants','defaultVariant','ar','modelScale'])assert.deepEqual(restored.draft[key],draft[key]);
+assert.equal(restored.published.description,'Public snapshot');
+assert.equal(await restored.draft.model.blob.text(),'model');
+assert.equal(restored.draft.model.blob.type,'model/gltf-binary');
+const damaged=structuredClone(pkg);damaged.files[0].data=btoa('wrong');
+await assert.rejects(()=>importProductPackage(damaged),/eksik veya değiştirilmiş/);
+const missing=structuredClone(pkg);missing.files=[];
+await assert.rejects(()=>importProductPackage(missing),/dosya eksik/);
+console.log('Portable product snapshot, ordering, defaults, deduplication and integrity passed.');
