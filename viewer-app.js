@@ -1,7 +1,7 @@
 import {materialTargetId} from './component-options.js?v=20261010-1';
 import * as THREE from 'three';
-import {createViewer} from './three-viewer.js?v=20261010-2';
-import {loadAuthoredConfig, paintAuthored, prepareAuthoredPage, updateAuthoredDimensions, prepareAuthoredComponents} from './authored-viewer.js?v=20261010-1';
+import {createViewer} from './three-viewer.js?v=20261010-3';
+import {loadAuthoredConfig, paintAuthored, prepareAuthoredPage, updateAuthoredDimensions, prepareAuthoredComponents} from './authored-viewer.js?v=20261010-3';
 import {woodPreviews} from './texture-previews.js';
 
 const page=document.body.dataset.product;
@@ -266,11 +266,11 @@ function updateDimensions(){
   if(!guides?.length){overlay.replaceChildren();return;}
   if(matchMedia('(max-width:600px)').matches){
     const card=document.createElement('div');card.className='mobile-measurements';
-    for(const [part,title] of [['desk','Masa'],['cabinet','Keson'],['product',page==='chair'?'Koltuk':'Kanepe']]){
+    for(const part of [...new Set(guides.map(g=>g.part))]){
       const partGuides=guides.filter(guide=>guide.part===part);
       if(!partGuides.length)continue;
       const row=document.createElement('div');row.className='mobile-measurements-row';
-      const heading=document.createElement('strong');heading.textContent=title;row.append(heading);
+      const heading=document.createElement('strong');heading.textContent=guides.find(g=>g.part===part)?.partLabel||({desk:'Masa',cabinet:'Keson',product:page==='chair'?'Koltuk':'Kanepe'}[part]||part);row.append(heading);
       for(const guide of partGuides){const value=document.createElement('span');value.textContent=guide.label;row.append(value);}
       card.append(row);
     }

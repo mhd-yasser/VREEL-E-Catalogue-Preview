@@ -1,4 +1,4 @@
-import {composeProduct,measuredBox} from './product-runtime.js?v=20261010-1';
+import {composeProduct,measuredBox} from './product-runtime.js?v=20261010-3';
 import * as THREE from './vendor/three.module.js';
 
 // Source node IDs remain stable even when the loader sanitizes or duplicates names.

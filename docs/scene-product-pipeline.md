@@ -37,3 +37,9 @@ BARI100 bounds are 100 glTF units wide, so interpreting that source as metres yi
 Phone hardware validation is still required for WebXR tracking/placement and iOS Quick Look. Static USDZ export does not transfer interactive playback, and cross-format material rendering can differ. Current selected motion pose is transferred. Desktop browser/export checks are not a physical AR test.
 
 Vendor exporters and fflate are from three@0.185.0, matching the repository's bundled Three.js revision; their upstream license headers are retained.
+
+### Per-part interaction and measurements
+
+Imported motion defaults are split by target node. Previously saved multi-target motion settings are also split into independent runtime actions, preserving duration/easing and reverse-from-current-position behavior. Each visible animated target has a projected, keyboard-accessible open/close marker; clicking its geometry triggers the same action. Hidden alternatives and occluded targets do not show markers. Dragging the camera does not trigger a motion. Authoring may still preview a configured multi-target source setting; the public viewer has no combined motion button.
+
+For scene products, dimension guides measure each visible top-level element inside shared/selected scenes separately. Decoration is excluded; a cabinet-and-basin group remains one element. External alternatives are measured as independent elements. Whole-product manual dimension fields are not copied onto every part; legacy aggregate manual measurement behavior is retained.

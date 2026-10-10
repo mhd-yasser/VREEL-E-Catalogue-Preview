@@ -1,4 +1,4 @@
-import {normalizeDraft,applyMaterialVariant,configureMotions,toggleMotion} from './product-runtime.js?v=20261010-1';
+import {normalizeDraft,applyMaterialVariant,configureMotions,toggleMotion} from './product-runtime.js?v=20261010-3';
 import {addARControls} from './product-ar.js?v=20261010-1';
 import {mountAlternatives, applyComponentSelection} from './component-options.js?v=20261010-1';
 import {getProduct} from './admin/store.js?v=20261010-1';
@@ -50,8 +50,8 @@ export function prepareAuthoredPage(config,viewer){
 export function updateAuthoredDimensions(config,viewer,guides=viewer.getMeasurementGuides()){
   if(!config.draft.features.dimensions||!guides?.length)return;
   const unit=config.draft.unit||'cm',factor={mm:1000,cm:100,m:1}[unit]||100;
-  for(const guide of guides){guide.axis ||= guide.label?.trim()[0];if(!Number.isFinite(guide.value)){const cm=Number(guide.label?.match(/^[GDY]\s+([\d.]+)\s+cm$/)?.[1]);guide.value=Number.isFinite(cm)?cm/100:0;}const key={G:'width',D:'depth',Y:'height'}[guide.axis],manual=Number(config.draft[key]);guide.label=`${guide.axis} ${manual>0?manual:Number((guide.value*factor).toFixed(2))} ${unit}`;}
-  const values=guides.filter(g=>g.part==='product').map(g=>g.label).join(' · ');
+  for(const guide of guides){guide.axis ||= guide.label?.trim()[0];if(!Number.isFinite(guide.value)){const cm=Number(guide.label?.match(/^[GDY]\s+([\d.]+)\s+cm$/)?.[1]);guide.value=Number.isFinite(cm)?cm/100:0;}const key={G:'width',D:'depth',Y:'height'}[guide.axis],manual=guide.part==='product'?Number(config.draft[key]):0;guide.label=`${guide.axis} ${manual>0?manual:Number((guide.value*factor).toFixed(2))} ${unit}`;}
+  const values=[...new Set(guides.map(g=>g.part))].map(part=>`${guides.find(g=>g.part===part).partLabel||part}: ${guides.filter(g=>g.part===part).map(g=>g.label).join(' · ')}`).join(' / ');
   const row=[...document.querySelectorAll('#details dt')].find(el=>el.textContent==='Ölçüler');
   if(row)row.nextElementSibling.textContent=values;
 }
@@ -62,7 +62,7 @@ export async function prepareAuthoredComponents(config,viewer,addCard,onChange){
   config.selection=selection;config.runtime=viewer.model.runtime;
   if(config.draft.schemaVersion===2){configureMotions(config.runtime,config.draft.animations);applyMaterialVariant(config.runtime,config.draft,config.draft.defaultVariant);
     if(config.draft.features.configurable&&config.draft.materialVariants.length){const choices=[{id:'original',label:'Özgün malzemeler'},...config.draft.materialVariants];let chosen=config.draft.defaultVariant||'original';config.componentChoices={_native:{label:'Malzeme kombinasyonu',value:choices.find(v=>v.id===chosen).label}};const card=addCard('Malzeme kombinasyonu',choices,chosen,id=>{chosen=id;config.componentChoices._native.value=choices.find(v=>v.id===id).label;applyMaterialVariant(config.runtime,config.draft,id==='original'?null:id);viewer.requestUpdate();onChange();});config.nativeVariantCard=card;config.nativeReset=()=>card.querySelector(`[data-variant="${config.draft.defaultVariant||'original'}"]`).click();}
-    const motions=document.createElement('div');motions.className='option-card product-motion-controls';for(const m of config.draft.animations){const b=document.createElement('button');b.textContent=m.name;b.onclick=()=>toggleMotion(config.runtime,m.id);motions.append(b);}if(motions.childElementCount)document.querySelector('#material-groups').append(motions);
+
     if(config.draft.ar?.enabled!==false){const host=document.createElement('div');host.className='option-card product-ar-controls';document.querySelector('#material-groups').append(host);const status=document.createElement('p');status.setAttribute('role','status');host.append(status);addARControls(viewer,host,message=>status.textContent=message);}
   }
   applyComponentSelection(nodes,groups,selection);

@@ -1,7 +1,7 @@
-import {normalizeDraft,sceneSettings,collectScenes,importVariantSettings,applyMaterialVariant,motionSettings,configureMotions,toggleMotion,productErrors,composeProduct} from '../product-runtime.js?v=20261010-1';
+import {normalizeDraft,sceneSettings,collectScenes,importVariantSettings,applyMaterialVariant,motionSettings,configureMotions,toggleMotion,productErrors,composeProduct} from '../product-runtime.js?v=20261010-3';
 import {addARControls} from '../product-ar.js?v=20261010-1';
 import * as THREE from "three";
-import { createViewer } from "../three-viewer.js?v=20261010-2";
+import { createViewer } from "../three-viewer.js?v=20261010-3";
 import {
   saveProduct,
   listProducts,
