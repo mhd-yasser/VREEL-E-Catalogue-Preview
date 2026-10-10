@@ -14,7 +14,7 @@
         }
       }
     </script>
-  <link rel="stylesheet" href="./workflow.css?v=20261007-2"></head>
+  <link rel="stylesheet" href="./workflow.css?v=20261010-1"></head>
   <body>
     <header>
       <a href="../manage/"
@@ -33,7 +33,7 @@
           <button data-step="1" class="active">
             <b>01</b> Ürün ve dosyalar</button
           ><button data-step="2"><b>02</b> Parça alternatifleri</button
-          ><button data-step="3"><b>03</b> Malzeme eşleştirme</button
+          ><button data-step="3"><b>03</b> Malzeme ve hareketler</button
           ><button data-step="4"><b>04</b> Önizleme ve kontrol</button>
         </nav>
         <div class="scope">
@@ -137,7 +137,7 @@
                   ><span>veya dosya seçin · gömülü dokular içeren GLB</span
                   ><input id="model-file" type="file" accept=".glb"
                 /></label>
-                <p id="model-status">Henüz model seçilmedi.</p>
+                <div id="model-inspection"></div><p id="model-status">Henüz model seçilmedi.</p>
                 <button id="example">Örnek masa ile deneyin</button
                 ><small
                   >Yeni bir model yüklemek mevcut eşleştirmeleri
@@ -181,7 +181,7 @@
                   ><input id="configurable" type="checkbox" /><span
                     ><strong>Malzeme ve renk seçenekleri</strong
                     ><small
-                      >En az bir eşleştirilmiş grup ve alternatif
+                      >GLB içindeki malzeme seçeneklerini gösterir. Eski ürünlerde eşleştirme
                       gerekir.</small
                     ></span
                   ></label
@@ -191,11 +191,10 @@
                     ><small>Genişlik, derinlik ve yükseklik girin.</small></span
                   ></label
                 ><label class="feature"
-                  ><input type="checkbox" disabled /><span
+                  ><input id="ar-enabled" type="checkbox" checked /><span
                     ><strong>Artırılmış gerçeklik</strong
                     ><small
-                      >Bu yükleme akışına henüz bağlanmadı. Mevcut AR denemeleri
-                      ayrı tutulur.</small
+                      >Seçili parçalar ve malzemelerle AR; noAR sahnesi dışarıda kalır.</small
                     ></span
                   ></label
                 ><label class="feature"
@@ -250,21 +249,21 @@
             <div id="component-editor" hidden>
               <article>
                 <div class="section-heading"><h3>Alternatif grupları</h3><button id="add-component-group">+ Grup</button></div>
-                <p class="helper">P_ ile başlayan grupları alternatif olarak düzenleyin. Her grup için yalnızca bir seçenek görünür. Atanmayan parçalar görünür kalır.</p>
-                <div id="component-groups"></div>
+                <p class="helper">Dosyadaki sahneleri alternatif olarak düzenleyin. Her grup için yalnızca bir seçenek görünür. Her sahneyi ortak, dekor, alternatif veya hariç olarak sınıflandırın.</p>
+                <div id="scene-classification"></div><div id="component-groups"></div>
               </article>
               <article id="component-group-editor" hidden>
                 <label>Grup adı<input id="component-group-name" maxlength="80" placeholder="Örn. Dolap ölçüsü" /></label>
-                <h4>Modeldeki P_ parçaları</h4><div id="component-nodes"></div>
+                <h4>Dosyadaki sahneler</h4><div id="component-nodes"></div>
                 <h4>Alternatif adları ve varsayılan seçim</h4><div id="component-options"></div>
                 <h4>Ayrı GLB dosyası ekleyin</h4>
                 <label>Yerini alacağı referans parça<select id="component-reference"></select></label>
                 <label>Alternatif GLB<input id="component-file" type="file" accept=".glb" /></label>
                 <p id="component-upload-status" role="status" aria-live="polite"></p>
-                <p class="helper">Dosyanın merkezi referans parçanın merkezine hizalanır. Boyut ve yön korunur; dosyaları aynı birim ve yönde hazırlayın. İç içe seçenek ilişkileri daha sonra eklenecek.</p>
+                <p class="helper">Dosyanın dışa aktarılmış konumu korunur. İsterseniz merkez hizalaması veya metre cinsinden konum düzeltmesi yapın. İç içe seçenek ilişkileri daha sonra eklenecek.</p>
               </article>
             </div>
-            <div id="editor">
+            <div id="imported-materials" hidden><article><h3>GLB malzeme seçenekleri</h3><p>KHR_materials_variants seçenekleri doğrudan dosyadan okunur. Bunlar bütün malzeme kombinasyonlarıdır.</p><div id="native-variants"></div></article></div><div id="motion-editor" hidden><article><h3>Hareket ayarları</h3><p>Yolları hedefe göre ayırın veya özel bir hareket oluşturun. Aynı yol birden fazla harekete bağlanamaz.</p><button id="split-motions">Hedeflere göre ayır</button><button id="add-motion">+ Hareket</button><div id="motion-settings"></div></article></div><div id="editor">
               <article>
                 <div class="section-heading">
                   <h3>Özelleştirme grupları</h3>
@@ -309,7 +308,7 @@
             </div>
             <div id="review" hidden>
               <article>
-                <h3>Yayın öncesi kontrol</h3>
+                <h3>Yayın öncesi kontrol</h3><label><input id="ar-preview" type="checkbox" /> AR bileşimini önizle (noAR hariç)</label><div id="review-ar"></div>
                 <ul id="checks"></ul>
                 <label class="feature"
                   ><input id="reviewed" type="checkbox" /><span
@@ -341,7 +340,7 @@
         </footer>
       </main>
     </div>
-    <script type="module" src="author.js?v=20261007-2"></script>
+    <script type="module" src="author.js?v=20261010-1"></script>
   </body>
 </html>
 

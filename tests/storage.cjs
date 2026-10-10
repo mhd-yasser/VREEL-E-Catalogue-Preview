@@ -15,7 +15,7 @@ global.indexedDB = indexedDB;
   assert(inspectGLB(buffer).meshes.length > 0);
   assert.throws(() => inspectGLB(new ArrayBuffer(22)), /GLB/);
   const json = JSON.stringify({
-    asset: { version: "2.0" },
+    asset: { version: "2.0" },scenes:[{}],
     images: [{ uri: "external.jpg" }],
   });
   const padding = " ".repeat((4 - (json.length % 4)) % 4),
@@ -45,6 +45,7 @@ global.indexedDB = indexedDB;
   ];
   assert(validation(draft).some((e) => e.includes("Ziyaretçiye açık")));
   draft.assets[0].public = true;
+  delete draft.schemaVersion; // Existing products retain the manual material workflow.
   draft.features.configurable = true;
   draft.groups = [
     {

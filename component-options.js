@@ -1,9 +1,11 @@
+import {composeProduct,measuredBox} from './product-runtime.js?v=20261010-1';
 import * as THREE from './vendor/three.module.js';
 
 // Source node IDs remain stable even when the loader sanitizes or duplicates names.
 export function collectComponents(root) {
   const result = [];
   root.traverse(node => {
+    for(let p=node.parent;p;p=p.parent)if(p.userData.productScene&&!p.visible)return;
     const name = node.userData.sourceName || node.name;
     if (node.userData.componentAssetChild || !Number.isInteger(node.userData.sourceNodeIndex) || !name?.startsWith('P_')) return;
     const path = [];
@@ -40,7 +42,9 @@ export function alignAlternative(root, reference, parent) {
   return wrapper;
 }
 export async function mountAlternatives(viewer, draft, assetUrl) {
-  const components = componentMap(viewer.model.root);
+  const runtime=viewer.model.runtime;
+  const components = draft.schemaVersion===2?new Map(runtime.scenes.map(s=>[s.id,s.node])):componentMap(viewer.model.root);
+  if(draft.schemaVersion===2){components.runtime=runtime;components.draft=draft;runtime.external=new Map();runtime.externalRuntimes=[];}
   for (const group of draft.componentGroups || []) {
     for (const option of group.options) {
       if (!option.assetId) continue;
@@ -48,7 +52,16 @@ export async function mountAlternatives(viewer, draft, assetUrl) {
       const reference = components.get(option.referenceId);
       if (!asset || !reference) throw new Error(`${group.name}: alternatif dosya veya referans parça bulunamadı.`);
       const root = await viewer.loadAdditionalModel(assetUrl(asset));
-      const wrapper = alignAlternative(root, reference, viewer.model.root);
+      let wrapper;
+      if(draft.schemaVersion===2){
+        const ext=root.productRuntime;for(const s of ext.scenes)s.node.visible=s.name==='0'||s.name==='noAR'||s.id===(option.sceneId||ext.defaultScene);
+        wrapper=new THREE.Group();wrapper.add(root);viewer.model.root.add(wrapper);
+        if(option.alignment==='center'){viewer.model.root.updateWorldMatrix(true,true);const wasVisible=reference.visible;reference.visible=true;const a=measuredBox(reference).getCenter(new THREE.Vector3()),b=measuredBox(root).getCenter(new THREE.Vector3());reference.visible=wasVisible;wrapper.position.copy(viewer.model.root.worldToLocal(a).sub(viewer.model.root.worldToLocal(b)));}
+        wrapper.position.add(new THREE.Vector3().fromArray(option.offset||[0,0,0]).divideScalar(Number(draft.modelScale)||1));
+        ext.defaultVariant=option.defaultVariant||null;runtime.externalRuntimes.push(ext);runtime.external.set(`asset-${asset.id}`,wrapper);
+        for(const v of ext.variants)if(!runtime.variants.some(other=>other.name===v.name))runtime.variants.push({...v,id:`asset-${asset.id}-${v.id}`});
+        for(const src of ext.sources){src.id=`asset-${asset.id}-${src.id}`;src.tracks.forEach(t=>t.key=`asset-${asset.id}:${t.key}`);runtime.sources.push(src);}
+      }else wrapper = alignAlternative(root, reference, viewer.model.root);
       wrapper.userData.componentAsset = asset.id;
       let index = 0;
       root.traverse(node => {
@@ -65,6 +78,7 @@ export async function mountAlternatives(viewer, draft, assetUrl) {
   return components;
 }
 export function applyComponentSelection(components, groups, selection = new Map()) {
+  if(components.runtime){composeProduct(components.runtime,components.draft,selection,components.arPreview);return;}
   for (const group of groups || []) {
     const selected = selection.get(group.id) || group.defaultId;
     for (const option of group.options) {

@@ -1,7 +1,7 @@
-import {materialTargetId} from './component-options.js?v=20261007-1';
+import {materialTargetId} from './component-options.js?v=20261010-1';
 import * as THREE from 'three';
-import {createViewer} from './three-viewer.js?v=20261007-1';
-import {loadAuthoredConfig, paintAuthored, prepareAuthoredPage, updateAuthoredDimensions, prepareAuthoredComponents} from './authored-viewer.js?v=20261007-1';
+import {createViewer} from './three-viewer.js?v=20261010-1';
+import {loadAuthoredConfig, paintAuthored, prepareAuthoredPage, updateAuthoredDimensions, prepareAuthoredComponents} from './authored-viewer.js?v=20261010-1';
 import {woodPreviews} from './texture-previews.js';
 
 const page=document.body.dataset.product;
@@ -182,11 +182,11 @@ wheelHandle.addEventListener('pointerup',()=>{dragWheel=null;});wheelHandle.addE
 ui.wheel.querySelector('#wheel-close').addEventListener('click',closeWheel);document.querySelector('#wheel-prev').addEventListener('click',()=>{wheelPage--;renderWheel();});document.querySelector('#wheel-next').addEventListener('click',()=>{wheelPage++;renderWheel();});
 viewer.addEventListener('pointerdown',event=>pointerStart={x:event.clientX,y:event.clientY});viewer.addEventListener('pointerup',event=>{if(!pointerStart||Math.hypot(event.clientX-pointerStart.x,event.clientY-pointerStart.y)>7)return;const hit=viewer.materialFromPoint(event.clientX,event.clientY);const key=hit&&inferGroup(hit.object,hit);if(key)openWheel(key,hit.object,event.clientX,event.clientY);else closeWheel();});
 
-viewer.addEventListener('load',async()=>{try{if(authored)resetConfiguration=await prepareAuthoredComponents(authored,viewer,addVariantCard,()=>{closeWheel();updateText();updateDimensions();});isolateMaterials();if(authored)updateAuthoredDimensions(authored,viewer);if(page==='sofa')setupSofa();if(page==='desk')setupDesk();await previewLoads;await Promise.all(Object.keys(config.groups).map(key=>applyGroup(key,choice(key),null,true)));updateText();ui.notice.textContent='';viewerCanvas.style.visibility='visible';document.querySelector('#model-loading').hidden=true;
+viewer.addEventListener('load',async()=>{try{if(authored)resetConfiguration=await prepareAuthoredComponents(authored,viewer,addVariantCard,()=>{closeWheel();updateText();updateDimensions();});if(!authored||authored.draft.schemaVersion!==2)isolateMaterials();if(authored)updateAuthoredDimensions(authored,viewer);if(page==='sofa')setupSofa();if(page==='desk')setupDesk();await previewLoads;await Promise.all(Object.keys(config.groups).map(key=>applyGroup(key,choice(key),null,true)));updateText();ui.notice.textContent='';viewerCanvas.style.visibility='visible';document.querySelector('#model-loading').hidden=true;
   // Let the browser paint the lightweight result before requesting PBR maps.
   setTimeout(()=>{Promise.all(Object.keys(config.groups).map(key=>applyGroup(key))).catch(console.error);},200);
 }catch(error){console.error(error);ui.notice.textContent='Malzemeler yüklenemedi. Lütfen sayfayı yenileyin.';}});
-viewer.addEventListener('error',()=>{ui.notice.textContent='3D model yüklenemedi. Lütfen sayfayı yenileyin.';});viewer.addEventListener('progress',event=>{const bar=viewer.querySelector('.progress'),span=bar?.querySelector('span');if(span)span.style.width=`${event.detail.totalProgress*100}%`;if(bar)bar.hidden=event.detail.totalProgress===1;});
+viewer.addEventListener('error',event=>{ui.notice.textContent=event.detail?.message||'3D model yüklenemedi. Lütfen sayfayı yenileyin.';});viewer.addEventListener('progress',event=>{const bar=viewer.querySelector('.progress'),span=bar?.querySelector('span');if(span)span.style.width=`${event.detail.totalProgress*100}%`;if(bar)bar.hidden=event.detail.totalProgress===1;});
 ui.notice.textContent='3D model yükleniyor…';viewer.src=config.file;
 
 const studio={environment:'https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/1k/brown_photostudio_02_1k.hdr',shadow:1.35,softness:.72};viewer.environmentImage=studio.environment;viewer.shadowIntensity=studio.shadow;viewer.shadowSoftness=studio.softness;viewer.setRotationSpeed(40);

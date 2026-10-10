@@ -1,13 +1,15 @@
-import {mountAlternatives, applyComponentSelection} from './component-options.js?v=20261007-1';
-import {getProduct} from './admin/store.js';
+import {normalizeDraft,applyMaterialVariant,configureMotions,toggleMotion} from './product-runtime.js?v=20261010-1';
+import {addARControls} from './product-ar.js?v=20261010-1';
+import {mountAlternatives, applyComponentSelection} from './component-options.js?v=20261010-1';
+import {getProduct} from './admin/store.js?v=20261010-1';
 const urls=[];
 const url=asset=>{const value=URL.createObjectURL(asset.blob);urls.push(value);return value;};
 window.addEventListener('pagehide',()=>urls.forEach(value=>URL.revokeObjectURL(value)));
 export async function loadAuthoredConfig(){
   const record=await getProduct(new URLSearchParams(location.search).get('view'));
   if(!record?.published){document.querySelector('#model-loading').textContent='Bu tarayıcıda yayın kopyası bulunamadı. Galeriden bir ürün seçin.';throw new Error('Published product unavailable');}
-  const draft=record.published;
-  return {draft,title:draft.name,file:url(draft.model),download:'VREEL_Product.glb',groups:Object.fromEntries((draft.features.configurable?draft.groups:[]).map(g=>[g.id,{label:g.name,initial:g.defaultId,targets:g.targets,options:g.options.map(o=>({...o,image:o.assetId?url(draft.assets.find(a=>a.id===o.assetId)):undefined}))}]))};
+  const draft=normalizeDraft(record.published);
+  return {draft,title:draft.name,file:url(draft.model),download:'VREEL_Product.glb',groups:Object.fromEntries((draft.features.configurable&&draft.schemaVersion!==2?draft.groups:[]).map(g=>[g.id,{label:g.name,initial:g.defaultId,targets:g.targets,options:g.options.map(o=>({...o,image:o.assetId?url(draft.assets.find(a=>a.id===o.assetId)):undefined}))}]))};
 }
 const textures=new Map();
 export async function paintAuthored(material,option,viewer){
@@ -24,6 +26,7 @@ export async function paintAuthored(material,option,viewer){
   material.userData.finishId=option.id;material.needsUpdate=true;
 }
 export function prepareAuthoredPage(config,viewer){
+  viewer.productMode=config.draft.schemaVersion===2?"scenes":"legacy";
   const d=config.draft,$=selector=>document.querySelector(selector);
   document.title=`VREEL | ${d.name}`;
   $('.panel-heading h1').textContent=d.name;$('.product-mark strong').textContent=d.name;
@@ -56,12 +59,18 @@ export function updateAuthoredDimensions(config,viewer,guides=viewer.getMeasurem
 export async function prepareAuthoredComponents(config,viewer,addCard,onChange){
   const groups=config.draft.componentGroups||[];
   const nodes=await mountAlternatives(viewer,config.draft,url), selection=new Map();
+  config.selection=selection;config.runtime=viewer.model.runtime;
+  if(config.draft.schemaVersion===2){configureMotions(config.runtime,config.draft.animations);applyMaterialVariant(config.runtime,config.draft,config.draft.defaultVariant);
+    if(config.draft.features.configurable&&config.draft.materialVariants.length){const choices=[{id:'original',label:'Özgün malzemeler'},...config.draft.materialVariants];let chosen=config.draft.defaultVariant||'original';config.componentChoices={_native:{label:'Malzeme kombinasyonu',value:choices.find(v=>v.id===chosen).label}};const card=addCard('Malzeme kombinasyonu',choices,chosen,id=>{chosen=id;config.componentChoices._native.value=choices.find(v=>v.id===id).label;applyMaterialVariant(config.runtime,config.draft,id==='original'?null:id);viewer.requestUpdate();onChange();});config.nativeVariantCard=card;config.nativeReset=()=>card.querySelector(`[data-variant="${config.draft.defaultVariant||'original'}"]`).click();}
+    const motions=document.createElement('div');motions.className='option-card product-motion-controls';for(const m of config.draft.animations){const b=document.createElement('button');b.textContent=m.name;b.onclick=()=>toggleMotion(config.runtime,m.id);motions.append(b);}if(motions.childElementCount)document.querySelector('#material-groups').append(motions);
+    if(config.draft.ar?.enabled!==false){const host=document.createElement('div');host.className='option-card product-ar-controls';document.querySelector('#material-groups').append(host);const status=document.createElement('p');status.setAttribute('role','status');host.append(status);addARControls(viewer,host,message=>status.textContent=message);}
+  }
   applyComponentSelection(nodes,groups,selection);
-  config.componentChoices=Object.fromEntries(groups.map(g=>[g.id,{label:g.name,value:g.options.find(o=>o.id===g.defaultId).label}]));
+  config.componentChoices={...config.componentChoices,...Object.fromEntries(groups.map(g=>[g.id,{label:g.name,value:g.options.find(o=>o.id===g.defaultId).label}]))};
   const cards=[];
-  for(const group of groups){
+  for(const [id,entry] of Object.entries(config.componentChoices)){
     const row=document.createElement('div'),dt=document.createElement('dt'),dd=document.createElement('dd');
-    dt.textContent=group.name;dd.dataset.componentDetail=group.id;dd.textContent=config.componentChoices[group.id].value;
+    dt.textContent=entry.label;dd.dataset.componentDetail=id;dd.textContent=entry.value;
     row.append(dt,dd);document.querySelector('#material-details').append(row);
   }
   for(const group of [...groups].reverse()){
@@ -72,7 +81,7 @@ export async function prepareAuthoredComponents(config,viewer,addCard,onChange){
     })});
   }
   if(groups.length)viewer.reframe();
-  return ()=>{selection.clear();applyComponentSelection(nodes,groups);for(const {group,card} of cards){
+  return ()=>{config.nativeReset?.();if(config.draft.schemaVersion===2)configureMotions(config.runtime,config.draft.animations);selection.clear();applyComponentSelection(nodes,groups);for(const {group,card} of cards){
     card.querySelectorAll('[data-variant]').forEach(b=>b.classList.toggle('active',b.dataset.variant===group.defaultId));
     config.componentChoices[group.id].value=group.options.find(o=>o.id===group.defaultId).label;
     card.querySelector('summary b').textContent=config.componentChoices[group.id].value;

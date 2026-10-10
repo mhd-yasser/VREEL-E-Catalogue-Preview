@@ -87,3 +87,7 @@ body:not(.public-mode) .dimension-parts input{width:15px;height:15px;flex:none;m
 #component-upload-status{font-size:11px;color:#8a5e26;overflow-wrap:anywhere}
 #component-upload-status:empty{display:none}
 #component-upload-status.error{color:#aa302d}
+#scene-classification .option,#native-variants .option,#motion-settings .option{display:grid;gap:10px;margin:12px 0;padding:14px;border:1px solid #dbe0e5;border-radius:12px}
+#model-inspection small{display:block}#imported-materials,#motion-editor{min-width:0}#motion-settings label{display:flex;gap:8px;align-items:center}
+body[data-author-step="3"] .mapping-grid{grid-template-columns:minmax(0,1.1fr) minmax(320px,.9fr)}
+@media(min-width:1101px){#imported-materials,#motion-editor{grid-column:2;overflow:auto;max-height:40vh}#viewer-column{grid-row:1 / span 2}}
