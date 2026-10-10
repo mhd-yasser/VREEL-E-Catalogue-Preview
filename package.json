@@ -4,8 +4,12 @@
   "scripts": {
     "test:storage": "node tests/storage.cjs",
     "test:components": "node tests/components.mjs",
-    "test:component-browser": "node tests/component-authoring.cjs",
-    "test:browser": "node tests/authoring.cjs"
+    "test:component-browser": "node tests/scene-pipeline.cjs",
+    "test:browser": "node tests/scene-pipeline.cjs",
+    "test:scene-browser": "node tests/scene-pipeline.cjs",
+    "test:scene-diagnostics": "node tests/scene-diagnostics.cjs",
+    "test:authored": "node tests/authored-viewer.mjs",
+    "test:runtime": "node tests/product-runtime.mjs"
   },
   "devDependencies": {
     "fake-indexeddb": "6.2.5",

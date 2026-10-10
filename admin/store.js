@@ -1,3 +1,4 @@
+import {normalizeDraft} from '../product-runtime.js?v=20261010-1';
 const database = new Promise((resolve, reject) => {
   const request = indexedDB.open("vreel-authoring", 1);
   request.onupgradeneeded = () =>
@@ -19,7 +20,7 @@ export async function listProducts() {
   const db = await database;
   return new Promise((resolve, reject) => {
     const request = db.transaction("products").objectStore("products").getAll();
-    request.onsuccess = () => resolve(request.result);
+    request.onsuccess = () => {const result=request.result;if(Array.isArray(result))result.forEach(p=>{normalizeDraft(p.draft);if(p.published)normalizeDraft(p.published);});else if(result){normalizeDraft(result.draft);if(result.published)normalizeDraft(result.published);}resolve(result);};
     request.onerror = () => reject(request.error);
   });
 }
@@ -27,12 +28,13 @@ export async function getProduct(id) {
   const db = await database;
   return new Promise((resolve, reject) => {
     const request = db.transaction("products").objectStore("products").get(id);
-    request.onsuccess = () => resolve(request.result);
+    request.onsuccess = () => {const result=request.result;if(Array.isArray(result))result.forEach(p=>{normalizeDraft(p.draft);if(p.published)normalizeDraft(p.published);});else if(result){normalizeDraft(result.draft);if(result.published)normalizeDraft(result.published);}resolve(result);};
     request.onerror = () => reject(request.error);
   });
 }
 export function newDraft() {
   return {
+    schemaVersion:2,scenes:[],materialVariants:[],defaultVariant:null,animations:[],modelScale:1,scaleConfirmed:false,ar:{enabled:true},
     name: "",
     code: "",
     category: "",
@@ -67,7 +69,7 @@ export function validation(draft, targetIds = []) {
     errors.push("Ziyaretçiye açık bir indirilebilir dosya gerekli.");
   if (draft.features.contact && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(draft.email))
     errors.push("Geçerli iletişim e-postası gerekli.");
-  if (draft.features.configurable) {
+  if (draft.features.configurable && draft.schemaVersion!==2) {
     if (!draft.groups.length)
       errors.push("En az bir özelleştirme grubu gerekli.");
     const used = new Set();
@@ -112,6 +114,7 @@ export function inspectGLB(buffer) {
   const json = JSON.parse(
     new TextDecoder().decode(new Uint8Array(buffer, 20, length)).trim(),
   );
+  if(!json.scenes?.length||json.scene!==undefined&&(!Number.isInteger(json.scene)||!json.scenes[json.scene]))throw new Error('GLB sahne tanımı geçersiz.');
   if (
     [...(json.buffers || []), ...(json.images || [])].some(
       (x) => x.uri && !x.uri.startsWith("data:"),
