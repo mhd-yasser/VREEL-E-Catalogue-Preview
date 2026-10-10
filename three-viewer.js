@@ -4,7 +4,7 @@ import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 import {DRACOLoader} from 'three/addons/loaders/DRACOLoader.js';
 import {RGBELoader} from 'three/addons/loaders/RGBELoader.js';
 import {KTX2Loader} from 'three/addons/loaders/KTX2Loader.js';
-import {registerProductLoader,createProductRuntime,updateMotions,toggleMotion,measuredBox} from './product-runtime.js?v=20261010-3';
+import {registerProductLoader,createProductRuntime,updateMotions,toggleMotion,measuredBox} from './product-runtime.js?v=20261010-4';
 import {MeshoptDecoder} from 'three/addons/libs/meshopt_decoder.module.js';
 
 // Small adapter for the configurator UI. Every visible finish is a real Three.js material.
@@ -198,16 +198,18 @@ export function createViewer(element){
     const active=new Set();
     for(const m of productRuntime?.motions||[]){if(!isVisible(m.target))continue;const box=measuredBox(m.target);if(box.isEmpty())continue;
       const center=box.getCenter(new THREE.Vector3()),rect=renderer.domElement.getBoundingClientRect();
-      center.z=camera.position.z>=center.z?box.max.z:box.min.z;
-      pointer.copy(center.clone().project(camera));raycaster.setFromCamera(pointer,camera);
-      const hit=raycaster.intersectObject(object,true).find(h=>isVisible(h.object));
-      if(!hit||motionFor(hit.object)!==m)continue;
-      const p=center.project(camera);if(p.z<-1||p.z>1||Math.abs(p.x)>1||Math.abs(p.y)>1)continue;
+      const front=center.clone();front.z=camera.position.z>=center.z?box.max.z:box.min.z;
+      let p=null;for(const candidate of [front,center]){
+        const projected=candidate.clone().project(camera);pointer.copy(projected);raycaster.setFromCamera(pointer,camera);
+        const hit=raycaster.intersectObject(object,true).find(h=>isVisible(h.object));
+        if(hit&&motionFor(hit.object)===m){p=projected;break;}
+      }
+      if(!p||p.z<-1||p.z>1||Math.abs(p.x)>1||Math.abs(p.y)>1)continue;
       active.add(m.setting.id);let b=motionButtons.get(m.setting.id);
-      if(!b){b=document.createElement('button');b.type='button';b.textContent='↔';b.title=`${m.setting.name} — Aç / kapat`;b.setAttribute('aria-label',b.title);b.style.cssText='position:absolute;transform:translate(-50%,-50%);pointer-events:auto;width:32px;height:32px;min-width:32px;min-height:32px;padding:0;display:grid;place-items:center;line-height:1;border-radius:50%;border:2px solid white;background:#b68a4c;color:white;box-shadow:0 2px 8px #0005;font:18px Alexandria,sans-serif;cursor:pointer';b.addEventListener('pointerdown',e=>e.stopPropagation());b.addEventListener('pointerup',e=>e.stopPropagation());b.onclick=e=>{e.stopPropagation();toggleMotion(productRuntime,m.setting.id);};motionOverlay.append(b);motionButtons.set(m.setting.id,b);}
-      b.hidden=false;b.style.left=`${(p.x+1)*rect.width/2}px`;b.style.top=`${(1-p.y)*rect.height/2}px`;
+      if(!b){b=document.createElement('button');b.type='button';b.textContent='';b.title=`${m.setting.name} — Aç / kapat`;b.setAttribute('aria-label',b.title);b.dataset.motionHint=m.setting.id;b.style.cssText='position:absolute;transform:translate(-50%,-50%);pointer-events:auto;width:32px;height:32px;min-width:32px;min-height:32px;padding:0;display:grid;place-items:center;line-height:1;border-radius:50%;border:7px solid rgba(255,255,255,.72);background:rgba(255,255,255,.95);color:white;box-shadow:0 0 0 5px rgba(255,255,255,.22),0 2px 8px #0004;background-clip:content-box;font:18px Alexandria,sans-serif;cursor:pointer';b.addEventListener('pointerdown',e=>e.stopPropagation());b.addEventListener('pointerup',e=>e.stopPropagation());b.onclick=e=>{e.stopPropagation();toggleMotion(productRuntime,m.setting.id);};motionOverlay.append(b);motionButtons.set(m.setting.id,b);}
+      b.hidden=false;b.style.display='grid';b.style.left=`${(p.x+1)*rect.width/2}px`;b.style.top=`${(1-p.y)*rect.height/2}px`;
     }
-    for(const [id,b] of motionButtons)if(!active.has(id))b.hidden=true;
+    for(const [id,b] of motionButtons)if(!active.has(id)){b.remove();motionButtons.delete(id);}
   }
   let last=performance.now();
   function frame(now){requestAnimationFrame(frame);const delta=Math.min((now-last)/1000,.1);last=now;
@@ -234,7 +236,7 @@ export function createViewer(element){
   element.jumpCameraToGoal=()=>controls.update();
   element.materialFromPoint=fromPoint;
   element.createTexture=(url)=>new Promise((resolve,reject)=>textureLoader.load(url,texture=>{texture.colorSpace=THREE.SRGBColorSpace;texture.flipY=false;resolve(texture);},undefined,reject));
-  element.requestUpdate=()=>renderer.render(scene,camera);
+  element.requestUpdate=()=>{lastHintUpdate=0;refreshMotionHints(performance.now());renderer.render(scene,camera);};
   element.loadAdditionalModel=async url=>{
     const bytes=await fetch(url).then(r=>{if(!r.ok)throw new Error('Alternatif model yüklenemedi.');return r.arrayBuffer();});
     const gltf=await parseModel(bytes);

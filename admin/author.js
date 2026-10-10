@@ -1,7 +1,7 @@
-import {normalizeDraft,sceneSettings,collectScenes,importVariantSettings,applyMaterialVariant,motionSettings,configureMotions,toggleMotion,productErrors,composeProduct} from '../product-runtime.js?v=20261010-3';
+import {normalizeDraft,sceneSettings,collectScenes,importVariantSettings,applyMaterialVariant,motionSettings,configureMotions,toggleMotion,productErrors,composeProduct} from '../product-runtime.js?v=20261010-4';
 import {addARControls} from '../product-ar.js?v=20261010-1';
 import * as THREE from "three";
-import { createViewer } from "../three-viewer.js?v=20261010-3";
+import { createViewer } from "../three-viewer.js?v=20261010-4";
 import {
   saveProduct,
   listProducts,
@@ -552,7 +552,7 @@ function renderPreviewOptions(host) {
       const b = button(o.label, () => {
         componentSelection.set(g.id,o.id);
         applyComponentSelection(componentNodes,draft.componentGroups,componentSelection);
-        viewer.reframe(); renderInfo(); renderPreviewOptions(host);
+        viewer.requestUpdate(); renderInfo(); renderPreviewOptions(host);
       });
       b.classList.toggle('active',o.id === (componentSelection.get(g.id)||g.defaultId));
       b.setAttribute('aria-pressed',String(b.classList.contains('active')));
@@ -998,10 +998,9 @@ start();
 
 function componentGroup() { return (draft.componentGroups || []).find(g => g.id === activeComponentGroup); }
 function refreshComponentPreview() {
-  for (const node of componentNodes.values()) node.visible = true;
+  if(draft.schemaVersion!==2)for (const node of componentNodes.values()) node.visible = true;
   applyComponentSelection(componentNodes,draft.componentGroups,componentSelection);
   viewer?.requestUpdate();
-  if(draft.schemaVersion===2)viewer?.reframe();
 }
 function renderComponentEditor() {
   draft.componentGroups ||= []; draft.componentAssets ||= [];
@@ -1051,7 +1050,7 @@ function renderComponentEditor() {
     const row=element('div',undefined,'component-option'),name=element('input');name.value=o.label;name.maxLength=80;name.setAttribute('aria-label','Alternatif adı');name.oninput=()=>{o.label=name.value;changed();};
     const bottom=element('div',undefined,'option-bottom'),label=element('label'),radio=element('input');radio.type='radio';radio.name='component-default';radio.checked=g.defaultId===o.id;
     radio.onchange=()=>{g.defaultId=o.id;componentSelection.delete(g.id);changed();refreshComponentPreview();};label.append(radio,element('span','Varsayılan'));
-    bottom.append(label,button('Önizle',()=>{componentSelection.set(g.id,o.id);refreshComponentPreview();viewer.reframe();}));
+    bottom.append(label,button('Önizle',()=>{componentSelection.set(g.id,o.id);refreshComponentPreview();}));
     if(o.assetId)bottom.append(button('Sil',async()=>{g.options=g.options.filter(x=>x.id!==o.id);draft.componentAssets=draft.componentAssets.filter(a=>a.id!==o.assetId);if(draft.schemaVersion===2)draft.animations=draft.animations.map(m=>({...m,tracks:m.tracks.filter(t=>!t.startsWith(`asset-${o.assetId}:`))})).filter(m=>m.tracks.length);removeExternalMaterialTargets(new Set([o.assetId]));if(g.defaultId===o.id)g.defaultId=g.options[0]?.id||null;componentSelection.delete(g.id);changed();await loadModel(draft.model);renderComponentEditor();}));
     if(!o.assetId&&draft.schemaVersion===2&&draft.materialVariants.length){const fallback=element('select');fallback.append(new Option('Özgün malzemeler',''));for(const v of draft.materialVariants)fallback.append(new Option(v.label,v.id));fallback.value=o.defaultVariant||'';fallback.onchange=()=>{o.defaultVariant=fallback.value;changed();applyAll();};row.append(element('small','Seçili malzeme eşleşmezse'),fallback);}
     if(o.assetId&&draft.schemaVersion===2){const align=element('select');align.append(new Option('Dışa aktarılmış konum','exported'),new Option('Merkezleri hizala','center'));align.value=o.alignment||'exported';align.onchange=async()=>{o.alignment=align.value;changed();await loadModel(draft.model);renderComponentEditor();};row.append(align);for(let axis=0;axis<3;axis++){const label=element('label',`${['X','Y','Z'][axis]} (m)`),input=element('input');input.type='number';input.step='any';input.value=o.offset?.[axis]||0;input.onchange=async()=>{o.offset ||= [0,0,0];o.offset[axis]=Number(input.value)||0;changed();await loadModel(draft.model);renderComponentEditor();};label.append(input);row.append(label);}const ext=viewer.model.runtime.externalRuntimes.find(r=>r.root.parent?.userData.componentAsset===o.assetId);if(ext?.scenes.length>1){const scene=element('select');for(const s of ext.scenes.filter(s=>!['0','noAR'].includes(s.name)))scene.append(new Option(s.name,s.id));scene.value=o.sceneId||ext.defaultScene;scene.onchange=async()=>{o.sceneId=scene.value;changed();await loadModel(draft.model);renderComponentEditor();};row.append(element('small','Alternatif dosyanın sahnesi'),scene);}if(ext?.variants.length){const v=element('select');v.append(new Option('Dosyanın özgün malzemesi',''));for(const choice of ext.variants)v.append(new Option(choice.name,choice.id));v.value=o.defaultVariant||'';v.onchange=()=>{o.defaultVariant=v.value;ext.defaultVariant=v.value;changed();applyAll();};row.append(element('small','Eşleşme yoksa kullanılacak malzeme'),v);}}
@@ -1094,7 +1093,7 @@ $('component-file').onchange=async e=>{
     await loadModel(draft.model);
     const known=new Set((draft.animations||[]).flatMap(m=>m.tracks));for(const source of draft.schemaVersion===2?viewer.model.runtime.sources:[]){const keys=[...new Set(source.tracks.map(t=>t.key))].filter(k=>!known.has(k));if(keys.length)draft.animations.push({id:uid(),name:source.name,duration:source.duration,mode:'toggle',smooth:false,tracks:keys});}if(draft.schemaVersion===2)configureMotions(viewer.model.runtime,draft.animations);
     if(draft.schemaVersion===2&&draft.materialVariants.length){draft.features.configurable=true;$("configurable").checked=true;}
-    componentSelection.set(g.id,option.id);refreshComponentPreview();viewer.reframe();
+    componentSelection.set(g.id,option.id);refreshComponentPreview();
     changed();renderComponentEditor();componentUploadNotice(`${file.name} alternatiflere eklendi ve önizlemede gösteriliyor.`);
   }catch(err){
     draft.componentAssets=(draft.componentAssets||[]).filter(a=>a.id!==asset.id);g.options=g.options.filter(o=>o.id!==option.id);
@@ -1156,6 +1155,6 @@ $('split-motions').onclick=()=>{
   draft.animations=[...groups.values()];changed();configureMotions(viewer.model.runtime,draft.animations);renderMotions();
 };
 $('add-motion').onclick=()=>{draft.animations.push({id:uid(),name:'Yeni hareket',duration:1,mode:'toggle',smooth:false,tracks:[]});changed();renderMotions();};
-$('ar-preview').onchange=()=>{componentNodes.arPreview=$('ar-preview').checked;refreshComponentPreview();viewer.reframe();};
+$('ar-preview').onchange=()=>{componentNodes.arPreview=$('ar-preview').checked;refreshComponentPreview();};
 $('ar-enabled').onchange=()=>{readFields();changed();};
 addARControls({get model(){return viewer?.model;},toDataURL:()=>viewer.toDataURL()},$('review-ar'),m=>notice(m));

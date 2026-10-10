@@ -20,3 +20,14 @@ configureMotions(rt,[{id:'combined',name:'All',duration:1,mode:'toggle',tracks:[
 assert.equal(rt.motions.length,2);toggleMotion(rt,rt.motions[0].setting.id);updateMotions(rt,.5);
 assert.equal(rt.motions[0].progress,.5);assert.equal(rt.motions[1].progress,0);
 console.log('PASS: combined animation splits into independently controlled target motions.');
+
+composeProduct(rt,d,new Map([['width','wide']]));toggleMotion(rt,rt.motions[0].setting.id);updateMotions(rt,.4);assert(rt.motions[0].progress>0);
+composeProduct(rt,d,new Map([['width','narrow']]));assert(rt.motions.every(m=>m.progress===0&&m.direction===0));
+composeProduct(rt,d,new Map([['width','wide']]));assert(rt.motions.every(m=>m.progress===0&&m.direction===0));
+console.log('PASS: switching alternatives resets outgoing and incoming target poses.');
+
+const sharedDoor=mesh.clone();shared.add(sharedDoor);const sharedTrack=new THREE.VectorKeyframeTrack(sharedDoor.uuid+'.position',[0,1],[0,0,0,0,1,0]);
+rt.sources[0].tracks.push({key:'0:2',track:sharedTrack,node:sharedDoor});configureMotions(rt,[{id:'all',name:'All',duration:1,mode:'toggle',tracks:['0:0','0:1','0:2']}]);
+const sharedMotion=rt.motions.find(m=>m.target===sharedDoor);toggleMotion(rt,sharedMotion.setting.id);updateMotions(rt,.4);
+composeProduct(rt,d,new Map([['width','narrow']]));assert.equal(sharedMotion.progress,.4);assert.equal(sharedMotion.direction,1);
+console.log('PASS: changing an alternative preserves shared-element motion state.');
