@@ -1,5 +1,5 @@
-import {normalizeDraft,applyMaterialVariant,configureMotions,toggleMotion} from './product-runtime.js?v=20261010-4';
-import {addARControls} from './product-ar.js?v=20261010-1';
+import {normalizeDraft,applyMaterialVariant,configureMotions,toggleMotion} from './product-runtime.js?v=20261010-5';
+import {addARControls} from './product-ar.js?v=20261010-5';
 import {mountAlternatives, applyComponentSelection} from './component-options.js?v=20261010-1';
 import {getProduct} from './admin/store.js?v=20261010-1';
 const urls=[];

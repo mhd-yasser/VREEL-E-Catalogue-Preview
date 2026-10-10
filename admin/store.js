@@ -1,4 +1,4 @@
-import {normalizeDraft} from '../product-runtime.js?v=20261010-4';
+import {normalizeDraft} from '../product-runtime.js?v=20261010-5';
 const database = new Promise((resolve, reject) => {
   const request = indexedDB.open("vreel-authoring", 1);
   request.onupgradeneeded = () =>

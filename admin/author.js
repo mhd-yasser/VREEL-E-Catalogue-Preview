@@ -1,5 +1,5 @@
-import {normalizeDraft,sceneSettings,collectScenes,importVariantSettings,applyMaterialVariant,motionSettings,configureMotions,toggleMotion,productErrors,composeProduct} from '../product-runtime.js?v=20261010-4';
-import {addARControls} from '../product-ar.js?v=20261010-1';
+import {normalizeDraft,sceneSettings,collectScenes,importVariantSettings,applyMaterialVariant,motionSettings,configureMotions,toggleMotion,productErrors,composeProduct} from '../product-runtime.js?v=20261010-5';
+import {addARControls} from '../product-ar.js?v=20261010-5';
 import * as THREE from "three";
 import { createViewer } from "../three-viewer.js?v=20261010-4";
 import {
@@ -73,12 +73,13 @@ function cleanup() {
   componentSelection.clear();
 }
 function readFields() {
-  if(draft.schemaVersion===2)draft.ar={enabled:$("ar-enabled").checked};
+  if(draft.schemaVersion===2)draft.ar={...draft.ar,enabled:$("ar-enabled").checked,placement:$("ar-placement").value,back:$("ar-back").value,heightOffset:Number($("ar-height").value)||0};
   for (const id of fieldIds) draft[id] = $(id).value;
   for (const id of featureIds) draft.features[id] = $(id).checked;
 }
 function fillFields() {
   $("ar-enabled").checked=draft.ar?.enabled!==false;
+  $("ar-placement").value=draft.ar?.placement||"floor";$("ar-back").value=draft.ar?.back||"-z";$("ar-height").value=draft.ar?.heightOffset||0;
   for (const id of fieldIds) $(id).value = draft[id];
   for (const id of featureIds) $(id).checked = draft.features[id];
   $("model-status").textContent = draft.model
@@ -1158,3 +1159,5 @@ $('add-motion').onclick=()=>{draft.animations.push({id:uid(),name:'Yeni hareket'
 $('ar-preview').onchange=()=>{componentNodes.arPreview=$('ar-preview').checked;refreshComponentPreview();};
 $('ar-enabled').onchange=()=>{readFields();changed();};
 addARControls({get model(){return viewer?.model;},toDataURL:()=>viewer.toDataURL()},$('review-ar'),m=>notice(m));
+
+for(const id of ['ar-placement','ar-back','ar-height'])$(id).onchange=()=>{readFields();applyAll();changed();};

@@ -9,7 +9,8 @@
     "test:scene-browser": "node tests/scene-pipeline.cjs",
     "test:scene-diagnostics": "node tests/scene-diagnostics.cjs",
     "test:authored": "node tests/authored-viewer.mjs",
-    "test:runtime": "node tests/product-runtime.mjs"
+    "test:runtime": "node tests/product-runtime.mjs",
+    "test:ar": "node tests/ar-placement.mjs"
   },
   "devDependencies": {
     "fake-indexeddb": "6.2.5",

@@ -4,7 +4,7 @@ import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 import {DRACOLoader} from 'three/addons/loaders/DRACOLoader.js';
 import {RGBELoader} from 'three/addons/loaders/RGBELoader.js';
 import {KTX2Loader} from 'three/addons/loaders/KTX2Loader.js';
-import {registerProductLoader,createProductRuntime,updateMotions,toggleMotion,measuredBox} from './product-runtime.js?v=20261010-4';
+import {registerProductLoader,createProductRuntime,updateMotions,toggleMotion,measuredBox} from './product-runtime.js?v=20261010-5';
 import {MeshoptDecoder} from 'three/addons/libs/meshopt_decoder.module.js';
 
 // Small adapter for the configurator UI. Every visible finish is a real Three.js material.
