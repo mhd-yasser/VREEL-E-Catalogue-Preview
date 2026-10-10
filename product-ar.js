@@ -1,5 +1,5 @@
 import * as THREE from './vendor/three.module.js';
-import {snapshotProduct} from './product-runtime.js?v=20261010-1';
+import {snapshotProduct} from './product-runtime.js?v=20261010-3';
 const urls=[];
 window.addEventListener('pagehide',()=>urls.forEach(u=>URL.revokeObjectURL(u)));
 export async function exportCurrentProduct(viewer,format='glb'){

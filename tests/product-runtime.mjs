@@ -13,3 +13,10 @@ const track=new THREE.VectorKeyframeTrack(mesh.uuid+'.position',[0,1],[0,0,0,0,1
 const legacy={groups:[{name:'Old'}]};normalizeDraft(legacy);assert.equal(legacy.schemaVersion,undefined);assert.equal(legacy.groups[0].name,'Old');
 const instances=new THREE.InstancedMesh(new THREE.BoxGeometry(1,1,1),original,2);instances.setMatrixAt(1,new THREE.Matrix4().makeTranslation(2,0,0));const baked=snapshotProduct(instances);assert(!baked.isInstancedMesh);assert.equal(baked.children.length,2);assert.equal(baked.children[1].position.x,2);
 console.log('PASS: scene composition, per-alternative material fallback, fixed surfaces, decoration exclusion, unchanged normal view after AR snapshot, easing/reversal, legacy normalization, instance export.');
+
+const otherTrack=new THREE.VectorKeyframeTrack(small.uuid+'.position',[0,1],[0,0,0,1,0,0]);
+rt.sources=[{tracks:[{key:'0:0',track,node:mesh},{key:'0:1',track:otherTrack,node:small}]}];
+configureMotions(rt,[{id:'combined',name:'All',duration:1,mode:'toggle',tracks:['0:0','0:1']}]);
+assert.equal(rt.motions.length,2);toggleMotion(rt,rt.motions[0].setting.id);updateMotions(rt,.5);
+assert.equal(rt.motions[0].progress,.5);assert.equal(rt.motions[1].progress,0);
+console.log('PASS: combined animation splits into independently controlled target motions.');

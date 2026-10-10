@@ -114,23 +114,27 @@ export function applyMaterialVariant(runtime,draft,requested){
   runtime.materialChoice=setting?.id||null;
 }
 export function motionSettings(runtime){
-  return runtime.sources.map(s=>({id:s.id,name:s.name,duration:s.duration,mode:'toggle',smooth:false,tracks:[...new Set(s.tracks.map(t=>t.key))]}));
+  return runtime.sources.flatMap(s=>{const groups=new Map();for(const t of s.tracks){const key=t.node.userData.sourceNodeIndex??t.node.uuid;if(!groups.has(key))groups.set(key,{id:`${s.id}:${key}`,name:t.label,duration:s.duration,mode:'toggle',smooth:false,tracks:[]});const group=groups.get(key);if(!group.tracks.includes(t.key))group.tracks.push(t.key);}return [...groups.values()];});
 }
 export function configureMotions(runtime,settings){
   runtime.mixer.stopAllAction();runtime.motions=[];
   for(const setting of settings||[]){
     const list=runtime.sources.flatMap(s=>s.tracks).filter(t=>setting.tracks.includes(t.key));
     if(!list.length)continue;
+    const targets=new Map();for(const t of list){if(!targets.has(t.node))targets.set(t.node,[]);targets.get(t.node).push(t);}
+    for(const [target,list] of targets){
+    const partSetting=targets.size>1?{...setting,id:`${setting.id}:${target.uuid}`,name:target.userData.sourceName||target.name||setting.name}:setting;
     const duration=Math.max(...list.map(t=>t.track.times[t.track.times.length-1]));
     const clip=new THREE.AnimationClip(setting.name,duration,list.map(t=>t.track.clone()));
     const action=runtime.mixer.clipAction(clip);action.setLoop(THREE.LoopOnce,1);action.clampWhenFinished=true;action.play();action.paused=true;
-    runtime.motions.push({setting,action,duration,progress:0,direction:0,tracks:list});
+    runtime.motions.push({setting:partSetting,sourceId:setting.id,target,action,duration,progress:0,direction:0,tracks:list});
+    }
   }
   runtime.mixer.update(0);
 }
-export function toggleMotion(runtime,id){const m=runtime.motions.find(m=>m.setting.id===id);if(!m)return;
+export function toggleMotion(runtime,id){for(const m of runtime.motions.filter(m=>m.setting.id===id||m.sourceId===id)){
   if(m.setting.mode==='once'){m.progress=0;m.direction=1;}else m.direction=m.direction?-m.direction:m.progress>=1?-1:1;
-}
+}}
 export function updateMotions(runtime,delta){
   for(const m of runtime?.motions||[]){
     if(!m.direction)continue;

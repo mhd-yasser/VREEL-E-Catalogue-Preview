@@ -1,7 +1,7 @@
-import {normalizeDraft,sceneSettings,collectScenes,importVariantSettings,applyMaterialVariant,motionSettings,configureMotions,toggleMotion,productErrors,composeProduct} from '../product-runtime.js?v=20261010-1';
+import {normalizeDraft,sceneSettings,collectScenes,importVariantSettings,applyMaterialVariant,motionSettings,configureMotions,toggleMotion,productErrors,composeProduct} from '../product-runtime.js?v=20261010-3';
 import {addARControls} from '../product-ar.js?v=20261010-1';
 import * as THREE from "three";
-import { createViewer } from "../three-viewer.js?v=20261010-2";
+import { createViewer } from "../three-viewer.js?v=20261010-3";
 import {
   saveProduct,
   listProducts,
@@ -649,7 +649,7 @@ function renderInfo() {
     host.append(
       element(
         "p",
-        (viewer?.getMeasurementGuides()||[]).map(g=>`${g.axis} ${(Number(draft[{G:'width',D:'depth',Y:'height'}[g.axis]])>0?Number(draft[{G:'width',D:'depth',Y:'height'}[g.axis]]):Number((g.value*({mm:1000,cm:100,m:1}[draft.unit]||100)).toFixed(2)))} ${draft.unit||'cm'}`).join(' · ') ,
+        (viewer?.getMeasurementGuides()||[]).map(g=>`${g.partLabel&&g.part!=='product'?g.partLabel+' — ':''}${g.axis} ${(g.part==='product'&&Number(draft[{G:'width',D:'depth',Y:'height'}[g.axis]])>0?Number(draft[{G:'width',D:'depth',Y:'height'}[g.axis]]):Number((g.value*({mm:1000,cm:100,m:1}[draft.unit]||100)).toFixed(2)))} ${draft.unit||'cm'}`).join(' · ') ,
       ),
     );
   if (draft.features.downloads)

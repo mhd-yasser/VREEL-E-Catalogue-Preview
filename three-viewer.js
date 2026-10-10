@@ -4,7 +4,7 @@ import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 import {DRACOLoader} from 'three/addons/loaders/DRACOLoader.js';
 import {RGBELoader} from 'three/addons/loaders/RGBELoader.js';
 import {KTX2Loader} from 'three/addons/loaders/KTX2Loader.js';
-import {registerProductLoader,createProductRuntime,updateMotions,measuredBox} from './product-runtime.js?v=20261010-1';
+import {registerProductLoader,createProductRuntime,updateMotions,toggleMotion,measuredBox} from './product-runtime.js?v=20261010-3';
 import {MeshoptDecoder} from 'three/addons/libs/meshopt_decoder.module.js';
 
 // Small adapter for the configurator UI. Every visible finish is a real Three.js material.
@@ -138,6 +138,7 @@ export function createViewer(element){
     try{
       const bytes=await fetch(url).then(r=>{if(!r.ok)throw new Error(`Model: ${r.status}`);return r.arrayBuffer();});
       const gltf=await parseModel(bytes);
+      motionOverlay.replaceChildren();motionButtons.clear();
       if(object)scene.remove(object);
       if(ground){scene.remove(ground);ground.geometry.dispose();ground.material.dispose();}
       productRuntime=await createProductRuntime(gltf);object=productRuntime.root;object.productRuntime=productRuntime;sourceNodes=await gltf.parser.getDependencies('node');scene.add(object);
@@ -180,10 +181,38 @@ export function createViewer(element){
     if(adapter)adapter.object=hit.object;
     return adapter;
   }
+  const motionOverlay=document.createElement('div');
+  motionOverlay.style.cssText='position:absolute;inset:0;pointer-events:none;z-index:5';
+  element.style.position='relative';element.append(motionOverlay);
+  const motionButtons=new Map();
+  function isVisible(node){for(let p=node;p;p=p.parent)if(!p.visible)return false;return true;}
+  function motionFor(node){for(let p=node;p;p=p.parent){const m=productRuntime?.motions.find(m=>m.target===p);if(m)return m;}return null;}
+  element.toggleMotionFromPoint=(x,y)=>{const hit=fromPoint(x,y),m=hit&&motionFor(hit.object);if(!m)return false;toggleMotion(productRuntime,m.setting.id);return true;};
+  let motionPointer=null;
+  renderer.domElement.addEventListener('pointerdown',e=>{motionPointer={x:e.clientX,y:e.clientY};});
+  renderer.domElement.addEventListener('pointerup',e=>{if(motionPointer&&Math.hypot(e.clientX-motionPointer.x,e.clientY-motionPointer.y)<7&&element.toggleMotionFromPoint(e.clientX,e.clientY)){e.stopPropagation();}motionPointer=null;});
+  renderer.domElement.addEventListener('pointercancel',()=>{motionPointer=null;});
+  let lastHintUpdate=0;
+  function refreshMotionHints(now){
+    if(now-lastHintUpdate<150)return;lastHintUpdate=now;
+    const active=new Set();
+    for(const m of productRuntime?.motions||[]){if(!isVisible(m.target))continue;const box=measuredBox(m.target);if(box.isEmpty())continue;
+      const center=box.getCenter(new THREE.Vector3()),rect=renderer.domElement.getBoundingClientRect();
+      center.z=camera.position.z>=center.z?box.max.z:box.min.z;
+      pointer.copy(center.clone().project(camera));raycaster.setFromCamera(pointer,camera);
+      const hit=raycaster.intersectObject(object,true).find(h=>isVisible(h.object));
+      if(!hit||motionFor(hit.object)!==m)continue;
+      const p=center.project(camera);if(p.z<-1||p.z>1||Math.abs(p.x)>1||Math.abs(p.y)>1)continue;
+      active.add(m.setting.id);let b=motionButtons.get(m.setting.id);
+      if(!b){b=document.createElement('button');b.type='button';b.textContent='↔';b.title=`${m.setting.name} — Aç / kapat`;b.setAttribute('aria-label',b.title);b.style.cssText='position:absolute;transform:translate(-50%,-50%);pointer-events:auto;width:32px;height:32px;min-width:32px;min-height:32px;padding:0;display:grid;place-items:center;line-height:1;border-radius:50%;border:2px solid white;background:#b68a4c;color:white;box-shadow:0 2px 8px #0005;font:18px Alexandria,sans-serif;cursor:pointer';b.addEventListener('pointerdown',e=>e.stopPropagation());b.addEventListener('pointerup',e=>e.stopPropagation());b.onclick=e=>{e.stopPropagation();toggleMotion(productRuntime,m.setting.id);};motionOverlay.append(b);motionButtons.set(m.setting.id,b);}
+      b.hidden=false;b.style.left=`${(p.x+1)*rect.width/2}px`;b.style.top=`${(1-p.y)*rect.height/2}px`;
+    }
+    for(const [id,b] of motionButtons)if(!active.has(id))b.hidden=true;
+  }
   let last=performance.now();
   function frame(now){requestAnimationFrame(frame);const delta=Math.min((now-last)/1000,.1);last=now;
     if(controls.autoRotate)controls.autoRotateSpeed=Math.max(.1,Number(element.dataset.rotationSpeed||40)/30);
-    updateMotions(productRuntime,delta);controls.update(delta);renderer.render(scene,camera);
+    updateMotions(productRuntime,delta);controls.update(delta);refreshMotionHints(now);renderer.render(scene,camera);
   }requestAnimationFrame(frame);
   Object.defineProperties(element,{
     src:{set:setModel},
@@ -237,6 +266,9 @@ export function createViewer(element){
         if(isCabinet)boxes.cabinet.expandByObject(node);
         if(isCabinet||names.some(name=>/^(Top|Leg|FrontPanel)/.test(name)))boxes.desk.expandByObject(node);
       });
+    }else if(element.productMode==='scenes'){
+      for(const entry of productRuntime.scenes){if(!entry.node.visible||entry.node.userData.excludeMeasurements)continue;for(const node of entry.node.children){const box=measuredBox(node);if(!box.isEmpty())boxes[node.uuid]=box;}}
+      for(const [id,node] of productRuntime.external||[]){if(node.visible){const box=measuredBox(node);if(!box.isEmpty())boxes[id]=box;}}
     }else if(element.measurementTargets?.length){
       boxes.product=new THREE.Box3();let index=0;
       object.updateWorldMatrix(true,true);
@@ -253,7 +285,7 @@ export function createViewer(element){
         const dx=mid.x-screenCenter.x,dy=mid.y-screenCenter.y,length=Math.hypot(dx,dy);
         const distance=part==='desk'?25:18;
         const offset=length>6?{x:dx/length*distance,y:dy/length*distance}:fallback;
-        guides.push({part,axis,value:axis==='G'?d.x:axis==='D'?d.z:d.y,label:`${axis} ${Math.round((axis==='G'?d.x:axis==='D'?d.z:d.y)*100)} cm`,start:a,end:b,offset});
+        guides.push({part,partLabel:object.getObjectByProperty('uuid',part)?.userData.sourceName||object.getObjectByProperty('uuid',part)?.name||part,axis,value:axis==='G'?d.x:axis==='D'?d.z:d.y,label:`${axis} ${Math.round((axis==='G'?d.x:axis==='D'?d.z:d.y)*100)} cm`,start:a,end:b,offset});
       };
       add('G',[box.min.x,box.min.y,nearZ],[box.max.x,box.min.y,nearZ],{x:0,y:25});
       add('D',[nearX,box.min.y,box.min.z],[nearX,box.min.y,box.max.z],{x:nearX===box.max.x?25:-25,y:0});
