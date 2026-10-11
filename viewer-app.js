@@ -1,7 +1,7 @@
 import {materialTargetId} from './component-options.js?v=20261010-1';
 import * as THREE from 'three';
-import {createViewer} from './three-viewer.js?v=20261010-5';
-import {loadAuthoredConfig, paintAuthored, prepareAuthoredPage, updateAuthoredDimensions, prepareAuthoredComponents} from './authored-viewer.js?v=20261010-6';
+import {createViewer} from './three-viewer.js?v=20261010-7';
+import {loadAuthoredConfig, paintAuthored, prepareAuthoredPage, updateAuthoredDimensions, prepareAuthoredComponents} from './authored-viewer.js?v=20261010-7';
 import {woodPreviews} from './texture-previews.js';
 
 const page=document.body.dataset.product;
@@ -200,7 +200,7 @@ const resetModal=document.querySelector('#reset-modal'),sourceModal=document.que
 document.querySelector('#reset-materials').addEventListener('click',()=>resetModal.hidden=false);
 document.querySelector('#cancel-reset').addEventListener('click',()=>resetModal.hidden=true);
 document.querySelector('#confirm-reset').addEventListener('click',async()=>{resetModal.hidden=true;resetConfiguration();for(const [key,spec] of Object.entries(config.groups)){state[key]=spec.initial;await applyGroup(key);}updateText();closeWheel();});
-document.querySelector('#source-download').addEventListener('click',()=>sourceModal.hidden=false);
+document.querySelector('#source-download').addEventListener('click',()=>{if(page==='authored'){config.downloadCurrent?.();return;}sourceModal.hidden=false;});
 document.querySelector('[data-close-source]').addEventListener('click',()=>sourceModal.hidden=true);
 document.querySelector('#source-form').addEventListener('submit',event=>{event.preventDefault();document.querySelector('#source-downloads').hidden=false;document.querySelector('#source-status').textContent='';});
 document.querySelectorAll('[data-source-format]').forEach(button=>button.addEventListener('click',()=>{const format=button.dataset.sourceFormat;const path=`${page}/files/${format}/${config.download.replace(/\.glb$/i,format==='max'?'.max':`.${format}`)}`;fetch(`../${path}`,{method:'HEAD'}).then(response=>{if(!response.ok)throw new Error('missing');const link=document.createElement('a');link.href=`../${path}`;link.download='';link.click();document.querySelector('#source-status').textContent='';}).catch(()=>document.querySelector('#source-status').textContent=`${button.textContent.replace(' İndir','')} dosyası henüz hazır değil.`);}));

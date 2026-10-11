@@ -1,10 +1,11 @@
+import {measurementKey} from './dimensions.js';
 import * as THREE from 'three';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 import {DRACOLoader} from 'three/addons/loaders/DRACOLoader.js';
 import {RGBELoader} from 'three/addons/loaders/RGBELoader.js';
 import {KTX2Loader} from 'three/addons/loaders/KTX2Loader.js';
-import {registerProductLoader,createProductRuntime,updateMotions,toggleMotion,measuredBox} from './product-runtime.js?v=20261010-6';
+import {registerProductLoader,createProductRuntime,updateMotions,toggleMotion,measuredBox} from './product-runtime.js?v=20261010-7';
 import {MeshoptDecoder} from 'three/addons/libs/meshopt_decoder.module.js';
 
 // Small adapter for the configurator UI. Every visible finish is a real Three.js material.
@@ -206,7 +207,7 @@ export function createViewer(element){
       }
       if(!p||p.z<-1||p.z>1||Math.abs(p.x)>1||Math.abs(p.y)>1)continue;
       active.add(m.setting.id);let b=motionButtons.get(m.setting.id);
-      if(!b){b=document.createElement('button');b.type='button';b.textContent='';b.title=`${m.setting.name} — Aç / kapat`;b.setAttribute('aria-label',b.title);b.dataset.motionHint=m.setting.id;b.style.cssText='position:absolute;transform:translate(-50%,-50%);pointer-events:auto;width:32px;height:32px;min-width:32px;min-height:32px;padding:0;display:grid;place-items:center;line-height:1;border-radius:50%;border:7px solid rgba(255,255,255,.72);background:rgba(255,255,255,.95);color:white;box-shadow:0 0 0 5px rgba(255,255,255,.22),0 2px 8px #0004;background-clip:content-box;font:18px Alexandria,sans-serif;cursor:pointer';b.addEventListener('pointerdown',e=>e.stopPropagation());b.addEventListener('pointerup',e=>e.stopPropagation());b.onclick=e=>{e.stopPropagation();toggleMotion(productRuntime,m.setting.id);};motionOverlay.append(b);motionButtons.set(m.setting.id,b);}
+      if(!b){b=document.createElement('button');b.type='button';b.textContent='';b.title=`${m.setting.name} — Aç / kapat`;b.setAttribute('aria-label',b.title);b.dataset.motionHint=m.setting.id;b.style.cssText='position:absolute;transform:translate(-50%,-50%);pointer-events:auto;width:24px;height:24px;min-width:24px;min-height:24px;opacity:.6;padding:0;display:grid;place-items:center;line-height:1;border-radius:50%;border:5.25px solid rgba(255,255,255,.72);background:rgba(255,255,255,.95);color:white;box-shadow:0 0 0 3.75px rgba(255,255,255,.22),0 2px 8px #0004;background-clip:content-box;font:18px Alexandria,sans-serif;cursor:pointer';b.addEventListener('pointerdown',e=>e.stopPropagation());b.addEventListener('pointerup',e=>e.stopPropagation());b.onclick=e=>{e.stopPropagation();toggleMotion(productRuntime,m.setting.id);};motionOverlay.append(b);motionButtons.set(m.setting.id,b);}
       b.hidden=false;b.style.display='grid';b.style.left=`${(p.x+1)*rect.width/2}px`;b.style.top=`${(1-p.y)*rect.height/2}px`;
     }
     for(const [id,b] of motionButtons)if(!active.has(id)){b.remove();motionButtons.delete(id);}
@@ -258,7 +259,7 @@ export function createViewer(element){
   element.getMeasurementGuides=()=>{if(!object)return null;
     // Measure visible geometry each time: a hidden sofa module or desk size
     // variant must never contribute to the displayed dimensions.
-    const boxes={};
+    const boxes={},labels={};
     if(document.body.dataset.product==='desk'){
       boxes.desk=new THREE.Box3();boxes.cabinet=new THREE.Box3();
       object.updateWorldMatrix(true,true);
@@ -269,8 +270,8 @@ export function createViewer(element){
         if(isCabinet||names.some(name=>/^(Top|Leg|FrontPanel)/.test(name)))boxes.desk.expandByObject(node);
       });
     }else if(element.productMode==='scenes'){
-      for(const entry of productRuntime.scenes){if(!entry.node.visible||entry.node.userData.excludeMeasurements)continue;for(const node of entry.node.children){const box=measuredBox(node);if(!box.isEmpty())boxes[node.uuid]=box;}}
-      for(const [id,node] of productRuntime.external||[]){if(node.visible){const box=measuredBox(node);if(!box.isEmpty())boxes[id]=box;}}
+      for(const entry of productRuntime.scenes){if(!entry.node.visible||entry.node.userData.excludeMeasurements)continue;for(const [index,node] of entry.node.children.entries()){const box=measuredBox(node),key=measurementKey(entry,node,index);if(!box.isEmpty()){boxes[key]=box;labels[key]=node.userData.sourceName||node.name||entry.name;}}}
+      for(const [id,node] of productRuntime.external||[]){if(node.visible){const box=measuredBox(node);if(!box.isEmpty()){boxes[id]=box;labels[id]=node.userData.sourceName||node.name||id;}}}
     }else if(element.measurementTargets?.length){
       boxes.product=new THREE.Box3();let index=0;
       object.updateWorldMatrix(true,true);
@@ -287,7 +288,7 @@ export function createViewer(element){
         const dx=mid.x-screenCenter.x,dy=mid.y-screenCenter.y,length=Math.hypot(dx,dy);
         const distance=part==='desk'?25:18;
         const offset=length>6?{x:dx/length*distance,y:dy/length*distance}:fallback;
-        guides.push({part,partLabel:object.getObjectByProperty('uuid',part)?.userData.sourceName||object.getObjectByProperty('uuid',part)?.name||part,axis,value:axis==='G'?d.x:axis==='D'?d.z:d.y,label:`${axis} ${Math.round((axis==='G'?d.x:axis==='D'?d.z:d.y)*100)} cm`,start:a,end:b,offset});
+        guides.push({part,measurementKey:part,partLabel:labels[part]||part,axis,value:axis==='G'?d.x:axis==='D'?d.z:d.y,label:`${axis} ${Math.round((axis==='G'?d.x:axis==='D'?d.z:d.y)*100)} cm`,start:a,end:b,offset});
       };
       add('G',[box.min.x,box.min.y,nearZ],[box.max.x,box.min.y,nearZ],{x:0,y:25});
       add('D',[nearX,box.min.y,box.min.z],[nearX,box.min.y,box.max.z],{x:nearX===box.max.x?25:-25,y:0});

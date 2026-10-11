@@ -18,22 +18,14 @@ body:not(.public-mode) input[type=checkbox],body:not(.public-mode) input[type=ra
 .product-card{border-radius:12px;overflow:hidden;box-shadow:0 5px 20px #0f1b2d07}
 .product-card:focus-within{outline:2px solid #b68a4c;outline-offset:4px}
 .card-heading h3{line-height:1.5}
-body[data-product=authored] .product-panel{background:#faf9f6}
-body[data-product=authored] .panel-heading{padding-bottom:20px}
-body[data-product=authored] .panel-heading h1{font-size:clamp(24px,2.5vw,34px);line-height:1.4;margin:9px 0 12px}
-body[data-product=authored] .panel-heading .lead{font-size:12px;line-height:1.9;color:#657282;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
-body[data-product=authored] .tabs{border-color:#e1ded6}
-body[data-product=authored] .option-card{border-color:#dedfdc;border-radius:10px;box-shadow:0 2px 8px #0f1b2d03;margin-bottom:12px}
-body[data-product=authored] .option-card summary{font-family:Alexandria,Arial,sans-serif;font-size:12px;padding:15px;flex-wrap:wrap}
-body[data-product=authored] .option-card summary b{font-family:inherit;font-size:10px;color:#647387;max-width:65%;text-align:right;overflow-wrap:anywhere}
-body[data-product=authored] .variant-options{display:flex;flex-wrap:wrap;gap:8px;padding-top:14px}
-body[data-product=authored] .variant-options button{font:inherit;font-size:11px;min-height:42px;line-height:1.6;padding:9px 12px;border:1px solid #dce1e5;border-radius:7px;background:#fff;color:#203349;cursor:pointer}
-body[data-product=authored] .variant-options button.active{background:#102237;color:#fff;border-color:#102237}
-body[data-product=authored] #details p{font-size:12px;line-height:1.9;color:#657282;white-space:pre-line}
-body[data-product=authored] #details h2{font-family:Alexandria,Arial,sans-serif;font-size:19px;line-height:1.6}
-body[data-product=authored] .detail-list{font-size:11px}
-body[data-product=authored] .detail-list div{gap:18px;align-items:flex-start;line-height:1.8}
-body[data-product=authored] .detail-list dd{max-width:68%;text-align:right;overflow-wrap:anywhere}
 .product-source{display:inline-flex;align-items:center;margin-top:18px;min-height:44px;color:#936b33;font-size:11px;text-decoration:underline;text-underline-offset:4px}
-body[data-product=authored] .product-ar-controls{border-color:#dcd5c8;background:#f5f0e7}
-@media(max-width:600px){body[data-product=authored] .detail-list div{flex-direction:column;gap:3px}body[data-product=authored] .detail-list dd{max-width:100%;text-align:left}.page-heading{gap:14px;flex-wrap:wrap}}
+body[data-product=authored] #details p{white-space:pre-line;font-size:.82rem;line-height:1.5;color:var(--navy)}
+body[data-product=authored] .tab.active{border:2px solid var(--navy);border-radius:3px}
+body[data-product=authored] .detail-list{font-size:.78rem}
+body[data-product=authored] .detail-list div{gap:18px;line-height:1.5}
+body[data-product=authored] .detail-list dd{max-width:68%;text-align:right;overflow-wrap:anywhere}
+body[data-product=authored] .material-files a{display:flex;align-items:center;justify-content:center;min-height:40px;padding:8px;border:1px solid var(--line);border-radius:7px;font-size:.7rem;font-weight:700;text-decoration:none}
+.element-dimensions{display:grid;gap:12px;margin:16px 0}.element-dimensions fieldset{border:1px solid #dbe2e9;border-radius:8px;display:flex;gap:12px;flex-wrap:wrap}.element-dimensions label{flex:1;min-width:90px}.element-dimensions input{width:100%}
+
+body[data-product=authored] .panel-heading h1{font:500 2.85rem Georgia,serif}
+@media(max-width:600px){body[data-product=authored] .detail-list div{flex-direction:column;gap:6px}body[data-product=authored] .detail-list dd{max-width:100%;text-align:left}}

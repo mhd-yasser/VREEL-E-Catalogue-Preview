@@ -1,0 +1,750 @@
+{
+  "id": "orka-bari",
+  "draft": {
+    "schemaVersion": 2,
+    "scenes": [
+      {
+        "id": "scene-0",
+        "name": "0",
+        "role": "shared",
+        "measure": true
+      },
+      {
+        "id": "scene-1",
+        "name": "noAR",
+        "role": "decoration",
+        "measure": false
+      },
+      {
+        "id": "scene-2",
+        "name": "BARI100",
+        "role": "alternative",
+        "measure": true
+      },
+      {
+        "id": "scene-3",
+        "name": "BARI85",
+        "role": "alternative",
+        "measure": true
+      },
+      {
+        "id": "scene-4",
+        "name": "BARI65",
+        "role": "alternative",
+        "measure": true
+      },
+      {
+        "id": "scene-5",
+        "name": "BARI65A",
+        "role": "alternative",
+        "measure": true
+      },
+      {
+        "id": "scene-6",
+        "name": "BARI65AD",
+        "role": "alternative",
+        "measure": true
+      },
+      {
+        "id": "scene-7",
+        "name": "BARI85A",
+        "role": "alternative",
+        "measure": true
+      },
+      {
+        "id": "scene-8",
+        "name": "BARI85AD",
+        "role": "alternative",
+        "measure": true
+      },
+      {
+        "id": "scene-9",
+        "name": "BARI100AD",
+        "role": "alternative",
+        "measure": true
+      },
+      {
+        "id": "scene-10",
+        "name": "BARI100A",
+        "role": "alternative",
+        "measure": true
+      }
+    ],
+    "materialVariants": [
+      {
+        "id": "variant-0",
+        "index": 0,
+        "name": "Green",
+        "key": "Green",
+        "label": "Green"
+      },
+      {
+        "id": "variant-1",
+        "index": 1,
+        "name": "Lacivert",
+        "key": "Lacivert",
+        "label": "Lacivert"
+      },
+      {
+        "id": "variant-2",
+        "index": 2,
+        "name": "Gri_Kaşmir",
+        "key": "Gri_Kaşmir",
+        "label": "Gri_Kaşmir"
+      },
+      {
+        "id": "variant-3",
+        "index": 3,
+        "name": "Antrasit",
+        "key": "Antrasit",
+        "label": "Antrasit"
+      },
+      {
+        "id": "variant-4",
+        "index": 4,
+        "name": "Beyaz",
+        "key": "Beyaz",
+        "label": "Beyaz"
+      }
+    ],
+    "defaultVariant": null,
+    "animations": [
+      {
+        "id": "animation-0:10",
+        "name": "BoyKapak",
+        "duration": 2,
+        "mode": "toggle",
+        "smooth": true,
+        "tracks": [
+          "0:0"
+        ]
+      },
+      {
+        "id": "animation-0:37",
+        "name": "100_ÜstÇek",
+        "duration": 2,
+        "mode": "toggle",
+        "smooth": true,
+        "tracks": [
+          "0:1"
+        ]
+      },
+      {
+        "id": "animation-0:44",
+        "name": "100_AltÇek",
+        "duration": 2,
+        "mode": "toggle",
+        "smooth": true,
+        "tracks": [
+          "0:2"
+        ]
+      },
+      {
+        "id": "animation-0:70",
+        "name": "85_ÜstÇek",
+        "duration": 2,
+        "mode": "toggle",
+        "smooth": true,
+        "tracks": [
+          "0:3"
+        ]
+      },
+      {
+        "id": "animation-0:77",
+        "name": "85_AltÇek",
+        "duration": 2,
+        "mode": "toggle",
+        "smooth": true,
+        "tracks": [
+          "0:4"
+        ]
+      },
+      {
+        "id": "animation-0:102",
+        "name": "65_ÜstÇek",
+        "duration": 2,
+        "mode": "toggle",
+        "smooth": true,
+        "tracks": [
+          "0:5"
+        ]
+      },
+      {
+        "id": "animation-0:109",
+        "name": "65_AltÇek",
+        "duration": 2,
+        "mode": "toggle",
+        "smooth": true,
+        "tracks": [
+          "0:6"
+        ]
+      },
+      {
+        "id": "animation-0:175",
+        "name": "ADK1",
+        "duration": 2,
+        "mode": "toggle",
+        "smooth": true,
+        "tracks": [
+          "0:7"
+        ]
+      },
+      {
+        "id": "animation-0:179",
+        "name": "ADK2",
+        "duration": 2,
+        "mode": "toggle",
+        "smooth": true,
+        "tracks": [
+          "0:8"
+        ]
+      },
+      {
+        "id": "animation-0:183",
+        "name": "ADK3",
+        "duration": 2,
+        "mode": "toggle",
+        "smooth": true,
+        "tracks": [
+          "0:9"
+        ]
+      },
+      {
+        "id": "animation-0:153",
+        "name": "85_ADK1",
+        "duration": 2,
+        "mode": "toggle",
+        "smooth": true,
+        "tracks": [
+          "0:10"
+        ]
+      },
+      {
+        "id": "animation-0:157",
+        "name": "85_ADK2",
+        "duration": 2,
+        "mode": "toggle",
+        "smooth": true,
+        "tracks": [
+          "0:11"
+        ]
+      },
+      {
+        "id": "animation-0:130",
+        "name": "65_ADK1",
+        "duration": 2,
+        "mode": "toggle",
+        "smooth": true,
+        "tracks": [
+          "0:12"
+        ]
+      },
+      {
+        "id": "animation-0:134",
+        "name": "65_ADK2",
+        "duration": 2,
+        "mode": "toggle",
+        "smooth": true,
+        "tracks": [
+          "0:13"
+        ]
+      }
+    ],
+    "modelScale": 0.01,
+    "scaleConfirmed": true,
+    "ar": {
+      "enabled": true,
+      "placement": "wall",
+      "back": "-z",
+      "heightOffset": 0
+    },
+    "name": "BARI",
+    "brand": "ORKA",
+    "code": "",
+    "category": "Banyo mobilyası",
+    "description": "Bari şehrinin zarif dokunuşları, İtalya’nın güneydoğusunda, Adriyatik Denizi’nin derin mavi sularına bakan bu eşsiz liman kenti, ORKA Banyo’nun BARI serisiyle banyolarınıza taşınıyor. ORKA Tasarım Ekibi’nin modern vizyonunu yansıtan bu koleksiyon, denizin huzurunu ve liman kentinin dinginliğini yaşam alanlarınıza getiriyor.\n\nSade ama çarpıcı çizgileri, geniş depolama alanları ve ORKA TherMold teknolojisi ile üretilen BARI, estetik ile fonksiyonelliği banyolarınızda buluşturuyor. Bari’nin tarihi sokaklarında hissedilen dinginliği anımsatan bu seri, yaşam alanlarınıza derin bir nefes ve zarif bir dokunuş katıyor.\n\nTherMold Teknolojmiz,\nbanyo gibi nemli ve ıslak ortamlar için ideal bir çözümdür, rutubete karşı üstün direnç sağlar. PVC içerikli malzemeler kullanarak yüksek ısıda şekillendirerek üretiyoruz. Özel tutkalı uygulanması sayesinde özellikle nemli ortamlara için idealdir. Bu seriler çevre dostu olup, yüksek kimyasal direnç, ışığa dayanıklılık, kolay bakım ve uzun ömür sunar.\n\nÜrün Özellikleri\n\nGövde ve Çekmece: TherMold MDF (TherMold, PVC içerikli malzemelerin yüksek ısı ile şekillendirilmesidir.)\nAyarlanabilir ışık şiddeti ile ideal aydınlatma\nSessiz kapanan kapak ve çekmeceler\nGeniş depolama hacmi\nHijyen serisi seramik lavabo",
+    "unit": "cm",
+    "width": "",
+    "depth": "",
+    "height": "",
+    "email": "sales@orka.com.tr",
+    "features": {
+      "configurable": true,
+      "dimensions": true,
+      "downloads": true,
+      "contact": true
+    },
+    "model": {
+      "id": "9715f6cf-7a84-40c9-8781-2d46ff5e50e3",
+      "name": "BARI_KHRONOS4.glb",
+      "url": "catalogue/orka/bari/model.glb",
+      "sha256": "be2bd6daa6177e5bd612ca9aac241155638ec28341fecb9e62cf164fc51071c8"
+    },
+    "assets": [
+      {
+        "id": "73374158-eead-4c00-9224-4596376ac637",
+        "name": "BARİ_3ds.zip",
+        "kind": "attachments",
+        "public": true,
+        "url": "catalogue/orka/bari/source.zip",
+        "sha256": "aefcb5a051624c1b96444080e964b7d14b0278a7df24854d60d0dcb54b0064f5"
+      },
+      {
+        "id": "105e0176-475c-498d-896b-dc49d5e85d35",
+        "name": "image_2026-10-10_101345846.png",
+        "kind": "photos",
+        "public": false,
+        "url": "catalogue/orka/bari/photo.png",
+        "sha256": "d1dc49113992dc7047a36849ea9eecb513b74641843fc8690907c65542d90d17"
+      }
+    ],
+    "groups": [],
+    "componentGroups": [
+      {
+        "id": "47d60542-ad62-4cba-866b-c0f65a89f2aa",
+        "name": "Banyo Dolabı",
+        "options": [
+          {
+            "id": "d0c68b0b-52a5-4763-9373-83249814f9cb",
+            "nodeId": "scene-2",
+            "label": "BARI100",
+            "defaultVariant": "variant-0"
+          },
+          {
+            "id": "e2b25cd0-992d-4951-bbbc-9f0ace5d898c",
+            "nodeId": "scene-3",
+            "label": "BARI85",
+            "defaultVariant": "variant-0"
+          },
+          {
+            "id": "1bf59b4f-03c8-4a47-be9a-dbbc8ef4e819",
+            "nodeId": "scene-4",
+            "label": "BARI65",
+            "defaultVariant": "variant-0"
+          }
+        ],
+        "defaultId": "d0c68b0b-52a5-4763-9373-83249814f9cb"
+      },
+      {
+        "id": "4518c946-bc81-4eb2-93bd-4ee12cdb9cb6",
+        "name": "Ayna",
+        "options": [
+          {
+            "id": "4721ea93-e5cf-4bf6-aa01-9818345d5fc9",
+            "nodeId": "scene-10",
+            "label": "BARI100A",
+            "defaultVariant": "variant-0"
+          },
+          {
+            "id": "0a5f0e63-2cbd-4e04-aa2d-30de7f161813",
+            "nodeId": "scene-5",
+            "label": "BARI65A",
+            "defaultVariant": "variant-0"
+          },
+          {
+            "id": "e8702161-91c8-4383-ab0d-255e4330b8de",
+            "nodeId": "scene-6",
+            "label": "BARI65AD",
+            "defaultVariant": "variant-0"
+          },
+          {
+            "id": "045493cb-7a80-465f-a0a3-67aa557a56f7",
+            "nodeId": "scene-7",
+            "label": "BARI85A",
+            "defaultVariant": "variant-0"
+          },
+          {
+            "id": "cd45d582-3cb0-4d95-9375-be7e15a71d1d",
+            "nodeId": "scene-8",
+            "label": "BARI85AD",
+            "defaultVariant": "variant-0"
+          },
+          {
+            "id": "fde824b4-8253-4eff-bca8-5f8f2d0d3956",
+            "nodeId": "scene-9",
+            "label": "BARI100AD",
+            "defaultVariant": "variant-0"
+          }
+        ],
+        "defaultId": "fde824b4-8253-4eff-bca8-5f8f2d0d3956"
+      }
+    ],
+    "componentAssets": [],
+    "dimensionTargets": [],
+    "productSource": "https://www.orkabanyo.com/tr/orka-koleksiyonlar/bari"
+  },
+  "published": {
+    "schemaVersion": 2,
+    "scenes": [
+      {
+        "id": "scene-0",
+        "name": "0",
+        "role": "shared",
+        "measure": true
+      },
+      {
+        "id": "scene-1",
+        "name": "noAR",
+        "role": "decoration",
+        "measure": false
+      },
+      {
+        "id": "scene-2",
+        "name": "BARI100",
+        "role": "alternative",
+        "measure": true
+      },
+      {
+        "id": "scene-3",
+        "name": "BARI85",
+        "role": "alternative",
+        "measure": true
+      },
+      {
+        "id": "scene-4",
+        "name": "BARI65",
+        "role": "alternative",
+        "measure": true
+      },
+      {
+        "id": "scene-5",
+        "name": "BARI65A",
+        "role": "alternative",
+        "measure": true
+      },
+      {
+        "id": "scene-6",
+        "name": "BARI65AD",
+        "role": "alternative",
+        "measure": true
+      },
+      {
+        "id": "scene-7",
+        "name": "BARI85A",
+        "role": "alternative",
+        "measure": true
+      },
+      {
+        "id": "scene-8",
+        "name": "BARI85AD",
+        "role": "alternative",
+        "measure": true
+      },
+      {
+        "id": "scene-9",
+        "name": "BARI100AD",
+        "role": "alternative",
+        "measure": true
+      },
+      {
+        "id": "scene-10",
+        "name": "BARI100A",
+        "role": "alternative",
+        "measure": true
+      }
+    ],
+    "materialVariants": [
+      {
+        "id": "variant-0",
+        "index": 0,
+        "name": "Green",
+        "key": "Green",
+        "label": "Green"
+      },
+      {
+        "id": "variant-1",
+        "index": 1,
+        "name": "Lacivert",
+        "key": "Lacivert",
+        "label": "Lacivert"
+      },
+      {
+        "id": "variant-2",
+        "index": 2,
+        "name": "Gri_Kaşmir",
+        "key": "Gri_Kaşmir",
+        "label": "Gri_Kaşmir"
+      },
+      {
+        "id": "variant-3",
+        "index": 3,
+        "name": "Antrasit",
+        "key": "Antrasit",
+        "label": "Antrasit"
+      },
+      {
+        "id": "variant-4",
+        "index": 4,
+        "name": "Beyaz",
+        "key": "Beyaz",
+        "label": "Beyaz"
+      }
+    ],
+    "defaultVariant": null,
+    "animations": [
+      {
+        "id": "animation-0:10",
+        "name": "BoyKapak",
+        "duration": 2,
+        "mode": "toggle",
+        "smooth": true,
+        "tracks": [
+          "0:0"
+        ]
+      },
+      {
+        "id": "animation-0:37",
+        "name": "100_ÜstÇek",
+        "duration": 2,
+        "mode": "toggle",
+        "smooth": true,
+        "tracks": [
+          "0:1"
+        ]
+      },
+      {
+        "id": "animation-0:44",
+        "name": "100_AltÇek",
+        "duration": 2,
+        "mode": "toggle",
+        "smooth": true,
+        "tracks": [
+          "0:2"
+        ]
+      },
+      {
+        "id": "animation-0:70",
+        "name": "85_ÜstÇek",
+        "duration": 2,
+        "mode": "toggle",
+        "smooth": true,
+        "tracks": [
+          "0:3"
+        ]
+      },
+      {
+        "id": "animation-0:77",
+        "name": "85_AltÇek",
+        "duration": 2,
+        "mode": "toggle",
+        "smooth": true,
+        "tracks": [
+          "0:4"
+        ]
+      },
+      {
+        "id": "animation-0:102",
+        "name": "65_ÜstÇek",
+        "duration": 2,
+        "mode": "toggle",
+        "smooth": true,
+        "tracks": [
+          "0:5"
+        ]
+      },
+      {
+        "id": "animation-0:109",
+        "name": "65_AltÇek",
+        "duration": 2,
+        "mode": "toggle",
+        "smooth": true,
+        "tracks": [
+          "0:6"
+        ]
+      },
+      {
+        "id": "animation-0:175",
+        "name": "ADK1",
+        "duration": 2,
+        "mode": "toggle",
+        "smooth": true,
+        "tracks": [
+          "0:7"
+        ]
+      },
+      {
+        "id": "animation-0:179",
+        "name": "ADK2",
+        "duration": 2,
+        "mode": "toggle",
+        "smooth": true,
+        "tracks": [
+          "0:8"
+        ]
+      },
+      {
+        "id": "animation-0:183",
+        "name": "ADK3",
+        "duration": 2,
+        "mode": "toggle",
+        "smooth": true,
+        "tracks": [
+          "0:9"
+        ]
+      },
+      {
+        "id": "animation-0:153",
+        "name": "85_ADK1",
+        "duration": 2,
+        "mode": "toggle",
+        "smooth": true,
+        "tracks": [
+          "0:10"
+        ]
+      },
+      {
+        "id": "animation-0:157",
+        "name": "85_ADK2",
+        "duration": 2,
+        "mode": "toggle",
+        "smooth": true,
+        "tracks": [
+          "0:11"
+        ]
+      },
+      {
+        "id": "animation-0:130",
+        "name": "65_ADK1",
+        "duration": 2,
+        "mode": "toggle",
+        "smooth": true,
+        "tracks": [
+          "0:12"
+        ]
+      },
+      {
+        "id": "animation-0:134",
+        "name": "65_ADK2",
+        "duration": 2,
+        "mode": "toggle",
+        "smooth": true,
+        "tracks": [
+          "0:13"
+        ]
+      }
+    ],
+    "modelScale": 0.01,
+    "scaleConfirmed": true,
+    "ar": {
+      "enabled": true,
+      "placement": "wall",
+      "back": "-z",
+      "heightOffset": 0
+    },
+    "name": "BARI",
+    "brand": "ORKA",
+    "code": "",
+    "category": "Banyo mobilyası",
+    "description": "Bari şehrinin zarif dokunuşları, İtalya’nın güneydoğusunda, Adriyatik Denizi’nin derin mavi sularına bakan bu eşsiz liman kenti, ORKA Banyo’nun BARI serisiyle banyolarınıza taşınıyor. ORKA Tasarım Ekibi’nin modern vizyonunu yansıtan bu koleksiyon, denizin huzurunu ve liman kentinin dinginliğini yaşam alanlarınıza getiriyor.\n\nSade ama çarpıcı çizgileri, geniş depolama alanları ve ORKA TherMold teknolojisi ile üretilen BARI, estetik ile fonksiyonelliği banyolarınızda buluşturuyor. Bari’nin tarihi sokaklarında hissedilen dinginliği anımsatan bu seri, yaşam alanlarınıza derin bir nefes ve zarif bir dokunuş katıyor.\n\nTherMold Teknolojmiz,\nbanyo gibi nemli ve ıslak ortamlar için ideal bir çözümdür, rutubete karşı üstün direnç sağlar. PVC içerikli malzemeler kullanarak yüksek ısıda şekillendirerek üretiyoruz. Özel tutkalı uygulanması sayesinde özellikle nemli ortamlara için idealdir. Bu seriler çevre dostu olup, yüksek kimyasal direnç, ışığa dayanıklılık, kolay bakım ve uzun ömür sunar.\n\nÜrün Özellikleri\n\nGövde ve Çekmece: TherMold MDF (TherMold, PVC içerikli malzemelerin yüksek ısı ile şekillendirilmesidir.)\nAyarlanabilir ışık şiddeti ile ideal aydınlatma\nSessiz kapanan kapak ve çekmeceler\nGeniş depolama hacmi\nHijyen serisi seramik lavabo",
+    "unit": "cm",
+    "width": "",
+    "depth": "",
+    "height": "",
+    "email": "sales@orka.com.tr",
+    "features": {
+      "configurable": true,
+      "dimensions": true,
+      "downloads": true,
+      "contact": true
+    },
+    "model": {
+      "id": "9715f6cf-7a84-40c9-8781-2d46ff5e50e3",
+      "name": "BARI_KHRONOS4.glb",
+      "url": "catalogue/orka/bari/model.glb",
+      "sha256": "be2bd6daa6177e5bd612ca9aac241155638ec28341fecb9e62cf164fc51071c8"
+    },
+    "assets": [
+      {
+        "id": "73374158-eead-4c00-9224-4596376ac637",
+        "name": "BARİ_3ds.zip",
+        "kind": "attachments",
+        "public": true,
+        "url": "catalogue/orka/bari/source.zip",
+        "sha256": "aefcb5a051624c1b96444080e964b7d14b0278a7df24854d60d0dcb54b0064f5"
+      },
+      {
+        "id": "105e0176-475c-498d-896b-dc49d5e85d35",
+        "name": "image_2026-10-10_101345846.png",
+        "kind": "photos",
+        "public": false,
+        "url": "catalogue/orka/bari/photo.png",
+        "sha256": "d1dc49113992dc7047a36849ea9eecb513b74641843fc8690907c65542d90d17"
+      }
+    ],
+    "groups": [],
+    "componentGroups": [
+      {
+        "id": "47d60542-ad62-4cba-866b-c0f65a89f2aa",
+        "name": "Banyo Dolabı",
+        "options": [
+          {
+            "id": "d0c68b0b-52a5-4763-9373-83249814f9cb",
+            "nodeId": "scene-2",
+            "label": "BARI100",
+            "defaultVariant": "variant-0"
+          },
+          {
+            "id": "e2b25cd0-992d-4951-bbbc-9f0ace5d898c",
+            "nodeId": "scene-3",
+            "label": "BARI85",
+            "defaultVariant": "variant-0"
+          },
+          {
+            "id": "1bf59b4f-03c8-4a47-be9a-dbbc8ef4e819",
+            "nodeId": "scene-4",
+            "label": "BARI65",
+            "defaultVariant": "variant-0"
+          }
+        ],
+        "defaultId": "d0c68b0b-52a5-4763-9373-83249814f9cb"
+      },
+      {
+        "id": "4518c946-bc81-4eb2-93bd-4ee12cdb9cb6",
+        "name": "Ayna",
+        "options": [
+          {
+            "id": "4721ea93-e5cf-4bf6-aa01-9818345d5fc9",
+            "nodeId": "scene-10",
+            "label": "BARI100A",
+            "defaultVariant": "variant-0"
+          },
+          {
+            "id": "0a5f0e63-2cbd-4e04-aa2d-30de7f161813",
+            "nodeId": "scene-5",
+            "label": "BARI65A",
+            "defaultVariant": "variant-0"
+          },
+          {
+            "id": "e8702161-91c8-4383-ab0d-255e4330b8de",
+            "nodeId": "scene-6",
+            "label": "BARI65AD",
+            "defaultVariant": "variant-0"
+          },
+          {
+            "id": "045493cb-7a80-465f-a0a3-67aa557a56f7",
+            "nodeId": "scene-7",
+            "label": "BARI85A",
+            "defaultVariant": "variant-0"
+          },
+          {
+            "id": "cd45d582-3cb0-4d95-9375-be7e15a71d1d",
+            "nodeId": "scene-8",
+            "label": "BARI85AD",
+            "defaultVariant": "variant-0"
+          },
+          {
+            "id": "fde824b4-8253-4eff-bca8-5f8f2d0d3956",
+            "nodeId": "scene-9",
+            "label": "BARI100AD",
+            "defaultVariant": "variant-0"
+          }
+        ],
+        "defaultId": "fde824b4-8253-4eff-bca8-5f8f2d0d3956"
+      }
+    ],
+    "componentAssets": [],
+    "dimensionTargets": [],
+    "productSource": "https://www.orkabanyo.com/tr/orka-koleksiyonlar/bari"
+  },
+  "publishedAt": "2026-10-10T07:18:26.132Z"
+}
