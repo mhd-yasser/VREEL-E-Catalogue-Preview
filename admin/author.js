@@ -1,9 +1,11 @@
-import {normalizeDraft,sceneSettings,collectScenes,importVariantSettings,applyMaterialVariant,motionSettings,configureMotions,toggleMotion,productErrors,composeProduct} from '../product-runtime.js?v=20261010-6';
-import {addARControls} from '../product-ar.js?v=20261010-6';
+import {normalizeDraft,sceneSettings,collectScenes,importVariantSettings,applyMaterialVariant,motionSettings,configureMotions,toggleMotion,productErrors,composeProduct} from '../product-runtime.js?v=20261010-7';
+import {measurementKey,measurementLabel,unitFactor} from '../dimensions.js';
+import {loadCatalogueProduct} from '../catalogue-store.js';
+import {addARControls} from '../product-ar.js?v=20261010-7';
 import {exportProductPackage, importProductPackage} from './product-package.js?v=20261010-1';
 import {addBariProfile} from './bari-profile.js?v=20261010-1';
 import * as THREE from "three";
-import { createViewer } from "../three-viewer.js?v=20261010-5";
+import { createViewer } from "../three-viewer.js?v=20261010-7";
 import {
   saveProduct,
   listProducts,
@@ -207,6 +209,7 @@ async function loadModel(model, applyConfig = true) {
     if (applyConfig) await applyAll();
     else composeProduct(viewer.model.runtime,draft);
     if(draft.schemaVersion===2)viewer.reframe();
+    renderElementDimensions();
     return true;
   } finally {
     loading = false;
@@ -654,7 +657,7 @@ function renderInfo() {
     host.append(
       element(
         "p",
-        (viewer?.getMeasurementGuides()||[]).map(g=>`${g.partLabel&&g.part!=='product'?g.partLabel+' — ':''}${g.axis} ${(g.part==='product'&&Number(draft[{G:'width',D:'depth',Y:'height'}[g.axis]])>0?Number(draft[{G:'width',D:'depth',Y:'height'}[g.axis]]):Number((g.value*({mm:1000,cm:100,m:1}[draft.unit]||100)).toFixed(2)))} ${draft.unit||'cm'}`).join(' · ') ,
+        (viewer?.getMeasurementGuides()||[]).map(g=>`${g.partLabel&&g.part!=='product'?g.partLabel+' — ':''}${measurementLabel(draft,g)}`).join(' · ') ,
       ),
     );
   if (draft.features.downloads)
@@ -766,6 +769,8 @@ async function acceptModel(file) {
     draft.componentGroups = [];
     draft.componentAssets = [];
     draft.dimensionTargets = [];
+    draft.elementDimensions = {};
+    renderElementDimensions();
     componentSelection.clear();
     activeComponentGroup = null;
     activeGroup = null;
@@ -791,6 +796,7 @@ for (const id of [...fieldIds, ...featureIds])
   $(id).addEventListener("input", () => {
     readFields();
     changed();
+    if(id === "unit" && loaded) renderElementDimensions();
   });
 $("model-file").onchange = (e) => {
   const file = e.target.files[0];
@@ -1009,6 +1015,8 @@ async function start() {
       renderPreviewOptions(host);
       $("clear-highlight").hidden = true;
     } else {
+      const catalogueId=new URLSearchParams(location.search).get('catalogue');
+      if(catalogueId){const id=`catalogue:${catalogueId}`;record=await getProduct(id);if(!record){record=await loadCatalogueProduct(catalogueId,true);record.id=id;await saveProduct(record);}draft=normalizeDraft(record.draft);}
       if (editId) {
         const saved = await getProduct(editId);
         if (!saved) throw new Error("Kayıt bulunamadı.");
@@ -1072,7 +1080,7 @@ function renderComponentEditor() {
         if(g.options.some(o=>o.referenceId===c.id)){notice('Önce bu parçaya bağlı dosya alternatiflerini kaldırın.',true);check.checked=true;return;}
         g.options=g.options.filter(o=>o.nodeId!==c.id);if(!g.options.some(o=>o.id===g.defaultId))g.defaultId=g.options[0]?.id||null;
       }
-      componentSelection.delete(g.id);changed();refreshComponentPreview();renderComponentEditor();
+      componentSelection.delete(g.id);changed();refreshComponentPreview();renderComponentEditor();renderElementDimensions();
     };
     row.append(check,element('span',c.path+(owner?` (${owner.name})`:nested?' (İç içe seçim daha sonra)':'')),button('Göster',()=>{
       componentSelection.set(g.id,g.options.find(o=>o.nodeId===c.id)?.id||g.defaultId);refreshComponentPreview();
@@ -1157,9 +1165,9 @@ function renderSceneClassification(){
     for(const [value,label] of [['unassigned','Sınıflandırılmadı'],['shared','Ortak / daima görünür'],['alternative','Alternatif'],['decoration','Dekor / AR ve ölçü hariç'],['excluded','Gösterme']])role.append(new Option(label,value));
     role.value=config.role;role.disabled=config.name==='0'||config.name==='noAR';role.onchange=()=>{
       if(draft.componentGroups.some(g=>g.options.some(o=>o.nodeId===config.id))){notice('Önce sahneyi alternatif grubundan çıkarın.',true);role.value=config.role;return;}
-      config.role=role.value;config.measure=role.value!=='decoration';changed();refreshComponentPreview();renderComponentEditor();
+      config.role=role.value;config.measure=role.value!=='decoration';changed();refreshComponentPreview();renderComponentEditor();renderElementDimensions();
     };
-    const measure=element('input');measure.type='checkbox';measure.checked=config.measure!==false;measure.disabled=config.role==='decoration';measure.onchange=()=>{config.measure=measure.checked;changed();refreshComponentPreview();};const label=element('label','Ölçülere dahil');label.prepend(measure);row.append(name,role,label);host.append(row);
+    const measure=element('input');measure.type='checkbox';measure.checked=config.measure!==false;measure.disabled=config.role==='decoration';measure.onchange=()=>{config.measure=measure.checked;changed();refreshComponentPreview();renderElementDimensions();};const label=element('label','Ölçülere dahil');label.prepend(measure);row.append(name,role,label);host.append(row);
   }
 }
 function renderNativeVariants(){
@@ -1194,3 +1202,12 @@ $('ar-enabled').onchange=()=>{readFields();changed();};
 addARControls({get model(){return viewer?.model;},toDataURL:()=>viewer.toDataURL()},$('review-ar'),m=>notice(m));
 
 for(const id of ['ar-placement','ar-back','ar-height'])$(id).onchange=()=>{readFields();applyAll();changed();};
+
+function renderElementDimensions(){
+ let host=document.getElementById('element-dimensions');if(!host){host=element('section');host.id='element-dimensions';host.className='element-dimensions';$('component-editor').append(host);}
+ host.replaceChildren(element('h3','Parça ölçüleri — elle düzeltme'),element('p','Boş bırakılan ölçüler modelden hesaplanır. Elle girilen ölçüler 3D / AR ölçeğini değiştirmez.'));
+ const entries=[];
+ for(const scene of viewer?.model.runtime?.scenes||[]){const settings=draft.scenes.find(s=>s.id===scene.id);if(['decoration','excluded'].includes(settings?.role)||settings?.measure===false)continue;for(const [index,node] of scene.node.children.entries())entries.push({key:measurementKey(scene,node,index),name:node.userData.sourceName||node.name||scene.name});}
+ for(const [key,node] of viewer?.model.runtime?.external||[])entries.push({key,name:node.userData.sourceName||node.name||key});
+ for(const entry of entries){const group=element('fieldset');group.append(element('legend',entry.name));for(const [axis,name] of [['width','Genişlik'],['depth','Derinlik'],['height','Yükseklik']]){const label=element('label',`${name} (${draft.unit||'cm'})`),input=element('input');input.type='number';input.min='0.01';input.step='any';input.placeholder='Modelden';const value=draft.elementDimensions?.[entry.key]?.[axis];input.value=value?Number((value*unitFactor(draft.unit)).toFixed(4)):'';input.onchange=()=>{draft.elementDimensions||={};draft.elementDimensions[entry.key]||={};if(input.value===''||Number(input.value)<=0)delete draft.elementDimensions[entry.key][axis];else draft.elementDimensions[entry.key][axis]=Number(input.value)/unitFactor(draft.unit);changed();viewer.requestUpdate();renderInfo();};label.append(input);group.append(label);}host.append(group);}
+}

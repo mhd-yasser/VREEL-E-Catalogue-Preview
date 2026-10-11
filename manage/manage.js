@@ -34,6 +34,9 @@ function render() {
   notice.textContent = records.childElementCount ? `${records.childElementCount} ürün` : products.length ? 'Aramaya uygun ürün bulunamadı.' : 'Henüz ürün yok. “Yeni ürün ekle” ile başlayın.';
 }
 for (const [name, path, category] of [['Axis Executive Desk','desk','Ofis'],['Aura Yönetici Koltuğu','chair','Oturma'],['Lounge Duo','sofa','Oturma']]) { const item = row(name, 'Mevcut demo', [['3D deneyimi aç ↗', `../${path}/`]], category, true, `../products/assets/product-${path}-transparent.webp`); item.querySelector('.status-pill').textContent = 'Demo'; document.querySelector('#demos').append(item); }
+const bari = row('ORKA / BARI', 'Paylaşılan katalog · düzenlenebilir kopya', [['3D deneyimi aç ↗', '../product/?catalogue=orka-bari'], ['Taslağı düzenle →', '../admin/?catalogue=orka-bari']], 'Banyo mobilyası', true, '../catalogue/orka/bari/photo.png');
+bari.querySelector('.status-pill').textContent = 'Katalog';
+document.querySelector('#demos').append(bari);
 search.addEventListener('input', render); status.addEventListener('change', render);
 try { products = await listProducts(); render(); } catch (e) { notice.textContent = 'Yerel ürünler okunamadı. Tarayıcı depolama izinlerini kontrol edin.'; notice.classList.add('error'); }
 
