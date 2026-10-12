@@ -1,5 +1,5 @@
 import {normalizeDraft,applyMaterialVariant,configureMotions,toggleMotion} from './product-runtime.js?v=20261010-7';
-import {openProductAR,exportCurrentProduct} from './product-ar.js?v=20261012-1';
+import {openProductAR,exportCurrentProduct} from './product-ar.js?v=20261010-7';
 import {measurementLabel} from './dimensions.js';
 import {loadCatalogueProduct} from './catalogue-store.js';
 import {mountAlternatives, applyComponentSelection} from './component-options.js?v=20261010-1';
