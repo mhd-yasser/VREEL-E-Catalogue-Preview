@@ -1,11 +1,11 @@
 import {normalizeDraft,sceneSettings,collectScenes,importVariantSettings,applyMaterialVariant,motionSettings,configureMotions,toggleMotion,productErrors,composeProduct} from '../product-runtime.js?v=20261010-7';
 import {measurementKey,measurementLabel,unitFactor} from '../dimensions.js';
 import {loadCatalogueProduct} from '../catalogue-store.js';
-import {addARControls} from '../product-ar.js?v=20261010-7';
+import {addARControls} from '../product-ar.js?v=20261012-1';
 import {exportProductPackage, importProductPackage} from './product-package.js?v=20261010-1';
 import {addBariProfile} from './bari-profile.js?v=20261010-1';
 import * as THREE from "three";
-import { createViewer } from "../three-viewer.js?v=20261010-7";
+import { createViewer } from "../three-viewer.js?v=20261012-1";
 import {
   saveProduct,
   listProducts,
