@@ -221,7 +221,6 @@ export function createViewer(element){
     src:{set:setModel},
     model:{get:()=>object?{materials:materialAdapters,root:object,nodes:sourceNodes,runtime:productRuntime}:null},
     environmentImage:{set:environment},
-    arLighting:{get:()=>({texture:scene.environment,intensity:scene.environmentIntensity,rotation:scene.environmentRotation.y,exposure:renderer.toneMappingExposure})},
     exposure:{set:value=>renderer.toneMappingExposure=value},
     shadowIntensity:{set:value=>{shadowsEnabled=Number(value)>0;light.castShadow=shadowsEnabled;renderer.shadowMap.needsUpdate=true;}},
     lightingPreset:{set:value=>{if(!lightingPresets[value])return;lightingMode=value;applyLighting();},get:()=>lightingMode},
