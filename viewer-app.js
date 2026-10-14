@@ -1,7 +1,10 @@
+import {fileLabel} from './file-labels.js?v=20261014-1';
+import {openProductAR,exportCurrentProduct} from './product-ar.js?v=20261014-1';
+import {bindSourceDownloads} from './source-downloads.js?v=20261014-1';
 import {materialTargetId} from './component-options.js?v=20261010-1';
 import * as THREE from 'three';
-import {createViewer} from './three-viewer.js?v=20261010-7';
-import {loadAuthoredConfig, paintAuthored, prepareAuthoredPage, updateAuthoredDimensions, prepareAuthoredComponents} from './authored-viewer.js?v=20261010-7';
+import {createViewer} from './three-viewer.js?v=20261014-1';
+import {loadAuthoredConfig, paintAuthored, prepareAuthoredPage, updateAuthoredDimensions, prepareAuthoredComponents} from './authored-viewer.js?v=20261014-1';
 import {woodPreviews} from './texture-previews.js';
 
 const page=document.body.dataset.product;
@@ -61,6 +64,7 @@ const authored=page==='authored'?await loadAuthoredConfig():null;
 const config=authored||configs[page];
 if(authored)prepareAuthoredPage(authored,viewer);
 const state=Object.fromEntries(Object.entries(config.groups).map(([key,value])=>[key,value.initial]));
+let modelReady=false;
 const textures=new Map(),projectedTextures=new Map();let pointerStart=null,wheelGroup=null,wheelObject=null,wheelPage=0,pdfDocument=null;
 const esc=value=>String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const choice=(key,id=state[key])=>config.groups[key].options.find(option=>option.id===id);
@@ -182,11 +186,11 @@ wheelHandle.addEventListener('pointerup',()=>{dragWheel=null;});wheelHandle.addE
 ui.wheel.querySelector('#wheel-close').addEventListener('click',closeWheel);document.querySelector('#wheel-prev').addEventListener('click',()=>{wheelPage--;renderWheel();});document.querySelector('#wheel-next').addEventListener('click',()=>{wheelPage++;renderWheel();});
 viewer.addEventListener('pointerdown',event=>pointerStart={x:event.clientX,y:event.clientY});viewer.addEventListener('pointerup',event=>{if(!pointerStart||Math.hypot(event.clientX-pointerStart.x,event.clientY-pointerStart.y)>7)return;const hit=viewer.materialFromPoint(event.clientX,event.clientY);const key=hit&&inferGroup(hit.object,hit);if(key)openWheel(key,hit.object,event.clientX,event.clientY);else closeWheel();});
 
-viewer.addEventListener('load',async()=>{try{if(authored)resetConfiguration=await prepareAuthoredComponents(authored,viewer,addVariantCard,()=>{closeWheel();updateText();updateDimensions();});if(!authored||authored.draft.schemaVersion!==2)isolateMaterials();if(authored)updateAuthoredDimensions(authored,viewer);if(page==='sofa')setupSofa();if(page==='desk')setupDesk();await previewLoads;await Promise.all(Object.keys(config.groups).map(key=>applyGroup(key,choice(key),null,true)));updateText();ui.notice.textContent='';viewerCanvas.style.visibility='visible';document.querySelector('#model-loading').hidden=true;
+viewer.addEventListener('load',async()=>{try{if(authored)resetConfiguration=await prepareAuthoredComponents(authored,viewer,addVariantCard,()=>{closeWheel();updateText();updateDimensions();});if(!authored||authored.draft.schemaVersion!==2)isolateMaterials();if(authored)updateAuthoredDimensions(authored,viewer);if(page==='sofa')setupSofa();if(page==='desk')setupDesk();await previewLoads;await Promise.all(Object.keys(config.groups).map(key=>applyGroup(key,choice(key),null,true)));updateText();ui.notice.textContent='';viewerCanvas.style.visibility='visible';document.querySelector('#model-loading').hidden=true;modelReady=true;if(!authored)document.querySelector('[data-action="ar"]').disabled=false;
   // Let the browser paint the lightweight result before requesting PBR maps.
   setTimeout(()=>{Promise.all(Object.keys(config.groups).map(key=>applyGroup(key))).catch(console.error);},200);
 }catch(error){console.error(error);ui.notice.textContent='Malzemeler yüklenemedi. Lütfen sayfayı yenileyin.';}});
-viewer.addEventListener('error',event=>{ui.notice.textContent=event.detail?.message||'3D model yüklenemedi. Lütfen sayfayı yenileyin.';});viewer.addEventListener('progress',event=>{const bar=viewer.querySelector('.progress'),span=bar?.querySelector('span');if(span)span.style.width=`${event.detail.totalProgress*100}%`;if(bar)bar.hidden=event.detail.totalProgress===1;});
+viewer.addEventListener('error',event=>{modelReady=false;if(!authored)document.querySelector('[data-action="ar"]').disabled=true;ui.notice.textContent=fileLabel(event.detail?.message)||'3D model yüklenemedi. Lütfen sayfayı yenileyin.';});viewer.addEventListener('progress',event=>{const bar=viewer.querySelector('.progress'),span=bar?.querySelector('span');if(span)span.style.width=`${event.detail.totalProgress*100}%`;if(bar)bar.hidden=event.detail.totalProgress===1;});
 ui.notice.textContent='3D model yükleniyor…';viewer.src=config.file;
 
 const studio={environment:'https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/1k/brown_photostudio_02_1k.hdr',shadow:1.35,softness:.72};viewer.environmentImage=studio.environment;viewer.shadowIntensity=studio.shadow;viewer.shadowSoftness=studio.softness;viewer.setRotationSpeed(40);
@@ -196,14 +200,24 @@ document.querySelector('[data-action="rotate"]').addEventListener('click',event=
 document.querySelectorAll('[data-lighting]').forEach(button=>button.addEventListener('click',()=>{viewer.lightingPreset=button.dataset.lighting;document.querySelectorAll('[data-lighting]').forEach(node=>node.setAttribute('aria-pressed',node===button));}));const lighting=document.querySelector('.lighting-presets');document.querySelector('[data-action="lighting-menu"]').addEventListener('click',()=>lighting.hidden=!lighting.hidden);
 document.querySelector('[data-action="fullscreen"]').addEventListener('click',()=>document.fullscreenElement?document.exitFullscreen():viewer.parentElement.requestFullscreen());document.querySelector('[data-action="reset"]').addEventListener('click',()=>viewer.reframe());document.querySelector('[data-action="zoom-in"]').addEventListener('click',()=>{const o=viewer.getCameraOrbit();viewer.cameraOrbit=`${o.theta}rad ${o.phi}rad ${o.radius*.82}m`;});document.querySelector('[data-action="zoom-out"]').addEventListener('click',()=>{const o=viewer.getCameraOrbit();viewer.cameraOrbit=`${o.theta}rad ${o.phi}rad ${o.radius*1.22}m`;});document.querySelector('[data-action="pan-left"]').addEventListener('click',()=>viewer.panView(-1));document.querySelector('[data-action="pan-right"]').addEventListener('click',()=>viewer.panView(1));document.querySelectorAll('[data-view]').forEach(button=>button.addEventListener('click',()=>{const views={front:'0deg 75deg auto',side:'90deg 75deg auto',top:'0deg 10deg auto'};viewer.cameraOrbit=views[button.dataset.view];activate('[data-view]',button);}));
 document.querySelector('[data-action="snapshot"]').addEventListener('click',()=>{const link=document.createElement('a');link.href=viewer.toDataURL();link.download=config.download.replace('.glb','.png');link.click();});document.querySelector('[data-action="snapshot-4k"]').addEventListener('click',()=>{const link=document.createElement('a');link.href=viewer.to4KDataURL();link.download=config.download.replace('.glb','_4K.png');link.click();});document.querySelector('[data-action="dimensions"]').addEventListener('click',event=>{const box=document.querySelector('#dimensions-overlay');box.hidden=!box.hidden;updateDimensions();event.currentTarget.setAttribute('aria-pressed',!box.hidden);});
-const resetModal=document.querySelector('#reset-modal'),sourceModal=document.querySelector('#source-modal');
+const resetModal=document.querySelector('#reset-modal');
 document.querySelector('#reset-materials').addEventListener('click',()=>resetModal.hidden=false);
 document.querySelector('#cancel-reset').addEventListener('click',()=>resetModal.hidden=true);
 document.querySelector('#confirm-reset').addEventListener('click',async()=>{resetModal.hidden=true;resetConfiguration();for(const [key,spec] of Object.entries(config.groups)){state[key]=spec.initial;await applyGroup(key);}updateText();closeWheel();});
-document.querySelector('#source-download').addEventListener('click',()=>{if(page==='authored'){config.downloadCurrent?.();return;}sourceModal.hidden=false;});
-document.querySelector('[data-close-source]').addEventListener('click',()=>sourceModal.hidden=true);
-document.querySelector('#source-form').addEventListener('submit',event=>{event.preventDefault();document.querySelector('#source-downloads').hidden=false;document.querySelector('#source-status').textContent='';});
-document.querySelectorAll('[data-source-format]').forEach(button=>button.addEventListener('click',()=>{const format=button.dataset.sourceFormat;const path=`${page}/files/${format}/${config.download.replace(/\.glb$/i,format==='max'?'.max':`.${format}`)}`;fetch(`../${path}`,{method:'HEAD'}).then(response=>{if(!response.ok)throw new Error('missing');const link=document.createElement('a');link.href=`../${path}`;link.download='';link.click();document.querySelector('#source-status').textContent='';}).catch(()=>document.querySelector('#source-status').textContent=`${button.textContent.replace(' İndir','')} dosyası henüz hazır değil.`);}));
+bindSourceDownloads({config,page,isReady:()=>modelReady,downloadCurrent:config.downloadCurrent||async function(){
+  if(!modelReady)throw new Error('Önce 3D File yüklenmesini bekleyin.');
+  const blob=await exportCurrentProduct(viewer),href=URL.createObjectURL(blob),link=document.createElement('a');
+  link.href=href;link.download=config.download;link.click();setTimeout(()=>URL.revokeObjectURL(href),60000);
+}});
+if(!authored){
+  const ar=document.querySelector('[data-action="ar"]');ar.title='AR ile görüntüle';ar.setAttribute('aria-label','Artırılmış gerçeklik');
+  ar.addEventListener('click',async()=>{
+    if(!modelReady)return;ar.disabled=true;
+    try{await openProductAR(viewer,message=>ui.notice.textContent=message,{worldLock:true});}
+    catch(error){ui.notice.textContent='AR: '+fileLabel(error.message);}
+    finally{ar.disabled=!modelReady;}
+  });
+}
 async function makeProductSheet(){
   await document.fonts.load('700 42px Alexandria');
   await document.fonts.load('400 24px Alexandria');

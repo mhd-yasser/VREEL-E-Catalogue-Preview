@@ -1,4 +1,4 @@
-import {normalizeDraft} from '../product-runtime.js?v=20261010-7';
+import {normalizeDraft} from '../product-runtime.js?v=20261014-1';
 const database = new Promise((resolve, reject) => {
   const request = indexedDB.open("vreel-authoring", 1);
   request.onupgradeneeded = () =>
@@ -62,7 +62,7 @@ export function validation(draft, targetIds = []) {
   const errors = [];
   if (!draft.name.trim()) errors.push("Ürün adı gerekli.");
   if (!draft.model)
-    errors.push("Yüklenmiş ve kontrol edilmiş bir GLB gerekli.");
+    errors.push("Yüklenmiş ve kontrol edilmiş bir 3D File gerekli.");
   if (
     draft.features.downloads &&
     !draft.assets.some((a) => a.kind === "attachments" && a.public)
@@ -108,21 +108,21 @@ export function inspectGLB(buffer) {
     v.getUint32(4, true) !== 2 ||
     v.getUint32(8, true) !== buffer.byteLength
   )
-    throw new Error("Geçerli bir GLB 2.0 dosyası seçin.");
+    throw new Error("Geçerli bir 3D File seçin.");
   const length = v.getUint32(12, true);
   if (v.getUint32(16, true) !== 0x4e4f534a || 20 + length > buffer.byteLength)
-    throw new Error("GLB JSON bölümü geçersiz.");
+    throw new Error("3D File verisi geçersiz.");
   const json = JSON.parse(
     new TextDecoder().decode(new Uint8Array(buffer, 20, length)).trim(),
   );
-  if(!json.scenes?.length||json.scene!==undefined&&(!Number.isInteger(json.scene)||!json.scenes[json.scene]))throw new Error('GLB sahne tanımı geçersiz.');
+  if(!json.scenes?.length||json.scene!==undefined&&(!Number.isInteger(json.scene)||!json.scenes[json.scene]))throw new Error('3D File sahne tanımı geçersiz.');
   if (
     [...(json.buffers || []), ...(json.images || [])].some(
       (x) => x.uri && !x.uri.startsWith("data:"),
     )
   )
     throw new Error(
-      "Model dış dosyalara bağlı. Dokuları GLB içine gömerek yeniden dışa aktarın.",
+      "Model dış dosyalara bağlı. Dokuları 3D File içine gömerek yeniden dışa aktarın.",
     );
   return json;
 }

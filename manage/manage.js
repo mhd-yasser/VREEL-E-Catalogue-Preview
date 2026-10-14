@@ -1,4 +1,5 @@
-import { listProducts } from '../admin/store.js';
+import {isLocalPublication} from '../local-publications.js?v=20261014-1';
+import { listProducts } from '../admin/store.js?v=20261014-1';
 const records = document.querySelector('#records');
 const notice = document.querySelector('#notice');
 const search = document.querySelector('#search');
@@ -24,12 +25,12 @@ function render() {
   records.replaceChildren();
   const term = search.value.trim().toLocaleLowerCase('tr-TR');
   for (const p of products) {
-    const d = p.draft;
-    if (status.value === 'draft' && p.published || status.value === 'published' && !p.published) continue;
+    const d = p.draft, local=isLocalPublication(p);
+    if (status.value === 'draft' && local || status.value === 'published' && !local) continue;
     if (term && ![d.name, d.code, d.category].join(' ').toLocaleLowerCase('tr-TR').includes(term)) continue;
     const links = [['Taslağı düzenle →', `../admin/?edit=${encodeURIComponent(p.id)}`]];
-    if (p.published) links.push(['Yerel ürünü görüntüle ↗', `../product/?view=${encodeURIComponent(p.id)}`]);
-    records.append(row(d.name || 'İsimsiz ürün', [d.code, d.category, p.published ? 'Yerel yayın · düzenlenebilir taslak' : 'Taslak'].filter(Boolean).join(' · '), links, d.category, Boolean(p.published)));
+    if (local) links.push(['Yerel ürünü görüntüle ↗', `../product/?view=${encodeURIComponent(p.id)}`]);
+    records.append(row(d.name || 'İsimsiz ürün', [d.code, d.category, local ? 'Yerel yayın · düzenlenebilir taslak' : 'Taslak'].filter(Boolean).join(' · '), links, d.category, Boolean(local)));
   }
   notice.textContent = records.childElementCount ? `${records.childElementCount} ürün` : products.length ? 'Aramaya uygun ürün bulunamadı.' : 'Henüz ürün yok. “Yeni ürün ekle” ile başlayın.';
 }
