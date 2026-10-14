@@ -1,5 +1,6 @@
 import * as THREE from './vendor/three.module.js';
 import {snapshotProduct} from './product-runtime.js?v=20261010-7';
+import {setupAREnvironment} from './ar-environment.js';
 import {placementSettings,surfacePose,preparePlacement,placeOnSurface} from './ar-placement.js';
 const urls=[];
 window.addEventListener('pagehide',()=>urls.forEach(u=>URL.revokeObjectURL(u)));
@@ -19,7 +20,8 @@ async function webXR(viewer,status){
   const holder=new THREE.Group();holder.add(product);holder.visible=false;scene.add(holder);
   const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});renderer.xr.enabled=true;
   renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(Math.min(devicePixelRatio,2));
-  scene.add(new THREE.HemisphereLight(0xffffff,0x888888,3));const key=new THREE.DirectionalLight(0xffffff,3);key.position.set(2,4,1);scene.add(key);
+  let releaseEnvironment=()=>{};
+  scene.add(new THREE.HemisphereLight(0xffffff,0x888888,.85));const key=new THREE.DirectionalLight(0xffffff,3.2);key.position.set(-2,10,5);scene.add(key);
   const overlay=document.createElement('div');overlay.style.cssText='position:fixed;inset:0;z-index:10000;background:transparent;font-family:Alexandria,sans-serif;touch-action:none';
   const help=document.createElement('p');help.style.cssText='position:absolute;top:16px;left:16px;right:16px;color:white;background:#0f1b2dcc;padding:12px';
   const panel=document.createElement('div');panel.style.cssText='position:absolute;bottom:20px;left:16px;right:16px;display:flex;gap:8px;flex-wrap:wrap';
@@ -35,12 +37,13 @@ async function webXR(viewer,status){
   if(!wall)for(const [label,amount] of [['↶ 5°',Math.PI/36],['5° ↷',-Math.PI/36]])button(label,()=>{if(placed)holder.rotation.y+=amount;});
   if(wall)button('Zemini yeniden tara',()=>{floorY=null;moving=true;holder.visible=false;placed=false;instructions();});
   button('AR kapat',()=>session?.end());
-  const dispose=()=>{hitSource?.cancel();touchSource?.cancel();renderer.setAnimationLoop(null);renderer.dispose();overlay.remove();};
+  const dispose=()=>{hitSource?.cancel();touchSource?.cancel();renderer.setAnimationLoop(null);releaseEnvironment();releaseEnvironment=()=>{};renderer.dispose();overlay.remove();};
   function place(pose){if(!moving||!pose)return;if(wall&&floorY===null){if(pose.kind!=='floor')return;floorY=pose.position.y;instructions();return;}if(placeOnSurface(holder,pose,state,floorY)){placed=true;instructions();}}
   try{
     session=await navigator.xr.requestSession('immersive-ar',{requiredFeatures:['hit-test','dom-overlay'],domOverlay:{root:overlay}});
     session.addEventListener('end',dispose,{once:true});
     renderer.xr.setReferenceSpaceType('local');await renderer.xr.setSession(session);
+    releaseEnvironment=setupAREnvironment(renderer,scene,viewer.arLighting);
     const view=await session.requestReferenceSpace('viewer');hitSource=await session.requestHitTestSource({space:view});
     if(session.requestHitTestSourceForTransientInput)try{touchSource=await session.requestHitTestSourceForTransientInput({profile:'generic-touchscreen'});}catch{}
     session.addEventListener('select',event=>{if(!moving)return;const touches=touchSource&&event.frame.getHitTestResultsForTransientInput(touchSource);const hit=touches?.find(t=>t.inputSource===event.inputSource)?.results[0];if(hit){const pose=hit.getPose(renderer.xr.getReferenceSpace());if(pose)place(surfacePose(new THREE.Matrix4().fromArray(pose.transform.matrix),renderer.xr.getCamera().getWorldPosition(new THREE.Vector3())));}else if(marker.visible)place(currentPose);});
