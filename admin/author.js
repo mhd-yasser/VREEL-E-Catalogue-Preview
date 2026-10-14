@@ -1,11 +1,13 @@
-import {normalizeDraft,sceneSettings,collectScenes,importVariantSettings,applyMaterialVariant,motionSettings,configureMotions,toggleMotion,productErrors,composeProduct} from '../product-runtime.js?v=20261010-7';
+import {publishLocal,asLocalDraft,isLocalPublication} from '../local-publications.js?v=20261014-1';
+import {fileLabel} from '../file-labels.js?v=20261014-1';
+import {normalizeDraft,sceneSettings,collectScenes,importVariantSettings,applyMaterialVariant,motionSettings,configureMotions,toggleMotion,productErrors,composeProduct} from '../product-runtime.js?v=20261014-1';
 import {measurementKey,measurementLabel,unitFactor} from '../dimensions.js';
 import {loadCatalogueProduct} from '../catalogue-store.js';
-import {addARControls} from '../product-ar.js?v=20261010-7';
+import {addARControls} from '../product-ar.js?v=20261014-1';
 import {exportProductPackage, importProductPackage} from './product-package.js?v=20261010-1';
 import {addBariProfile} from './bari-profile.js?v=20261010-1';
 import * as THREE from "three";
-import { createViewer } from "../three-viewer.js?v=20261010-7";
+import { createViewer } from "../three-viewer.js?v=20261014-1";
 import {
   saveProduct,
   listProducts,
@@ -13,7 +15,7 @@ import {
   newDraft,
   validation,
   inspectGLB,
-} from "./store.js?v=20261010-1";
+} from "./store.js?v=20261014-1";
 import {collectComponents, mountAlternatives, applyComponentSelection, componentErrors, materialTargetId} from '../component-options.js?v=20261010-1';
 let components = [], componentNodes = new Map(), activeComponentGroup = null;
 const componentSelection = new Map();
@@ -54,7 +56,7 @@ function releaseDerivedMaps() {
   derivedMaps.clear();
 }
 function notice(message, error = false) {
-  $("notice").textContent = message;
+  $("notice").textContent = fileLabel(message);
   $("notice").classList.toggle("error", error);
 }
 function changed() {
@@ -89,7 +91,7 @@ function fillFields() {
   for (const id of fieldIds) $(id).value = draft[id] || '';
   for (const id of featureIds) $(id).checked = draft.features[id];
   $("model-status").textContent = draft.model
-    ? `${draft.model.name} · ${(draft.model.blob.size / 1048576).toFixed(2)} MB`
+    ? `${fileLabel(draft.model.name)} · ${(draft.model.blob.size / 1048576).toFixed(2)} MB`
     : "Henüz model seçilmedi.";
 }
 function group() {
@@ -319,7 +321,7 @@ function renderAssets() {
       row.append(img);
     }
     row.append(
-      element("span", `${a.name} · ${(a.blob.size / 1048576).toFixed(2)} MB`),
+      element("span", `${fileLabel(a.name)} · ${(a.blob.size / 1048576).toFixed(2)} MB`),
     );
     if (a.kind === "attachments") {
       const label = element("label"),
@@ -483,7 +485,7 @@ function renderOptions() {
       if (a) img.src = assetUrl(a);
       img.alt = "";
       top.append(img);
-    } else if (o.original) top.append(element("span", "GLB", "swatch"));
+    } else if (o.original) top.append(element("span", "3D File", "swatch"));
     else {
       const color = document.createElement("input");
       color.type = "color";
@@ -664,7 +666,7 @@ function renderInfo() {
     for (const a of draft.assets.filter(
       (a) => a.kind === "attachments" && a.public,
     )) {
-      const link = element("a", a.name);
+      const link = element("a", fileLabel(a.name));
       link.href = assetUrl(a);
       link.download = a.name;
       host.append(link);
@@ -679,7 +681,7 @@ async function go(next) {
   if (loading || componentUploadBusy) return;
   readFields();
   if (next > 1 && !draft.model) {
-    notice("Önce bir GLB model ekleyin.", true);
+    notice("Önce bir 3D File ekleyin.", true);
     return;
   }
   if (next > 1 && !loaded) {
@@ -739,7 +741,7 @@ async function refreshDrafts() {
   for (const p of products)
     $("drafts").append(
       new Option(
-        `${p.draft.name || "Adsız ürün"}${p.published ? " · yerel yayın var" : ""}`,
+        `${p.draft.name || "Adsız ürün"}${isLocalPublication(p) ? " · yerel yayın var" : ""}`,
         p.id,
       ),
     );
@@ -786,8 +788,8 @@ async function acceptModel(file) {
     notice(message, true);
     $("model-status").textContent =
       previous && loaded
-        ? `${previous.name} · Önceki model korundu.`
-        : "Model kontrolü başarısız. Geçerli bir GLB seçin.";
+        ? `${fileLabel(previous.name)} · Önceki model korundu.`
+        : "Model kontrolü başarısız. Geçerli bir 3D File seçin.";
   } finally {
     $("model-file").value = "";
   }
@@ -812,7 +814,7 @@ $("drop").ondrop = (e) => {
   $("drop").classList.remove("over");
   const files = e.dataTransfer.files;
   if (files.length !== 1 || !files[0].name.toLowerCase().endsWith(".glb")) {
-    notice("Tek bir GLB dosyası bırakın.", true);
+    notice("Tek bir 3D File bırakın.", true);
     return;
   }
   acceptModel(files[0]);
@@ -906,13 +908,12 @@ $("publish").onclick = async () => {
       return;
     }
     await applyAll();
-    const previous = record.published;
-    record.published = structuredClone(draft);
-    record.publishedAt = new Date().toISOString();
+    const previous = {published:record.published,publishedAt:record.publishedAt,localPublication:record.localPublication};
+    publishLocal(record,draft);
     try {
       await save();
     } catch (e) {
-      record.published = previous;
+      Object.assign(record,previous);
       throw e;
     }
     $("state").textContent = "Yerel yayın hazır";
@@ -976,7 +977,7 @@ $('import-package').onchange = async event => {
     const next = await importProductPackage(JSON.parse(await file.text()));
     inspectGLB(await next.draft.model.blob.arrayBuffer());
     // Import as a new editable copy; never overwrite an existing local draft.
-    next.id = uid(); next.updatedAt = new Date().toISOString();
+    asLocalDraft(next); next.id = uid(); next.updatedAt = new Date().toISOString();
     await saveProduct(next); dirty = false;
     location.href = `${location.pathname}?edit=${encodeURIComponent(next.id)}`;
   } catch (error) { notice(error.message, true); }
@@ -1016,7 +1017,7 @@ async function start() {
       $("clear-highlight").hidden = true;
     } else {
       const catalogueId=new URLSearchParams(location.search).get('catalogue');
-      if(catalogueId){const id=`catalogue:${catalogueId}`;record=await getProduct(id);if(!record){record=await loadCatalogueProduct(catalogueId,true);record.id=id;await saveProduct(record);}draft=normalizeDraft(record.draft);}
+      if(catalogueId){const id=`catalogue:${catalogueId}`;record=await getProduct(id);if(!record){record=asLocalDraft(await loadCatalogueProduct(catalogueId,true));record.id=id;await saveProduct(record);}draft=normalizeDraft(record.draft);}
       if (editId) {
         const saved = await getProduct(editId);
         if (!saved) throw new Error("Kayıt bulunamadı.");
@@ -1096,7 +1097,7 @@ function renderComponentEditor() {
     if(o.assetId)bottom.append(button('Sil',async()=>{g.options=g.options.filter(x=>x.id!==o.id);draft.componentAssets=draft.componentAssets.filter(a=>a.id!==o.assetId);if(draft.schemaVersion===2)draft.animations=draft.animations.map(m=>({...m,tracks:m.tracks.filter(t=>!t.startsWith(`asset-${o.assetId}:`))})).filter(m=>m.tracks.length);removeExternalMaterialTargets(new Set([o.assetId]));if(g.defaultId===o.id)g.defaultId=g.options[0]?.id||null;componentSelection.delete(g.id);changed();await loadModel(draft.model);renderComponentEditor();}));
     if(!o.assetId&&draft.schemaVersion===2&&draft.materialVariants.length){const fallback=element('select');fallback.append(new Option('Özgün malzemeler',''));for(const v of draft.materialVariants)fallback.append(new Option(v.label,v.id));fallback.value=o.defaultVariant||'';fallback.onchange=()=>{o.defaultVariant=fallback.value;changed();applyAll();};row.append(element('small','Seçili malzeme eşleşmezse'),fallback);}
     if(o.assetId&&draft.schemaVersion===2){const align=element('select');align.append(new Option('Dışa aktarılmış konum','exported'),new Option('Merkezleri hizala','center'));align.value=o.alignment||'exported';align.onchange=async()=>{o.alignment=align.value;changed();await loadModel(draft.model);renderComponentEditor();};row.append(align);for(let axis=0;axis<3;axis++){const label=element('label',`${['X','Y','Z'][axis]} (m)`),input=element('input');input.type='number';input.step='any';input.value=o.offset?.[axis]||0;input.onchange=async()=>{o.offset ||= [0,0,0];o.offset[axis]=Number(input.value)||0;changed();await loadModel(draft.model);renderComponentEditor();};label.append(input);row.append(label);}const ext=viewer.model.runtime.externalRuntimes.find(r=>r.root.parent?.userData.componentAsset===o.assetId);if(ext?.scenes.length>1){const scene=element('select');for(const s of ext.scenes.filter(s=>!['0','noAR'].includes(s.name)))scene.append(new Option(s.name,s.id));scene.value=o.sceneId||ext.defaultScene;scene.onchange=async()=>{o.sceneId=scene.value;changed();await loadModel(draft.model);renderComponentEditor();};row.append(element('small','Alternatif dosyanın sahnesi'),scene);}if(ext?.variants.length){const v=element('select');v.append(new Option('Dosyanın özgün malzemesi',''));for(const choice of ext.variants)v.append(new Option(choice.name,choice.id));v.value=o.defaultVariant||'';v.onchange=()=>{o.defaultVariant=v.value;ext.defaultVariant=v.value;changed();applyAll();};row.append(element('small','Eşleşme yoksa kullanılacak malzeme'),v);}}
-    row.append(name,element('small',o.assetId?'Ayrı GLB dosyası':components.find(c=>c.id===o.nodeId)?.path||'Eksik parça'),bottom);options.append(row);
+    row.append(name,element('small',o.assetId?'Ayrı 3D File':components.find(c=>c.id===o.nodeId)?.path||'Eksik parça'),bottom);options.append(row);
   }
   const reference=$('component-reference'),previousReference=reference.value;
   reference.replaceChildren(new Option('Referans parça seçin',''));
@@ -1152,9 +1153,9 @@ $('component-file').onchange=async e=>{
 function renderModelInspection(){
   const host=$('model-inspection');host.replaceChildren();if(draft.schemaVersion!==2)return;
   const rt=viewer.model.runtime;
-  host.append(element('p',`${rt.scenes.length} sahne · ${rt.variants.length} malzeme seçeneği · ${rt.sources.length} hareket. glTF uzunluk birimi metredir; dosyada kaynak Max birimi doğrulanamaz.`,'helper'));
+  host.append(element('p',`${rt.scenes.length} sahne · ${rt.variants.length} malzeme seçeneği · ${rt.sources.length} hareket. 3D File uzunluk birimi metredir; dosyada kaynak Max birimi doğrulanamaz.`,'helper'));
   const label=element('label','Model ölçeği (1 = dosyanın metre ölçeği)'),scale=element('select');
-  for(const [value,name] of [[1,'Metre / doğru glTF ölçeği'],[.01,'Santimetre sayıları → metre'],[.001,'Milimetre sayıları → metre']])scale.append(new Option(name,String(value)));
+  for(const [value,name] of [[1,'Metre / doğru 3D File ölçeği'],[.01,'Santimetre sayıları → metre'],[.001,'Milimetre sayıları → metre']])scale.append(new Option(name,String(value)));
   scale.value=String(draft.modelScale||1);scale.onchange=()=>{draft.modelScale=Number(scale.value);draft.scaleConfirmed=false;changed();applyAll();viewer.reframe();renderModelInspection();};label.append(scale);host.append(label);
   const check=element('input');check.type='checkbox';check.checked=!!draft.scaleConfirmed;check.onchange=()=>{draft.scaleConfirmed=check.checked;changed();};const confirm=element('label','Ölçeği ürünün gerçek ölçüleriyle doğruladım');confirm.prepend(check);host.append(confirm);
   for(const scene of rt.scenes){const b=new THREE.Box3().setFromObject(scene.node),size=b.getSize(new THREE.Vector3());host.append(element('small',`${scene.name}: ${(size.x*draft.modelScale).toFixed(3)} × ${(size.z*draft.modelScale).toFixed(3)} × ${(size.y*draft.modelScale).toFixed(3)} m`));}

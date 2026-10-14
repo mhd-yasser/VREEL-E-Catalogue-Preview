@@ -1,8 +1,9 @@
-import { listProducts } from "../admin/store.js";
+import {isLocalPublication} from '../local-publications.js?v=20261014-1';
+import { listProducts } from "../admin/store.js?v=20261014-1";
 // Local publications are deliberately separate from the deployed catalogue.
 try {
-  const records = (await listProducts()).filter((p) => p.published);
-  if (records.length) {
+  const records = (await listProducts()).filter(isLocalPublication);
+  {
     const section = document.createElement("section");
     section.className = "collection container";
     section.id = "local-publications";
@@ -38,6 +39,7 @@ try {
       grid.append(card);
     }
     section.append(heading, note, grid);
+    if(!records.length){const empty=document.createElement('p');empty.className='empty-state';empty.textContent='Henüz yerel yayın yok. Müşteri demosu için bir taslak hazırlayıp yerel olarak yayınlayın.';section.append(empty);}
     document.querySelector("main").append(section);
   }
 } catch (error) {

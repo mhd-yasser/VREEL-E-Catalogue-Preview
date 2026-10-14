@@ -193,6 +193,6 @@ export function productErrors(d,runtime){
   if(d.defaultVariant&&!d.materialVariants.some(v=>v.id===d.defaultVariant))errors.push('Varsayılan malzeme seçeneği bulunamadı.');
   const claimed=new Set();for(const a of d.animations||[]){if(!a.name?.trim()||!(Number(a.duration)>0)||!a.tracks.length)errors.push('Hareket adı, pozitif süre ve en az bir yol gerekli.');for(const t of a.tracks){if(runtime&&!validTracks.has(t))errors.push('Hareket yolu dosyada bulunamadı.');if(claimed.has(t))errors.push('Bir hareket yolu birden fazla harekete atanamaz.');claimed.add(t);}}
   if(runtime&&measuredBox(runtime.root).isEmpty())errors.push('Seçilen bileşimde ölçülebilir ürün geometrisi yok.');
-  if(!d.scaleConfirmed)errors.push('glTF metre ölçeğini önizlemede doğrulayın.');
+  if(!d.scaleConfirmed)errors.push('3D File metre ölçeğini önizlemede doğrulayın.');
   return [...new Set(errors)];
 }

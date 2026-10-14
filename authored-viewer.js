@@ -1,9 +1,10 @@
-import {normalizeDraft,applyMaterialVariant,configureMotions,toggleMotion} from './product-runtime.js?v=20261010-7';
-import {openProductAR,exportCurrentProduct} from './product-ar.js?v=20261010-7';
+import {is3DFile,fileLabel} from './file-labels.js?v=20261014-1';
+import {normalizeDraft,applyMaterialVariant,configureMotions,toggleMotion} from './product-runtime.js?v=20261014-1';
+import {openProductAR,exportCurrentProduct} from './product-ar.js?v=20261014-1';
 import {measurementLabel} from './dimensions.js';
 import {loadCatalogueProduct} from './catalogue-store.js';
 import {mountAlternatives, applyComponentSelection} from './component-options.js?v=20261010-1';
-import {getProduct} from './admin/store.js?v=20261010-1';
+import {getProduct} from './admin/store.js?v=20261014-1';
 const urls=[];
 const url=asset=>{if(asset.url)return new URL(asset.url,import.meta.url).href;const value=URL.createObjectURL(asset.blob);urls.push(value);return value;};
 window.addEventListener('pagehide',()=>urls.forEach(value=>URL.revokeObjectURL(value)));
@@ -43,13 +44,15 @@ export function prepareAuthoredPage(config,viewer){
   if(d.productSource){try{const source=new URL(d.productSource);if(source.protocol==='https:'){const a=document.createElement('a');a.className='product-source';a.href=source.href;a.target='_blank';a.rel='noopener';a.textContent='Üretici ürün bilgisi ↗';$('#details').append(a);}}catch{}}
   const hint=$('.viewer-hint');hint.textContent=d.animations?.length?'Döndürmek için sürükleyin. Açmak için kapak veya çekmeceye dokunun.':'Döndürmek için sürükleyin. Seçenekleri sağ panelden değiştirin.';
   $('#details h3').textContent='Ürün Dosyaları';$('.coming').hidden=true;$('.material-files').replaceChildren();
-  if(d.features.downloads)for(const a of d.assets.filter(a=>a.kind==='attachments'&&a.public)){const link=document.createElement('a');link.textContent=a.name;link.href=url(a);link.download=a.name;$('.material-files').append(link);}
+  if(d.features.downloads)for(const a of d.assets.filter(a=>a.kind==='attachments'&&a.public&&!is3DFile(a))){const link=document.createElement('a');link.textContent=fileLabel(a.name);link.href=url(a);link.download=a.name;$('.material-files').append(link);}
+  $('#details h3').hidden=!$('.material-files').children.length;
   for(const a of d.assets.filter(a=>a.kind==='photos')){const img=document.createElement('img');img.src=url(a);img.alt=d.name;img.style.cssText='width:100%;height:auto;border-radius:12px;margin-top:16px';$('#details').append(img);}
   $('[data-action="dimensions"]').hidden=!d.features.dimensions;
   viewer.measurementTargets=(d.componentGroups||[]).length?[]:d.dimensionTargets||[];
   $('#source-download').hidden=!d.features.downloads;
-  config.downloadCurrent=async()=>{const button=$('#source-download');button.disabled=true;try{const blob=await exportCurrentProduct(viewer);const a=document.createElement('a');a.href=URL.createObjectURL(blob);urls.push(a.href);a.download=`${d.name}.glb`;a.click();}catch(e){$('#notice').textContent=e.message;}finally{button.disabled=false;}};
-  const ar=$('[data-action="ar"]');ar.hidden=d.ar?.enabled===false;ar.disabled=false;ar.title='AR ile görüntüle';ar.setAttribute('aria-label','Artırılmış gerçeklik');ar.addEventListener('click',async()=>{ar.disabled=true;try{await openProductAR(viewer,message=>$('#notice').textContent=message);}catch(e){$('#notice').textContent=e.message;}finally{ar.disabled=false;}});$('#reset-materials').hidden=!d.features.configurable&&!(d.componentGroups||[]).length;
+  config.sourceFiles=d.assets.filter(a=>a.kind==='attachments'&&a.public&&is3DFile(a)).map(a=>({name:a.name,href:()=>url(a)}));
+  config.downloadCurrent=async()=>{const blob=await exportCurrentProduct(viewer);const a=document.createElement('a');a.href=URL.createObjectURL(blob);urls.push(a.href);a.download=`${d.name}.glb`;a.click();};
+  const ar=$('[data-action="ar"]');ar.hidden=d.ar?.enabled===false;ar.disabled=false;ar.title='AR ile görüntüle';ar.setAttribute('aria-label','Artırılmış gerçeklik');ar.addEventListener('click',async()=>{ar.disabled=true;try{await openProductAR(viewer,message=>$('#notice').textContent=message);}catch(e){$('#notice').textContent=fileLabel(e.message);}finally{ar.disabled=false;}});$('#reset-materials').hidden=!d.features.configurable&&!(d.componentGroups||[]).length;
   $('#add').hidden=!d.features.contact;$('#add').textContent='Teklif İste →';
   $('#add').addEventListener('click',event=>{event.stopImmediatePropagation();location.href=`mailto:${encodeURIComponent(d.email)}?subject=${encodeURIComponent(d.name+' — Teklif talebi')}`;});
 }

@@ -59,7 +59,7 @@ export function createViewer(element){
   const ktx2=new KTX2Loader();ktx2.setTranscoderPath(new URL('vendor/addons/libs/basis/',moduleRoot).href);ktx2.detectSupport(renderer);
   const loader=new GLTFLoader();registerProductLoader(loader);loader.setDRACOLoader(draco);loader.setKTX2Loader(ktx2);loader.setMeshoptDecoder(MeshoptDecoder);
   const textureLoader=new THREE.TextureLoader();
-  function parseModel(bytes){return new Promise((resolve,reject)=>{const timeout=setTimeout(()=>reject(new Error('GLB yüklemesi zaman aşımına uğradı. Draco / Meshopt / KTX2 verisini ve dosyayı kontrol edin.')),90000);loader.parse(bytes,'',gltf=>{clearTimeout(timeout);resolve(gltf);},error=>{clearTimeout(timeout);reject(error);});});}
+  function parseModel(bytes){return new Promise((resolve,reject)=>{const timeout=setTimeout(()=>reject(new Error('3D File yüklemesi zaman aşımına uğradı. Draco / Meshopt / KTX2 verisini ve dosyayı kontrol edin.')),90000);loader.parse(bytes,'',gltf=>{clearTimeout(timeout);resolve(gltf);},error=>{clearTimeout(timeout);reject(error);});});}
 
   function size(){const w=Math.max(1,element.clientWidth),h=Math.max(1,element.clientHeight);renderer.setSize(w,h);camera.aspect=w/h;camera.updateProjectionMatrix();}
   new ResizeObserver(size).observe(element);size();

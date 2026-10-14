@@ -13,7 +13,7 @@ global.indexedDB = indexedDB;
     bytes.byteOffset + bytes.byteLength,
   );
   assert(inspectGLB(buffer).meshes.length > 0);
-  assert.throws(() => inspectGLB(new ArrayBuffer(22)), /GLB/);
+  assert.throws(() => inspectGLB(new ArrayBuffer(22)), /3D File/);
   const json = JSON.stringify({
     asset: { version: "2.0" },scenes:[{}],
     images: [{ uri: "external.jpg" }],

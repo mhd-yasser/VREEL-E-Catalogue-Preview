@@ -1,0 +1,14 @@
+import assert from 'node:assert/strict';
+import {ARWorldAnchor} from '../ar-world-anchor.js';
+globalThis.XRRigidTransform=class{constructor(position,orientation){this.position=position;this.orientation=orientation;}};
+const p={x:1,y:.2,z:-2},q={x:0,y:0,z:0,w:1},ref={},anchor=new ARWorldAnchor();let created=0,deleted=0,resolve;
+const native={anchorSpace:{},delete(){deleted++;}},pose={transform:{position:p,orientation:q}};
+const frame={createAnchor(transform,space){created++;assert.equal(space,ref);assert.deepEqual(transform.position,p);return new Promise(r=>resolve=r);},trackedAnchors:new Set(),getPose(){return pose;}};
+anchor.request(p,q);assert.equal(anchor.update(frame,ref),null);anchor.update(frame,ref);assert.equal(created,1);
+resolve(native);await Promise.resolve();assert.equal(anchor.mode,'anchored');assert.equal(anchor.update(frame,ref),null);
+frame.trackedAnchors.add(native);assert.equal(anchor.update(frame,ref),pose);frame.getPose=()=>null;assert.equal(anchor.update(frame,ref),null);frame.getPose=()=>pose;assert.equal(anchor.update(frame,ref),pose);
+anchor.clear();assert.equal(deleted,1);assert.equal(anchor.mode,'idle');
+anchor.request(p,q);anchor.update(frame,ref);anchor.clear();resolve(native);await Promise.resolve();assert.equal(deleted,2);assert.equal(anchor.anchor,null);
+anchor.request(p,q);anchor.update({createAnchor:()=>Promise.reject(new Error('unsupported'))},ref);await Promise.resolve();await Promise.resolve();assert.equal(anchor.mode,'local');
+anchor.request(p,q);anchor.update({},ref);assert.equal(anchor.mode,'local');
+console.log('PASS: one anchor per lock; materialization/tracking loss/recovery; async cancellation and cleanup; unsupported-device fallback.');

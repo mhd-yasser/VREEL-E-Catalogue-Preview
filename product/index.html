@@ -52,7 +52,7 @@
         <button type="button" data-action="snapshot" title="Görüntü kaydet" aria-label="Görüntü kaydet"><svg><use href="#ico-camera"/></svg></button>
         <button type="button" data-action="snapshot-4k" title="4K görüntü kaydet" aria-label="4K görüntü kaydet">4K</button>
         <button type="button" data-action="dimensions" aria-pressed="false" title="Ölçüleri göster" aria-label="Ölçüleri göster"><svg><use href="#ico-measure"/></svg></button>
-        <button type="button" data-action="ar" disabled title="AR yakında" aria-label="Artırılmış gerçeklik, yakında"><svg><use href="#ico-ar"/></svg></button>
+        <button type="button" data-action="ar" disabled title="AR ile görüntüle" aria-label="Artırılmış gerçeklik"><svg><use href="#ico-ar"/></svg></button>
         <button type="button" data-action="fullscreen" title="Tam ekran" aria-label="Tam ekran"><svg><use href="#ico-expand"/></svg></button>
       </div>
       <div id="dimensions-overlay" class="dimensions-overlay" hidden aria-live="polite"></div>
@@ -148,6 +148,7 @@
       <h2 id="source-title">3D İndir</h2>
       <p>Şirket bilgilerinizi doğrulayın ve indirmek istediğiniz dosya türünü seçin. Bu form şu anda bilgilerinizi göndermez veya kaydetmez.</p>
       <form id="source-form">
+        <label>Ad Soyad <input name="person" autocomplete="name" required maxlength="100"></label>
         <label>Şirket adı <input name="company" autocomplete="organization" placeholder="Şirket adınız" required maxlength="120"></label>
         <label>Şirket türü <select name="type" required><option value="Mimarlık ofisi" selected>Mimarlık ofisi</option><option value="İç mimarlık firması">İç mimarlık firması</option><option value="Gayrimenkul geliştiricisi">Gayrimenkul geliştiricisi</option><option value="Mobilya üreticisi">Mobilya üreticisi</option><option value="Diğer">Diğer</option></select></label>
         <label>E-posta <input name="email" type="email" autocomplete="email" placeholder="ad@firma.com" required maxlength="160"></label>
@@ -155,7 +156,7 @@
         <button class="primary" type="submit">Bilgileri Onayla</button>
       </form>
       <div id="source-downloads" hidden>
-        <p class="source-note">Dosyalar henüz yüklenmedi. Hazır olan türler burada indirilebilir.</p>
+        <p class="source-note">Mevcut seçimlerle 3D File veya hazır kaynak dosyalarını indirin.</p>
         <div class="source-actions"><button type="button" data-source-format="dwg">DWG İndir</button><button type="button" data-source-format="max">3ds Max İndir</button><button type="button" data-source-format="fbx">FBX İndir</button></div>
         <p id="source-status" class="notice" role="status"></p>
       </div>
@@ -167,6 +168,6 @@
       <div class="confirm-actions"><button type="button" id="cancel-reset">Vazgeç</button><button type="button" id="confirm-reset" class="primary">Evet, sıfırla</button></div>
     </div>
   </div>
-  <script type="module" src="../viewer-app.js?v=20261010-7"></script>
+  <script type="module" src="../viewer-app.js?v=20261014-1"></script>
 </body>
 </html>
