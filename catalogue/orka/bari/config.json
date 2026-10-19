@@ -366,7 +366,33 @@
             "defaultVariant": "variant-0"
           }
         ],
-        "defaultId": "fde824b4-8253-4eff-bca8-5f8f2d0d3956"
+        "defaultId": "fde824b4-8253-4eff-bca8-5f8f2d0d3956",
+        "compatibility": {
+          "sourceGroupId": "47d60542-ad62-4cba-866b-c0f65a89f2aa",
+          "choices": {
+            "1bf59b4f-03c8-4a47-be9a-dbbc8ef4e819": {
+              "allowedIds": [
+                "0a5f0e63-2cbd-4e04-aa2d-30de7f161813",
+                "e8702161-91c8-4383-ab0d-255e4330b8de"
+              ],
+              "defaultId": "e8702161-91c8-4383-ab0d-255e4330b8de"
+            },
+            "e2b25cd0-992d-4951-bbbc-9f0ace5d898c": {
+              "allowedIds": [
+                "045493cb-7a80-465f-a0a3-67aa557a56f7",
+                "cd45d582-3cb0-4d95-9375-be7e15a71d1d"
+              ],
+              "defaultId": "cd45d582-3cb0-4d95-9375-be7e15a71d1d"
+            },
+            "d0c68b0b-52a5-4763-9373-83249814f9cb": {
+              "allowedIds": [
+                "4721ea93-e5cf-4bf6-aa01-9818345d5fc9",
+                "fde824b4-8253-4eff-bca8-5f8f2d0d3956"
+              ],
+              "defaultId": "fde824b4-8253-4eff-bca8-5f8f2d0d3956"
+            }
+          }
+        }
       }
     ],
     "componentAssets": [],
@@ -739,7 +765,33 @@
             "defaultVariant": "variant-0"
           }
         ],
-        "defaultId": "fde824b4-8253-4eff-bca8-5f8f2d0d3956"
+        "defaultId": "fde824b4-8253-4eff-bca8-5f8f2d0d3956",
+        "compatibility": {
+          "sourceGroupId": "47d60542-ad62-4cba-866b-c0f65a89f2aa",
+          "choices": {
+            "1bf59b4f-03c8-4a47-be9a-dbbc8ef4e819": {
+              "allowedIds": [
+                "0a5f0e63-2cbd-4e04-aa2d-30de7f161813",
+                "e8702161-91c8-4383-ab0d-255e4330b8de"
+              ],
+              "defaultId": "e8702161-91c8-4383-ab0d-255e4330b8de"
+            },
+            "e2b25cd0-992d-4951-bbbc-9f0ace5d898c": {
+              "allowedIds": [
+                "045493cb-7a80-465f-a0a3-67aa557a56f7",
+                "cd45d582-3cb0-4d95-9375-be7e15a71d1d"
+              ],
+              "defaultId": "cd45d582-3cb0-4d95-9375-be7e15a71d1d"
+            },
+            "d0c68b0b-52a5-4763-9373-83249814f9cb": {
+              "allowedIds": [
+                "4721ea93-e5cf-4bf6-aa01-9818345d5fc9",
+                "fde824b4-8253-4eff-bca8-5f8f2d0d3956"
+              ],
+              "defaultId": "fde824b4-8253-4eff-bca8-5f8f2d0d3956"
+            }
+          }
+        }
       }
     ],
     "componentAssets": [],

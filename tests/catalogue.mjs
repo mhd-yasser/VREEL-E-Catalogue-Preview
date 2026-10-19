@@ -34,6 +34,8 @@ for(const [unit,label] of [['cm','G 85 cm'],['mm','G 850 mm'],['m','G 0.85 m']])
 assert.equal(measurementLabel({...record.draft,unit:'cm'},{part:key,axis:'D',value:.47}),'D 47 cm');
 const restored=await importProductPackage(await exportProductPackage(record));
 assert.deepEqual(restored.draft.elementDimensions,record.draft.elementDimensions);
+assert.deepEqual(restored.draft.componentGroups,record.draft.componentGroups);
+assert.deepEqual(restored.published.componentGroups,record.published.componentGroups);
 assert.equal(restored.published.elementDimensions,undefined,'editing a draft must preserve its publication');
 assert.equal(restored.draft.model.blob.size,(await readFile(new URL(draft.model.url,root))).length);
 console.log('PASS: catalogue binary integrity, editable hydration, preserved ORKA configuration, stable per-element dimensions, unit conversion, package persistence and publication isolation.');

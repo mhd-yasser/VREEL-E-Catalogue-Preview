@@ -1,3 +1,4 @@
+import {resolveCompatibility,compatibilityErrors} from './option-compatibility.js';
 import * as THREE from './vendor/three.module.js';
 
 // Tag at dependency creation time: GLTFLoader reduces its association map per scene.
@@ -85,8 +86,9 @@ export function composeProduct(runtime,draft,selection=new Map(),ar=false){
   runtime.ar=draft.ar||{enabled:true};
   runtime.scaleConfirmed=!!draft.scaleConfirmed;
   runtime.root.scale.setScalar(Number(draft.modelScale)||1);
+  resolveCompatibility(draft,selection);
   const chosen=new Set();
-  for(const group of draft.componentGroups||[]){const option=group.options.find(o=>o.id===(selection.get(group.id)||group.defaultId));if(option)chosen.add(option.assetId?`asset-${option.assetId}`:option.nodeId);}
+  for(const group of draft.componentGroups||[]){const option=group.options.find(o=>o.id===(selection.get(group.id)));if(option)chosen.add(option.assetId?`asset-${option.assetId}`:option.nodeId);}
   const settings=draft.scenes||[];
   for(const s of runtime.scenes){
     const config=settings.find(c=>c.id===s.id)||{role:'unassigned',measure:true};
@@ -180,7 +182,7 @@ export function snapshotProduct(root,ar=false){
   root.updateMatrixWorld(true);return copy(root);
 }
 export function productErrors(d,runtime){
-  const errors=[],used=new Set();
+  const errors=compatibilityErrors(d),used=new Set();
   for(const g of d.componentGroups||[]){
     if(!g.name?.trim()||g.options.length<2||!g.options.some(o=>o.id===g.defaultId))errors.push(`${g.name||'Grup'}: ad, iki alternatif ve varsayılan seçim gerekli.`);
     for(const o of g.options){if(!o.label?.trim())errors.push('Alternatif adı gerekli.');const id=o.assetId?`asset-${o.assetId}`:o.nodeId;if(used.has(id))errors.push('Bir sahne yalnızca bir alternatif grubuna atanabilir.');used.add(id);

@@ -1,10 +1,10 @@
 import {fileLabel} from './file-labels.js?v=20261014-1';
 import {openProductAR,exportCurrentProduct} from './product-ar.js?v=20261014-1';
 import {bindSourceDownloads} from './source-downloads.js?v=20261014-1';
-import {materialTargetId} from './component-options.js?v=20261010-1';
+import {materialTargetId} from './component-options.js?v=20261019-compatibility';
 import * as THREE from 'three';
 import {createViewer} from './three-viewer.js?v=20261014-1';
-import {loadAuthoredConfig, paintAuthored, prepareAuthoredPage, updateAuthoredDimensions, prepareAuthoredComponents} from './authored-viewer.js?v=20261014-1';
+import {loadAuthoredConfig, paintAuthored, prepareAuthoredPage, updateAuthoredDimensions, prepareAuthoredComponents} from './authored-viewer.js?v=20261019-compatibility';
 import {woodPreviews} from './texture-previews.js';
 
 const page=document.body.dataset.product;
@@ -103,7 +103,7 @@ function buildMaterials(){ui.groups.replaceChildren();ui.details.replaceChildren
 function updateText(){ui.selection.textContent=[...Object.values(authored?.componentChoices||{}).map(c=>`${c.label}: ${c.value}`),...Object.entries(config.groups).map(([key,spec])=>`${spec.label}: ${choice(key).label}`)].join(' · ');for(const [id,c] of Object.entries(authored?.componentChoices||{})){const dd=document.querySelector(`[data-component-detail="${id}"]`);if(dd)dd.textContent=c.value;}for(const key of Object.keys(config.groups)){document.querySelectorAll(`[data-summary="${key}"],[data-detail="${key}"]`).forEach(node=>node.textContent=choice(key).label);document.querySelectorAll(`[data-material="${key}"]`).forEach(node=>node.classList.toggle('active',node.dataset.value===state[key]));}}
 function select(key,id){state[key]=id;updateText();applyGroup(key);if(wheelGroup===key)renderWheel();}
 
-function addVariantCard(title,options,initial,onChange){const card=document.createElement('details');card.className='option-card';card.open=true;card.innerHTML=`<summary><span>${esc(title)}</span><b>${esc(options.find(x=>x.id===initial).label)}</b></summary><div class="option-body variant-options">${options.map(x=>`<button type="button" data-variant="${x.id}" class="${x.id===initial?'active':''}">${esc(x.label)}</button>`).join('')}</div>`;ui.groups.prepend(card);card.addEventListener('click',event=>{const button=event.target.closest('[data-variant]');if(!button)return;card.querySelectorAll('[data-variant]').forEach(x=>x.classList.toggle('active',x===button));card.querySelector('summary b').textContent=options.find(x=>x.id===button.dataset.variant).label;onChange(button.dataset.variant);});return card;}
+function addVariantCard(title,options,initial,onChange){const card=document.createElement('details');card.className='option-card';card.open=true;card.innerHTML=`<summary><span>${esc(title)}</span><b>${esc(options.find(x=>x.id===initial).label)}</b></summary><div class="option-body variant-options">${options.map(x=>`<button type="button" data-variant="${x.id}" class="${x.id===initial?'active':''}">${esc(x.label)}</button>`).join('')}</div>`;ui.groups.prepend(card);card.addEventListener('click',event=>{const button=event.target.closest('[data-variant]');if(!button||button.disabled)return;card.querySelectorAll('[data-variant]').forEach(x=>x.classList.toggle('active',x===button));card.querySelector('summary b').textContent=options.find(x=>x.id===button.dataset.variant).label;onChange(button.dataset.variant);});return card;}
 let resetConfiguration=()=>{};
 function setupSofa(){
   const nodes=viewer.model.nodes;
