@@ -1,9 +1,10 @@
+import {resolveCompatibility,allowedOptions,orderedGroups} from './option-compatibility.js';
 import {is3DFile,fileLabel} from './file-labels.js?v=20261014-1';
-import {normalizeDraft,applyMaterialVariant,configureMotions,toggleMotion} from './product-runtime.js?v=20261014-1';
+import {normalizeDraft,applyMaterialVariant,configureMotions,toggleMotion} from './product-runtime.js?v=20261019-compatibility';
 import {openProductAR,exportCurrentProduct} from './product-ar.js?v=20261014-1';
 import {measurementLabel} from './dimensions.js';
 import {loadCatalogueProduct} from './catalogue-store.js';
-import {mountAlternatives, applyComponentSelection} from './component-options.js?v=20261010-1';
+import {mountAlternatives, applyComponentSelection} from './component-options.js?v=20261019-compatibility';
 import {getProduct} from './admin/store.js?v=20261014-1';
 const urls=[];
 const url=asset=>{if(asset.url)return new URL(asset.url,import.meta.url).href;const value=URL.createObjectURL(asset.blob);urls.push(value);return value;};
@@ -75,25 +76,56 @@ export async function prepareAuthoredComponents(config,viewer,addCard,onChange){
 
 
   }
+  resolveCompatibility(config.draft,selection);
   applyComponentSelection(nodes,groups,selection);
-  config.componentChoices={...config.componentChoices,...Object.fromEntries(groups.map(g=>[g.id,{label:g.name,value:g.options.find(o=>o.id===g.defaultId).label}]))};
+  config.componentChoices={...config.componentChoices,...Object.fromEntries(groups.map(g=>[g.id,{label:g.name,value:g.options.find(o=>o.id===selection.get(g.id))?.label||'Seçenek yok'}]))};
   const cards=[];
+  function refreshCards(){
+    for(const {group,card} of cards){
+      const allowed=new Set(allowedOptions(group,selection).map(o=>o.id));
+      const value=group.options.find(o=>o.id===selection.get(group.id))?.label||'Seçenek yok';
+      config.componentChoices[group.id].value=value;
+      card.querySelector('summary b').textContent=value;
+      card.querySelectorAll('[data-variant]').forEach(b=>{
+        b.disabled=!allowed.has(b.dataset.variant);
+        b.setAttribute?.('aria-disabled',String(b.disabled));
+        b.title=b.disabled?'Seçili ürün seçeneğiyle uyumlu değil.':'';
+        b.classList.toggle('active',b.dataset.variant===selection.get(group.id));
+        b.setAttribute?.('aria-pressed',String(b.dataset.variant===selection.get(group.id)));
+      });
+    }
+  }
   for(const [id,entry] of Object.entries(config.componentChoices)){
     const row=document.createElement('div'),dt=document.createElement('dt'),dd=document.createElement('dd');
     dt.textContent=entry.label;dd.dataset.componentDetail=id;dd.textContent=entry.value;
     row.append(dt,dd);document.querySelector('#material-details').append(row);
   }
-  for(const group of [...groups].reverse()){
-    cards.push({group,card:addCard(group.name,group.options,group.defaultId,id=>{
-      config.componentChoices[group.id].value=group.options.find(o=>o.id===id).label;
-      selection.set(group.id,id);applyComponentSelection(nodes,groups,selection);
+  for(const group of [...orderedGroups(config.draft)].reverse()){
+    cards.push({group,card:addCard(group.name,group.options,selection.get(group.id)||group.defaultId,id=>{
+      if(!allowedOptions(group,selection).some(o=>o.id===id))return;
+      selection.set(group.id,id);
+      const adjustments=resolveCompatibility(config.draft,selection);
+      applyComponentSelection(nodes,groups,selection);refreshCards();
+      const notice=document.querySelector('#notice');
+      if(notice)notice.textContent=adjustments.length?adjustments.map(change=>{
+        const dependent=groups.find(g=>g.id===change.groupId);
+        const label=dependent.options.find(o=>o.id===change.next)?.label||'Seçenek yok';
+        return `${dependent.name}, seçiminize uyacak şekilde değiştirildi: ${label}.`;
+      }).join(' '):'';
       viewer.requestUpdate();onChange();
     })});
   }
+  refreshCards();
+  for(const {group,card} of cards)if(group.compatibility){
+    const note=document.createElement('p');note.className='helper';
+    note.textContent='Pasif seçenekler, seçili ürün seçeneğiyle uyumlu değildir.';card.append(note);
+  }
   if(groups.length)viewer.reframe();
-  return ()=>{config.nativeReset?.();if(config.draft.schemaVersion===2)configureMotions(config.runtime,config.draft.animations);selection.clear();applyComponentSelection(nodes,groups);for(const {group,card} of cards){
-    card.querySelectorAll('[data-variant]').forEach(b=>b.classList.toggle('active',b.dataset.variant===group.defaultId));
-    config.componentChoices[group.id].value=group.options.find(o=>o.id===group.defaultId).label;
-    card.querySelector('summary b').textContent=config.componentChoices[group.id].value;
-  }viewer.reframe();onChange();};
+  return ()=>{
+    config.nativeReset?.();
+    if(config.draft.schemaVersion===2)configureMotions(config.runtime,config.draft.animations);
+    selection.clear();resolveCompatibility(config.draft,selection);applyComponentSelection(nodes,groups,selection);
+    refreshCards();const notice=document.querySelector('#notice');if(notice)notice.textContent='';
+    viewer.reframe();onChange();
+  };
 }

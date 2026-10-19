@@ -1,4 +1,5 @@
-import {composeProduct,measuredBox} from './product-runtime.js?v=20261010-7';
+import {resolveCompatibility,compatibilityErrors} from './option-compatibility.js';
+import {composeProduct,measuredBox} from './product-runtime.js?v=20261019-compatibility';
 import * as THREE from './vendor/three.module.js';
 
 // Source node IDs remain stable even when the loader sanitizes or duplicates names.
@@ -79,8 +80,9 @@ export async function mountAlternatives(viewer, draft, assetUrl) {
 }
 export function applyComponentSelection(components, groups, selection = new Map()) {
   if(components.runtime){composeProduct(components.runtime,components.draft,selection,components.arPreview);return;}
+  resolveCompatibility({componentGroups:groups},selection);
   for (const group of groups || []) {
-    const selected = selection.get(group.id) || group.defaultId;
+    const selected = selection.get(group.id);
     for (const option of group.options) {
       const key = option.assetId ? `asset-${option.assetId}` : option.nodeId;
       const node = components.get(key);
@@ -89,7 +91,7 @@ export function applyComponentSelection(components, groups, selection = new Map(
   }
 }
 export function componentErrors(draft, available) {
-  const errors = [], used = new Set();
+  const errors = compatibilityErrors(draft), used = new Set();
   const ids = new Set(available.map(c => c.id));
   const assigned = [];
   for (const group of draft.componentGroups || []) {

@@ -1,6 +1,7 @@
+import {resolveCompatibility,allowedOptions,compatibilityErrors} from '../option-compatibility.js';
 import {publishLocal,asLocalDraft,isLocalPublication} from '../local-publications.js?v=20261014-1';
 import {fileLabel} from '../file-labels.js?v=20261014-1';
-import {normalizeDraft,sceneSettings,collectScenes,importVariantSettings,applyMaterialVariant,motionSettings,configureMotions,toggleMotion,productErrors,composeProduct} from '../product-runtime.js?v=20261014-1';
+import {normalizeDraft,sceneSettings,collectScenes,importVariantSettings,applyMaterialVariant,motionSettings,configureMotions,toggleMotion,productErrors,composeProduct} from '../product-runtime.js?v=20261019-compatibility';
 import {measurementKey,measurementLabel,unitFactor} from '../dimensions.js';
 import {loadCatalogueProduct} from '../catalogue-store.js';
 import {addARControls} from '../product-ar.js?v=20261014-1';
@@ -16,7 +17,7 @@ import {
   validation,
   inspectGLB,
 } from "./store.js?v=20261014-1";
-import {collectComponents, mountAlternatives, applyComponentSelection, componentErrors, materialTargetId} from '../component-options.js?v=20261010-1';
+import {collectComponents, mountAlternatives, applyComponentSelection, componentErrors, materialTargetId} from '../component-options.js?v=20261019-compatibility';
 let components = [], componentNodes = new Map(), activeComponentGroup = null;
 const componentSelection = new Map();
 const $ = (id) => document.getElementById(id),
@@ -555,6 +556,7 @@ function renderOptions() {
 }
 function renderPreviewOptions(host) {
   host.replaceChildren();
+  resolveCompatibility(draft,componentSelection);
   for (const g of draft.componentGroups || []) {
     const block = element('div', undefined, 'preview-group');
     block.append(element('strong', g.name));
@@ -564,7 +566,9 @@ function renderPreviewOptions(host) {
         applyComponentSelection(componentNodes,draft.componentGroups,componentSelection);
         viewer.requestUpdate(); renderInfo(); renderPreviewOptions(host);
       });
-      b.classList.toggle('active',o.id === (componentSelection.get(g.id)||g.defaultId));
+      b.disabled=!allowedOptions(g,componentSelection).some(option=>option.id===o.id);
+      b.title=b.disabled?'Seçili ürün seçeneğiyle uyumlu değil.':'';
+      b.classList.toggle('active',o.id === componentSelection.get(g.id));
       b.setAttribute('aria-pressed',String(b.classList.contains('active')));
       block.append(b);
     }
@@ -1067,6 +1071,7 @@ function renderComponentEditor() {
   }
   const g=componentGroup(); $('component-group-editor').hidden=!g; if(!g)return;
   $('component-group-name').value=g.name;
+  renderCompatibilityEditor(g);
   const list=$('component-nodes'); list.replaceChildren();
   if(!components.length)list.append(element('p','Dosyada sahne bulunamadı.','helper'));
   const assigned=(draft.componentGroups||[]).flatMap(x=>x.options).filter(o=>o.nodeId).map(o=>o.nodeId);
@@ -1211,4 +1216,39 @@ function renderElementDimensions(){
  for(const scene of viewer?.model.runtime?.scenes||[]){const settings=draft.scenes.find(s=>s.id===scene.id);if(['decoration','excluded'].includes(settings?.role)||settings?.measure===false)continue;for(const [index,node] of scene.node.children.entries())entries.push({key:measurementKey(scene,node,index),name:node.userData.sourceName||node.name||scene.name});}
  for(const [key,node] of viewer?.model.runtime?.external||[])entries.push({key,name:node.userData.sourceName||node.name||key});
  for(const entry of entries){const group=element('fieldset');group.append(element('legend',entry.name));for(const [axis,name] of [['width','Genişlik'],['depth','Derinlik'],['height','Yükseklik']]){const label=element('label',`${name} (${draft.unit||'cm'})`),input=element('input');input.type='number';input.min='0.01';input.step='any';input.placeholder='Modelden';const value=draft.elementDimensions?.[entry.key]?.[axis];input.value=value?Number((value*unitFactor(draft.unit)).toFixed(4)):'';input.onchange=()=>{draft.elementDimensions||={};draft.elementDimensions[entry.key]||={};if(input.value===''||Number(input.value)<=0)delete draft.elementDimensions[entry.key][axis];else draft.elementDimensions[entry.key][axis]=Number(input.value)/unitFactor(draft.unit);changed();viewer.requestUpdate();renderInfo();};label.append(input);group.append(label);}host.append(group);}
+}
+
+// One source group per dependent group; the editor only offers independent sources.
+function renderCompatibilityEditor(group){
+  const host=$('component-compatibility');host.replaceChildren();
+  const source=element('select');source.setAttribute('aria-label','Uyumluluk kaynak grubu');
+  source.append(new Option('Bağımsız — tüm seçenekler kullanılabilir',''));
+  for(const candidate of draft.componentGroups.filter(g=>g.id!==group.id&&!g.compatibility))source.append(new Option(candidate.name,candidate.id));
+  if(group.compatibility&&!draft.componentGroups.some(g=>g.id===group.compatibility.sourceGroupId&&!g.compatibility))source.append(new Option('Geçersiz kaynak — yeniden seçin',group.compatibility.sourceGroupId));
+  source.value=group.compatibility?.sourceGroupId||'';
+  const label=element('label','Seçenekleri şu gruba göre sınırla');label.append(source);host.append(element('h4','Koşullu uyumluluk'),label);
+  host.append(element('p','Her kaynak seçeneği için izin verilen alternatifleri ve otomatik geçişte kullanılacak varsayılanı belirleyin.','helper'));
+  source.onchange=()=>{
+    if(source.value)group.compatibility={sourceGroupId:source.value,choices:{}};else delete group.compatibility;
+    changed();renderCompatibilityEditor(group);refreshComponentPreview();
+  };
+  const parent=draft.componentGroups.find(g=>g.id===group.compatibility?.sourceGroupId);
+  if(!parent)return;
+  for(const option of parent.options){
+    const config=group.compatibility;config.choices ||= {};const rule=config.choices[option.id]||{allowedIds:[],defaultId:null};
+    const block=element('fieldset');block.append(element('legend',`${parent.name}: ${option.label}`));
+    for(const target of group.options){
+      const row=element('label'),check=element('input');check.type='checkbox';check.checked=rule.allowedIds.includes(target.id);check.setAttribute('aria-label',`${option.label}: ${target.label}`);
+      check.onchange=()=>{
+        rule.allowedIds=check.checked?[...new Set([...rule.allowedIds,target.id])]:rule.allowedIds.filter(id=>id!==target.id);
+        if(!rule.allowedIds.includes(rule.defaultId))rule.defaultId=null;
+        config.choices[option.id]=rule;changed();renderCompatibilityEditor(group);refreshComponentPreview();
+      };row.append(check,element('span',target.label));block.append(row);
+    }
+    const fallback=element('select');fallback.setAttribute('aria-label',`${option.label}: varsayılan`);fallback.append(new Option('Varsayılan seçin',''));
+    for(const target of group.options.filter(o=>rule.allowedIds.includes(o.id)))fallback.append(new Option(target.label,target.id));fallback.value=rule.defaultId||'';
+    fallback.onchange=()=>{rule.defaultId=fallback.value||null;config.choices[option.id]=rule;changed();renderCompatibilityEditor(group);refreshComponentPreview();};
+    const fallbackLabel=element('label','Uyumsuz seçimde geçilecek alternatif');fallbackLabel.append(fallback);block.append(fallbackLabel);host.append(block);
+  }
+  for(const message of compatibilityErrors(draft).filter(text=>text.startsWith(group.name+':')||text.startsWith(group.name+' /')))host.append(element('p',message,'error'));
 }
